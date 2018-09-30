@@ -1,0 +1,14 @@
+Rebuild native module:
+    NODE_MODULE_VERSION refers to the ABI (application binary interface) version number of Node.js, used to determine which versions of Node.js compiled C++ add-on binaries can be loaded in to without needing to be re-compiled. It used to be stored as hex value in earlier versions, but is now represented as an integer. https://nodejs.org/en/download/releases/
+    https://github.com/electron/electron-rebuild
+
+
+https://www.npmjs.com/package/serialport-builds-electron
+
+
+- Execute:
+    cd C:\Users\Bernd\AppData\Roaming\npm\node_modules\electron-rebuild\node_modules\
+    npm install node-abi  (this updates node-abi to at least version 2.4.4 in order to recognize Electron 3.x.x)
+    
+    electron-rebuild --version 3.0.2 --force
+    
