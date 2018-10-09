@@ -7,12 +7,13 @@ const FREQUENCIES = require('require-all')(__dirname +'/frequency_data');
 
 var START_FREQ = undefined;
 var STOP_FREQ  = undefined;
-var FREQ_STEP  = undefined; // Leaving this value undefined because we take the readout from the device in order to align correctly
+var FREQ_STEP  = undefined;
 var MAX_DBM    = -30;
 var MIN_DBM    = -110;
+var SWEEP_POINTS = 112;
+var CHANNEL_TABLE = undefined;
 
 var data_receive_array  = [];
-var max_array           = [];
 var receiving_new_sweep = false;
 
 const chartColors = {
@@ -29,7 +30,7 @@ let RECOMMENDED_CHANNELS_COLOR = chartColors.GREEN;
 let FORBIDDEN_COLOR            = chartColors.RED;
 let SCAN_COLOR                 = chartColors.PURPLE;
 
-let SENNHEISER_CHANNEL_WIDTH   = 96; // +/-48kHz Spitzenhub
+let SENNHEISER_CHANNEL_WIDTH   = 96000; // +/-48kHz Spitzenhub
 
 var ctx = document.getElementById("graph2d").getContext('2d');
 var myChart = new Chart(ctx, {
@@ -37,11 +38,14 @@ var myChart = new Chart(ctx, {
     data: {
         datasets: [
             {
-                label: 'Fill',
-                borderWidth: 1,
-                pointRadius: 0,
-                fill: false,
-                spanGaps: true
+                label: 'Live scan',
+                backgroundColor: Chart.helpers.color(SCAN_COLOR).alpha(0.2).rgbString(),
+                borderColor: SCAN_COLOR,
+                pointBackgroundColor: SCAN_COLOR,
+                borderWidth: 2,
+                fill: 'start',
+                lineTension: 0.4,
+                pointRadius: 1.5
             },{
                 label: 'Recommended by manuf.',
                 backgroundColor: Chart.helpers.color(RECOMMENDED_CHANNELS_COLOR).alpha(0.2).rgbString(),
@@ -49,49 +53,35 @@ var myChart = new Chart(ctx, {
                 borderWidth: 2,
                 pointRadius: 0,
                 lineTension: 0,
-                fill: 0,
-                spanGaps: false
+                fill: 'start',
+                spanGaps: true
             },{
                 label: 'Forbidden',
                 backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.2).rgbString(),
                 borderColor: FORBIDDEN_COLOR,
                 borderWidth: 2,
                 pointRadius: 0,
-                fill: 0,
+                fill: 'start',
                 lineTension: 0,
                 spanGaps: false
-            },{
-                label: 'Live scan',
-                backgroundColor: Chart.helpers.color(SCAN_COLOR).alpha(0.2).rgbString(),
-                borderColor: SCAN_COLOR,
-                pointBackgroundColor: SCAN_COLOR,
-                borderWidth: 2,
-                fill: 0,
-                lineTension: 0.4,
-                pointRadius: 1.5
             }
-        ],
-        options: {
-            responsive: true,
-            scales: {
-                xAxes: [{
-                    display:true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'MHz'
-                    }
-                }],
-                yAxes: [{
-                    stacked: true,
-                    ticks: {
-                        beginAtZero:true
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'dBm'
-                    }
-                }]
-            }
+        ]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            xAxes: [{
+                scaleLabel: {
+                    display: true,
+                    labelString: 'MHz'
+                }
+            }],
+            yAxes: [{
+                scaleLabel: {
+                    display: true,
+                    labelString: 'dBm'
+                }
+            }]
         }
     }
 });
@@ -99,43 +89,53 @@ var myChart = new Chart(ctx, {
 function InitChart () {
     myChart.data.labels = [];
     data_receive_array  = [];
-    max_array           = [];
     receiving_new_sweep = false;
 
-    for ( var freq = START_FREQ; freq <= STOP_FREQ ; freq += FREQ_STEP ) {
-        let freq_str = Math.round(freq).toString();
-        let str_len  = freq_str.length;
-        freq_str = [freq_str.slice(0, str_len-3), '.', freq_str.slice(str_len-3)].join('');
-        myChart.data.labels.push (freq_str);
-    }
+    for ( var freq = START_FREQ; freq <= STOP_FREQ ; freq += FREQ_STEP )
+        myChart.data.labels.push ( Math.round ( freq/1000 ) / 1000 );
 
     myChart.data.datasets[0].data = [];
     myChart.data.datasets[1].data = [];
     myChart.data.datasets[2].data = [];
-    myChart.data.datasets[3].data = [];
 
     // Initialize all values of all graphs (except the scan graph) with lowest dBm value
-    for ( let i = 0 ; i < 112 ; i++ ) {
-        myChart.data.datasets[0].data[i] = MIN_DBM; // Flat line
-        myChart.data.datasets[1].data[i] = undefined; // Sennheiser
-        myChart.data.datasets[2].data[i] = undefined; // LTE
-//        myChart.data.datasets[3].data[i] = MIN_DBM; // Scan
+    for ( let i = 0 ; i < SWEEP_POINTS ; i++ ) {
+        myChart.data.datasets[1].data[i] = undefined; // Recommended
+        myChart.data.datasets[2].data[i] = undefined; // Forbidden
+    }
+
+    function isInRange ( start, stop ) {
+        if ( (start >= START_FREQ && start <= STOP_FREQ) || (stop >= START_FREQ && stop <= STOP_FREQ) )
+            return true;
+        else
+            return false;
+    }
+
+    function isForbidden ( start, stop ) {
+        for ( var f of FREQUENCIES.forbidden ) {
+            if ( (start >= f.start*1000 && start <= f.stop*1000) || (stop >= f.start*1000 && stop <= f.stop*1000) )
+                return true;
+        }
+
+        return false;
+    }
+
+    function alignToBoundary ( point ) {
+        if ( point < 0 )
+            return 0;
+        else if ( point > SWEEP_POINTS - 1 )
+            return SWEEP_POINTS - 1;
+        else
+            return point;
     }
 
     // Forbidden frequencies
     for ( var f of FREQUENCIES.forbidden ) {
-        let left_data_point  = Math.round ( (f.start - START_FREQ) / FREQ_STEP );
-        let right_data_point = Math.round ( (f.end   - START_FREQ) / FREQ_STEP );
+        if ( !isInRange ( f.start*1000, f.stop*1000) )
+            continue;
 
-        if ( left_data_point < 0 )
-            left_data_point = 0;
-        if ( left_data_point > 111 )
-            left_data_point = 111;
-        if ( right_data_point < 0 )
-            right_data_point = 0;
-        if ( right_data_point > 111 )
-            right_data_point = 111;
-
+        let left_data_point  = alignToBoundary ( Math.round ( (f.start * 1000 - START_FREQ) / FREQ_STEP ) );
+        let right_data_point = alignToBoundary ( Math.round ( (f.stop  * 1000 - START_FREQ) / FREQ_STEP ) );
         let data_point = left_data_point;
  
         while ( data_point <= right_data_point ) {
@@ -144,25 +144,20 @@ function InitChart () {
         }
     }
 
-    // Sennheiser frequencies
-    for ( var s of FREQUENCIES.sennheiser_g3_e[2] ) {
-        let left_freq_edge  = s - SENNHEISER_CHANNEL_WIDTH/2;
-        let left_data_point = Math.round ( (left_freq_edge - START_FREQ) / FREQ_STEP );
-        let right_freq_edge = s + SENNHEISER_CHANNEL_WIDTH/2;
-        let right_data_point = Math.round ( (right_freq_edge - START_FREQ) / FREQ_STEP );
+    // Recommended frequencies
+if (!CHANNEL_TABLE) CHANNEL_TABLE = 'SEN_E_G3';
+    for ( var s of FREQUENCIES[CHANNEL_TABLE][2] ) {
+        let left_freq_edge  = s*1000 - SENNHEISER_CHANNEL_WIDTH/2;
+        let right_freq_edge = s*1000 + SENNHEISER_CHANNEL_WIDTH/2;
 
-        if ( left_data_point < 0 )
-            left_data_point = 0;
-        if ( left_data_point > 111 )
-            left_data_point = 111;
-        if ( right_data_point < 0 )
-            right_data_point = 0;
-        if ( right_data_point > 111 )
-            right_data_point = 111;
+        if ( isForbidden ( left_freq_edge, right_freq_edge ) || !isInRange ( left_freq_edge, right_freq_edge) )
+            continue;
 
-        let data_point = left_data_point;
+        let left_data_point  = alignToBoundary ( Math.round ( (left_freq_edge  - START_FREQ) / FREQ_STEP ) );
+        let right_data_point = alignToBoundary ( Math.round ( (right_freq_edge - START_FREQ) / FREQ_STEP ) );
+        let data_point       = left_data_point;
         
-        if ( left_data_point-1 >= 0 && left_data_point-1 <= 112 )
+        if ( left_data_point - 1 >= 0 )
             myChart.data.datasets[1].data[left_data_point-1] = MIN_DBM;
         
         while ( data_point <= right_data_point ) {
@@ -170,7 +165,7 @@ function InitChart () {
             data_point++;
         }
 
-        if ( right_data_point+1 >= 0 && right_data_point+1 <= 112 )
+        if ( right_data_point + 1 < SWEEP_POINTS )
             myChart.data.datasets[1].data[right_data_point+1] = MIN_DBM;
     }
 
@@ -202,13 +197,15 @@ function sendAnalyzerGetConfig () {
 }
 
 // Configure analyzer device
-function sendAnalyzerSetConfig ( start_freq, stop_freq ) {
-    START_FREQ = start_freq;
-    STOP_FREQ  = stop_freq;
-    var config_buf = Buffer.from ( '#0C2-F:0'+START_FREQ+',0'+STOP_FREQ+',-0'+Math.abs(MAX_DBM).toString()+','+MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
+function sendAnalyzerSetConfig ( start_freq, stop_freq, label, id ) {
+    var config_buf = Buffer.from ( '#0C2-F:0'+start_freq+',0'+stop_freq+',-0'+Math.abs(MAX_DBM).toString()+','+MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
+    START_FREQ = start_freq * 1000;
+    STOP_FREQ  = stop_freq  * 1000;
+    CHANNEL_TABLE = id;
     config_buf.writeUInt8 ( 0x20, 1 );
     port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
     setTimeout ( () => {sendAnalyzerGetConfig().then ( () => {
+        myChart.options.scales.xAxes[0].scaleLabel.labelString = label;
         InitChart ();        
     });}, 500);
 }
@@ -218,20 +215,17 @@ function sendAnalyzerSetConfig ( start_freq, stop_freq ) {
 /*    Receive data from device     */
 /***********************************/
 port.on ( 'data', function ( data ) {
-    if ( data.includes('$Sp') ) { //p = 112 bytes to receive
+    if ( data.includes('$Sp') ) { //p = SWEEP_POINTS bytes to receive
         data_receive_array = [];
         receiving_new_sweep = true;
         return;
     } else if ( data.includes('#C2-F:') ) {
         let start_freq_idx = data.indexOf('#C2-F:') + 6;
         let start_freq_step_idx = data.indexOf(',', start_freq_idx) + 1;
-
-        let analyzer_cur_start_freq = parseInt ( data.slice ( start_freq_idx, start_freq_step_idx) );
-        let analyzer_cur_freq_step  = parseInt ( data.slice ( start_freq_step_idx, data.indexOf(',', start_freq_step_idx)) );
-
-        START_FREQ = analyzer_cur_start_freq;
-        STOP_FREQ  = Math.floor ( (analyzer_cur_freq_step * 112) / 1000 ) + START_FREQ;
-        FREQ_STEP  = analyzer_cur_freq_step / 1000; //Device sends step in Hz not kHz !!
+        
+        START_FREQ = parseInt ( data.slice ( start_freq_idx, start_freq_step_idx) ) * 1000;
+        FREQ_STEP  = parseInt ( data.slice ( start_freq_step_idx, data.indexOf(',', start_freq_step_idx)) );
+        STOP_FREQ  = Math.floor ( FREQ_STEP * SWEEP_POINTS ) + START_FREQ;
         analyzerGetConfigPromise_Resolve();
         return;
     }
@@ -240,39 +234,24 @@ port.on ( 'data', function ( data ) {
         for ( var byte of data ) {
             data_receive_array.push ( -(byte/2) );
 
-            if ( data_receive_array.length === 112 ) {
+            if ( data_receive_array.length === SWEEP_POINTS ) {
+                var val_changed = false;
                 receiving_new_sweep = false;
 
-                if ( !max_array.length ) {
-                    max_array = data_receive_array.slice();
-                } else {
-                    for ( var i = 0 ; i < data_receive_array.length ; i++ ) {
-                        if ( data_receive_array[i] > max_array[i] )
-                            max_array[i] = data_receive_array[i];
+                for ( let i = 0 ; i < data_receive_array.length ; i++ ) {
+                    if ( data_receive_array[i] > myChart.data.datasets[0].data[i] || myChart.data.datasets[0].data[i] === undefined ) {
+                        myChart.data.datasets[0].data[i] = data_receive_array[i];
+                        val_changed = true;
                     }
                 }
 
-                if ( !myChart.data.datasets[3].data.length ) {
-                    myChart.data.datasets[3].data = max_array.slice();
+                if ( val_changed )
                     myChart.update();
-                } else {
-                    var val_changed = false;
-
-                    for ( var i = 0 ; i < max_array.length ; i++ ) {
-                        if ( max_array[i] > myChart.data.datasets[3].data[i] ) {
-                            myChart.data.datasets[3].data[i] = max_array[i];
-                            val_changed = true;
-                        }
-                    }
-
-                    if ( val_changed )
-                        myChart.update();
-                }
             }    
         }
     }
 });
 
 ipcRenderer.on ( 'CHANGE_FREQ', (event, message) => {
-    sendAnalyzerSetConfig ( message.start_freq, message.stop_freq );
+    sendAnalyzerSetConfig ( message.start_freq, message.stop_freq, message.label, message.id );
 })
