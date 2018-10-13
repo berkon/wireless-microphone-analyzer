@@ -8,13 +8,10 @@ const FREQUENCIES = require('require-all')(__dirname +'/frequency_data');
 var START_FREQ = undefined;
 var STOP_FREQ  = undefined;
 var FREQ_STEP  = undefined;
-var MAX_DBM    = -30;
+var MAX_DBM    = -20;
 var MIN_DBM    = -110;
 var SWEEP_POINTS = 112;
 var CHANNEL_TABLE = undefined;
-
-var data_receive_array  = [];
-var receiving_new_sweep = false;
 
 const chartColors = {
 	RED    : 'rgb(255, 99 , 132)',
@@ -38,7 +35,7 @@ var myChart = new Chart(ctx, {
     data: {
         datasets: [
             {
-                label: 'Live scan',
+                label: 'Live scan (peak hold)',
                 backgroundColor: Chart.helpers.color(SCAN_COLOR).alpha(0.2).rgbString(),
                 borderColor: SCAN_COLOR,
                 pointBackgroundColor: SCAN_COLOR,
@@ -88,11 +85,21 @@ var myChart = new Chart(ctx, {
 
 function InitChart () {
     myChart.data.labels = [];
-    data_receive_array  = [];
-    receiving_new_sweep = false;
 
-    for ( var freq = START_FREQ; freq <= STOP_FREQ ; freq += FREQ_STEP )
-        myChart.data.labels.push ( Math.round ( freq/1000 ) / 1000 );
+    for ( var freq = START_FREQ; freq <= STOP_FREQ ; freq += FREQ_STEP ) {
+        let val = Math.round ( freq / 1000 ) / 1000
+        val = val.toString();
+        
+        if ( val.length < 7 ) {
+            if ( !val.includes(".") )
+                val += ".000";
+            else
+                while ( val.length < 7 )
+                    val += "0";
+        }
+
+        myChart.data.labels.push ( val );
+    }
 
     myChart.data.datasets[0].data = [];
     myChart.data.datasets[1].data = [];
@@ -100,6 +107,7 @@ function InitChart () {
 
     // Initialize all values of all graphs (except the scan graph) with lowest dBm value
     for ( let i = 0 ; i < SWEEP_POINTS ; i++ ) {
+        myChart.data.datasets[0].data[i] = undefined; // Live scan
         myChart.data.datasets[1].data[i] = undefined; // Recommended
         myChart.data.datasets[2].data[i] = undefined; // Forbidden
     }
@@ -183,6 +191,10 @@ var port = new SerialPort ( "COM2", { baudRate : 500000 }, function ( err ) {
     })
 });
 
+function sendAnalyzerGetConfig () {
+    return analyzerGetConfigPromise;
+}
+
 // Receive device configuration for confirming configured values and start receiving analyzer data.
 var analyzerGetConfigPromise_Resolve = null;
 var analyzerGetConfigPromise = new Promise ( (resolve, reject) => {
@@ -192,10 +204,6 @@ var analyzerGetConfigPromise = new Promise ( (resolve, reject) => {
     analyzerGetConfigPromise_Resolve = resolve;
 });
 
-function sendAnalyzerGetConfig () {
-    return analyzerGetConfigPromise;
-}
-
 // Configure analyzer device
 function sendAnalyzerSetConfig ( start_freq, stop_freq, label, id ) {
     var config_buf = Buffer.from ( '#0C2-F:0'+start_freq+',0'+stop_freq+',-0'+Math.abs(MAX_DBM).toString()+','+MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
@@ -204,51 +212,90 @@ function sendAnalyzerSetConfig ( start_freq, stop_freq, label, id ) {
     CHANNEL_TABLE = id;
     config_buf.writeUInt8 ( 0x20, 1 );
     port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
-    setTimeout ( () => {sendAnalyzerGetConfig().then ( () => {
+    setTimeout ( () => { sendAnalyzerGetConfig().then ( () => {
         myChart.options.scales.xAxes[0].scaleLabel.labelString = label;
         InitChart ();        
-    });}, 500);
+    });}, 1000 );
 }
 
 
 /***********************************/
 /*    Receive data from device     */
 /***********************************/
+var rec_buf = []; // Buffer for continuosly receiving data
+var rec_buf_str = [];
+var msg_buf = []; // Once a message is complete, it will be placed in this buffer
+var msg_id_array = [
+    '$Sp',
+    '#C2-F:'
+];
+var msgId = undefined;
+var oldest_msg_idx = undefined;
+
 port.on ( 'data', function ( data ) {
-    if ( data.includes('$Sp') ) { //p = SWEEP_POINTS bytes to receive
-        data_receive_array = [];
-        receiving_new_sweep = true;
-        return;
-    } else if ( data.includes('#C2-F:') ) {
-        let start_freq_idx = data.indexOf('#C2-F:') + 6;
-        let start_freq_step_idx = data.indexOf(',', start_freq_idx) + 1;
-        
-        START_FREQ = parseInt ( data.slice ( start_freq_idx, start_freq_step_idx) ) * 1000;
-        FREQ_STEP  = parseInt ( data.slice ( start_freq_step_idx, data.indexOf(',', start_freq_step_idx)) );
-        STOP_FREQ  = Math.floor ( FREQ_STEP * SWEEP_POINTS ) + START_FREQ;
-        analyzerGetConfigPromise_Resolve();
-        return;
+    Array.prototype.push.apply ( rec_buf, data ); //Add new data to receive buffer
+    rec_buf_str = String.fromCharCode.apply ( null, rec_buf ); // Convert to characters
+
+    for ( var msg_id of msg_id_array ) {
+        let idx = rec_buf_str.indexOf ( msg_id );
+
+        if ( idx !== -1 ) {
+            if ( oldest_msg_idx === undefined ) {
+                oldest_msg_idx = idx;
+                msgId = msg_id;
+            } else if ( idx < oldest_msg_idx ) {
+                oldest_msg_idx = idx;
+                msgId = msg_id;
+            }
+        }
     }
 
-    if ( receiving_new_sweep ) {
-        for ( var byte of data ) {
-            data_receive_array.push ( -(byte/2) );
+    if ( oldest_msg_idx === undefined ) // If undefined, there is no new message.
+        return;
 
-            if ( data_receive_array.length === SWEEP_POINTS ) {
-                var val_changed = false;
-                receiving_new_sweep = false;
+    let msg_end = rec_buf_str.indexOf ('\r\n');
 
-                for ( let i = 0 ; i < data_receive_array.length ; i++ ) {
-                    if ( data_receive_array[i] > myChart.data.datasets[0].data[i] || myChart.data.datasets[0].data[i] === undefined ) {
-                        myChart.data.datasets[0].data[i] = data_receive_array[i];
-                        val_changed = true;
-                    }
+    if ( msg_end != -1 ) {
+        msg_buf = rec_buf.slice ( oldest_msg_idx + msgId.length, msg_end );
+        rec_buf = rec_buf.slice ( msg_end + 2 ); // Ignore CR LF
+    } else
+        msg_buf = [];
+
+
+    oldest_msg_idx = undefined;
+
+    if ( !msg_buf.length )
+        return;
+
+    switch ( msgId ) {
+        case '$Sp':
+            var val_changed = false;
+
+            for ( let i = 0 ; i < msg_buf.length ; i++ ) {
+                msg_buf[i] = -( msg_buf[i] / 2 );
+        
+                if ( msg_buf[i] > myChart.data.datasets[0].data[i] || myChart.data.datasets[0].data[i] === undefined ) {
+                    myChart.data.datasets[0].data[i] = msg_buf[i];
+                    val_changed = true;
                 }
-
+        
                 if ( val_changed )
                     myChart.update();
-            }    
-        }
+            }
+            break;
+
+        case '#C2-F:':
+            let msg_buf_str = String.fromCharCode.apply ( null, msg_buf ); // Convert to characters
+            let start_freq_step_idx = msg_buf_str.indexOf(',') + 1;
+
+            START_FREQ = parseInt ( msg_buf_str.slice ( 0, start_freq_step_idx) ) * 1000;
+            FREQ_STEP  = parseInt ( msg_buf_str.slice ( start_freq_step_idx, msg_buf_str.indexOf(',', start_freq_step_idx)) );
+            STOP_FREQ  = Math.floor ( FREQ_STEP * SWEEP_POINTS ) + START_FREQ;
+            analyzerGetConfigPromise_Resolve();
+            break;
+
+        default:
+            console.log ( "We should never get here!");
     }
 });
 
