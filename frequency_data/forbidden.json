@@ -1,4 +1,6 @@
 [
-    { "start" : 832000, "stop" : 862000 },
-    { "start" : 790000, "stop" : 821000 }
+    { "start" : 703000, "stop" : 733000, "info": "LTE II Uplink"   },
+    { "start" : 758000, "stop" : 788000, "info": "LTE II Downlink" },
+    { "start" : 791000, "stop" : 821000, "info": "LTE I  Downlink" },
+    { "start" : 832000, "stop" : 862000, "info": "LTE I  Uplink"   }
 ]

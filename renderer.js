@@ -11,7 +11,12 @@ var FREQ_STEP  = undefined;
 var MAX_DBM    = -20;
 var MIN_DBM    = -110;
 var SWEEP_POINTS = 112;
-var CHANNEL_TABLE = undefined;
+var BAND = undefined;
+var VENDOR_ID  = 'NON';
+
+var LINE_LIVE        = 0;
+var LINE_RECOMMENDED = 1;
+var LINE_FORBIDDEN   = 2;
 
 const chartColors = {
 	RED    : 'rgb(255, 99 , 132)',
@@ -83,6 +88,62 @@ var myChart = new Chart(ctx, {
     }
 });
 
+function setVendorChannels ( presets ) {
+    if ( !presets )
+        return;
+    
+    for ( let i = 0 ; i < SWEEP_POINTS ; i++ )
+        myChart.data.datasets[LINE_RECOMMENDED].data[i] = undefined;
+
+    for ( var p of presets ) {
+        let left_freq_edge  = p*1000 - SENNHEISER_CHANNEL_WIDTH/2;
+        let right_freq_edge = p*1000 + SENNHEISER_CHANNEL_WIDTH/2;
+
+        if ( isForbidden ( left_freq_edge, right_freq_edge ) || !isInRange ( left_freq_edge, right_freq_edge) )
+            continue;
+
+        let left_data_point  = alignToBoundary ( Math.round ( (left_freq_edge  - START_FREQ) / FREQ_STEP ) );
+        let right_data_point = alignToBoundary ( Math.round ( (right_freq_edge - START_FREQ) / FREQ_STEP ) );
+        let data_point       = left_data_point;
+        
+        if ( left_data_point - 1 >= 0 )
+            myChart.data.datasets[LINE_RECOMMENDED].data[left_data_point-1] = MIN_DBM;
+        
+        while ( data_point <= right_data_point ) {
+            myChart.data.datasets[LINE_RECOMMENDED].data[data_point] = MAX_DBM;
+            data_point++;
+        }
+
+        if ( right_data_point + 1 < SWEEP_POINTS )
+            myChart.data.datasets[LINE_RECOMMENDED].data[right_data_point+1] = MIN_DBM;
+    }
+}
+
+function isInRange ( start, stop ) {
+    if ( (start >= START_FREQ && start <= STOP_FREQ) || (stop >= START_FREQ && stop <= STOP_FREQ) )
+        return true;
+    else
+        return false;
+}
+
+function isForbidden ( start, stop ) {
+    for ( var f of FREQUENCIES.forbidden ) {
+        if ( (start >= f.start*1000 && start <= f.stop*1000) || (stop >= f.start*1000 && stop <= f.stop*1000) )
+            return true;
+    }
+
+    return false;
+}
+
+function alignToBoundary ( point ) {
+    if ( point < 0 )
+        return 0;
+    else if ( point > SWEEP_POINTS - 1 )
+        return SWEEP_POINTS - 1;
+    else
+        return point;
+}
+
 function InitChart () {
     myChart.data.labels = [];
 
@@ -101,40 +162,11 @@ function InitChart () {
         myChart.data.labels.push ( val );
     }
 
-    myChart.data.datasets[0].data = [];
-    myChart.data.datasets[1].data = [];
-    myChart.data.datasets[2].data = [];
-
     // Initialize all values of all graphs (except the scan graph) with lowest dBm value
     for ( let i = 0 ; i < SWEEP_POINTS ; i++ ) {
-        myChart.data.datasets[0].data[i] = undefined; // Live scan
-        myChart.data.datasets[1].data[i] = undefined; // Recommended
-        myChart.data.datasets[2].data[i] = undefined; // Forbidden
-    }
-
-    function isInRange ( start, stop ) {
-        if ( (start >= START_FREQ && start <= STOP_FREQ) || (stop >= START_FREQ && stop <= STOP_FREQ) )
-            return true;
-        else
-            return false;
-    }
-
-    function isForbidden ( start, stop ) {
-        for ( var f of FREQUENCIES.forbidden ) {
-            if ( (start >= f.start*1000 && start <= f.stop*1000) || (stop >= f.start*1000 && stop <= f.stop*1000) )
-                return true;
-        }
-
-        return false;
-    }
-
-    function alignToBoundary ( point ) {
-        if ( point < 0 )
-            return 0;
-        else if ( point > SWEEP_POINTS - 1 )
-            return SWEEP_POINTS - 1;
-        else
-            return point;
+        myChart.data.datasets[LINE_LIVE].data[i] = undefined; // Live scan
+        myChart.data.datasets[LINE_RECOMMENDED].data[i] = undefined; // Recommended
+        myChart.data.datasets[LINE_FORBIDDEN].data[i] = undefined; // Forbidden
     }
 
     // Forbidden frequencies
@@ -147,36 +179,12 @@ function InitChart () {
         let data_point = left_data_point;
  
         while ( data_point <= right_data_point ) {
-            myChart.data.datasets[2].data[data_point] = MAX_DBM;
+            myChart.data.datasets[LINE_FORBIDDEN].data[data_point] = MAX_DBM;
             data_point++;
         }
     }
 
-    // Recommended frequencies
-if (!CHANNEL_TABLE) CHANNEL_TABLE = 'SEN_E_G3';
-    for ( var s of FREQUENCIES[CHANNEL_TABLE][2] ) {
-        let left_freq_edge  = s*1000 - SENNHEISER_CHANNEL_WIDTH/2;
-        let right_freq_edge = s*1000 + SENNHEISER_CHANNEL_WIDTH/2;
-
-        if ( isForbidden ( left_freq_edge, right_freq_edge ) || !isInRange ( left_freq_edge, right_freq_edge) )
-            continue;
-
-        let left_data_point  = alignToBoundary ( Math.round ( (left_freq_edge  - START_FREQ) / FREQ_STEP ) );
-        let right_data_point = alignToBoundary ( Math.round ( (right_freq_edge - START_FREQ) / FREQ_STEP ) );
-        let data_point       = left_data_point;
-        
-        if ( left_data_point - 1 >= 0 )
-            myChart.data.datasets[1].data[left_data_point-1] = MIN_DBM;
-        
-        while ( data_point <= right_data_point ) {
-            myChart.data.datasets[1].data[data_point] = MAX_DBM;
-            data_point++;
-        }
-
-        if ( right_data_point + 1 < SWEEP_POINTS )
-            myChart.data.datasets[1].data[right_data_point+1] = MIN_DBM;
-    }
-
+    setVendorChannels ();
     myChart.update();
 }
 
@@ -186,36 +194,35 @@ var port = new SerialPort ( "COM2", { baudRate : 500000 }, function ( err ) {
         return;
     }
 
-    sendAnalyzerGetConfig ().then ( () => {
+    sendAnalyzer_GetConfig ().then ( () => {
         InitChart ();
     })
 });
 
-function sendAnalyzerGetConfig () {
-    return analyzerGetConfigPromise;
-}
+var analyzerGetConfigPromise_Resolve = null;
 
 // Receive device configuration for confirming configured values and start receiving analyzer data.
-var analyzerGetConfigPromise_Resolve = null;
-var analyzerGetConfigPromise = new Promise ( (resolve, reject) => {
-    var buf = Buffer.from ( '#0C0', 'ascii' );
-    buf.writeUInt8 ( 0x4, 1 );
-    port.write ( buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
-    analyzerGetConfigPromise_Resolve = resolve;
-});
+function sendAnalyzer_GetConfig () {
+    return new Promise ( (resolve, reject) => {
+        var buf = Buffer.from ( '#0C0', 'ascii' );
+        buf.writeUInt8 ( 0x4, 1 );
+        port.write ( buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
+        analyzerGetConfigPromise_Resolve = resolve;
+    });
+}
 
 // Configure analyzer device
-function sendAnalyzerSetConfig ( start_freq, stop_freq, label, id ) {
+function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
     var config_buf = Buffer.from ( '#0C2-F:0'+start_freq+',0'+stop_freq+',-0'+Math.abs(MAX_DBM).toString()+','+MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
     START_FREQ = start_freq * 1000;
     STOP_FREQ  = stop_freq  * 1000;
-    CHANNEL_TABLE = id;
+    BAND = band;
     config_buf.writeUInt8 ( 0x20, 1 );
     port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
-    setTimeout ( () => { sendAnalyzerGetConfig().then ( () => {
+    setTimeout ( () => { sendAnalyzer_GetConfig().then ( () => {
         myChart.options.scales.xAxes[0].scaleLabel.labelString = label;
         InitChart ();        
-    });}, 1000 );
+    });}, 500 );
 }
 
 
@@ -223,14 +230,14 @@ function sendAnalyzerSetConfig ( start_freq, stop_freq, label, id ) {
 /*    Receive data from device     */
 /***********************************/
 var rec_buf = []; // Buffer for continuosly receiving data
-var rec_buf_str = [];
+var rec_buf_str = []; // rec_buf converted to string so that we can check for commands
 var msg_buf = []; // Once a message is complete, it will be placed in this buffer
 var msg_id_array = [
-    '$Sp',
-    '#C2-F:'
+    '$Sp',    // '$S' = sweep data, 'p' = ASCII code 112 ( 112 sweep points will be received)
+    '#C2-F:'  // '#C2-F:' = config data from device
 ];
-var msgId = undefined;
-var oldest_msg_idx = undefined;
+var oldest_msg_idx = undefined; // first completely received message in the buffer ( in case there are more than one )
+var msgId = undefined; // Command prefix of the message (see msg_id_array[])
 
 port.on ( 'data', function ( data ) {
     Array.prototype.push.apply ( rec_buf, data ); //Add new data to receive buffer
@@ -274,8 +281,8 @@ port.on ( 'data', function ( data ) {
             for ( let i = 0 ; i < msg_buf.length ; i++ ) {
                 msg_buf[i] = -( msg_buf[i] / 2 );
         
-                if ( msg_buf[i] > myChart.data.datasets[0].data[i] || myChart.data.datasets[0].data[i] === undefined ) {
-                    myChart.data.datasets[0].data[i] = msg_buf[i];
+                if ( msg_buf[i] > myChart.data.datasets[LINE_LIVE].data[i] || myChart.data.datasets[LINE_LIVE].data[i] === undefined ) {
+                    myChart.data.datasets[LINE_LIVE].data[i] = msg_buf[i];
                     val_changed = true;
                 }
         
@@ -287,18 +294,52 @@ port.on ( 'data', function ( data ) {
         case '#C2-F:':
             let msg_buf_str = String.fromCharCode.apply ( null, msg_buf ); // Convert to characters
             let start_freq_step_idx = msg_buf_str.indexOf(',') + 1;
-
             START_FREQ = parseInt ( msg_buf_str.slice ( 0, start_freq_step_idx) ) * 1000;
             FREQ_STEP  = parseInt ( msg_buf_str.slice ( start_freq_step_idx, msg_buf_str.indexOf(',', start_freq_step_idx)) );
-            STOP_FREQ  = Math.floor ( FREQ_STEP * SWEEP_POINTS ) + START_FREQ;
+            STOP_FREQ  = ( FREQ_STEP * (SWEEP_POINTS-1) ) + START_FREQ;
             analyzerGetConfigPromise_Resolve();
             break;
 
         default:
-            console.log ( "We should never get here!");
+            console.log ( "Unknown command!");
     }
 });
 
-ipcRenderer.on ( 'CHANGE_FREQ', (event, message) => {
-    sendAnalyzerSetConfig ( message.start_freq, message.stop_freq, message.label, message.id );
-})
+ipcRenderer.on ( 'CHANGE_BAND', (event, message) => {
+    sendAnalyzer_SetConfig ( message.start_freq, message.stop_freq, message.label, message.band );
+});
+
+ipcRenderer.on ( 'SET_VENDOR_4_ANALYSIS', (event, message) => {
+    switch ( message.vendor ) {
+        case 'NON': // No vendor selected
+            VENDOR_ID = 'NON';
+
+            for ( let i = 0 ; i < SWEEP_POINTS ; i++ )
+                myChart.data.datasets[LINE_RECOMMENDED].data[i] = undefined;
+
+            myChart.update();
+            break;
+
+        case 'SEN': // Sennheiser
+            VENDOR_ID = 'SEN';
+            break;
+
+        case 'SHU': // Shure
+            VENDOR_ID = 'SHU';
+            break;
+        
+        default:
+            console.log ( "Vendor missing in message!")
+    }
+});
+
+ipcRenderer.on ( 'SET_CHAN_PRESET', (event, message) => {
+    let preset_arr = message.preset.split ( '_' );
+    let vendor = preset_arr[0];
+    let band   = preset_arr[1];
+    let series = preset_arr[2];
+    let preset = preset_arr[3];
+    
+    setVendorChannels ( FREQUENCIES[vendor+'_'+band+'_'+series][parseInt(preset)-1] );
+    myChart.update();
+});
