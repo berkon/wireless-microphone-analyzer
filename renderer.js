@@ -3,7 +3,7 @@
 var { ipcRenderer } = require ( 'electron' );
 var SerialPort = require ( 'serialport' );
 var Chart      = require ( 'chart.js'   );
-const FREQUENCIES = require('require-all')(__dirname +'/frequency_data');
+const FREQUENCIES = require('require-all')(__dirname +'/frequency_data/presets');
 
 var START_FREQ = undefined;
 var STOP_FREQ  = undefined;
@@ -45,17 +45,17 @@ var myChart = new Chart(ctx, {
                 borderColor: SCAN_COLOR,
                 pointBackgroundColor: SCAN_COLOR,
                 borderWidth: 2,
+                pointRadius: 1.5,
                 fill: 'start',
-                lineTension: 0.4,
-                pointRadius: 1.5
+                lineTension: 0.4
             },{
                 label: 'Recommended by manuf.',
                 backgroundColor: Chart.helpers.color(RECOMMENDED_CHANNELS_COLOR).alpha(0.2).rgbString(),
                 borderColor: RECOMMENDED_CHANNELS_COLOR,
                 borderWidth: 2,
                 pointRadius: 0,
-                lineTension: 0,
                 fill: 'start',
+                lineTension: 0,
                 spanGaps: true
             },{
                 label: 'Forbidden',
@@ -77,6 +77,25 @@ var myChart = new Chart(ctx, {
                     display: true,
                     labelString: 'MHz'
                 }
+            },{
+                position: "top",
+                weight: 1,
+                labels: [],
+                offset: true,
+                gridLines: { display: false },
+                ticks: { 
+                    autoSkip: false,
+                    fontColor: '#FF6384'
+                }
+            },{
+                position: "top",
+                weight: 0,
+                labels: [],
+                gridLines: { display: false },
+                ticks: { 
+                    autoSkip: false,
+                    fontColor: '#4BDEC0'
+                }
             }],
             yAxes: [{
                 scaleLabel: {
@@ -88,24 +107,51 @@ var myChart = new Chart(ctx, {
     }
 });
 
-function setVendorChannels ( presets ) {
+
+function setForbidden () {
+    for ( var f of FREQUENCIES.forbidden ) {
+        if ( !isInRange ( f.start*1000, f.stop*1000) )
+            continue;
+
+        let left_data_point  = alignToBoundary ( Math.round ( (f.start * 1000 - START_FREQ) / FREQ_STEP ) );
+        let right_data_point = alignToBoundary ( Math.round ( (f.stop  * 1000 - START_FREQ) / FREQ_STEP ) );
+        let data_point = left_data_point;
+
+        myChart.config.options.scales.xAxes[1].labels[left_data_point] = f.info;
+
+        while ( data_point <= right_data_point ) {
+            myChart.data.datasets[LINE_FORBIDDEN].data[data_point] = MAX_DBM;
+            data_point++;
+        }
+
+        myChart.data.datasets[LINE_FORBIDDEN].data[left_data_point] = MIN_DBM;
+        myChart.data.datasets[LINE_FORBIDDEN].data[right_data_point] = MIN_DBM;
+    }
+}
+
+function setVendorChannels ( presets, bank ) {
     if ( !presets )
         return;
     
     for ( let i = 0 ; i < SWEEP_POINTS ; i++ )
         myChart.data.datasets[LINE_RECOMMENDED].data[i] = undefined;
 
-    for ( var p of presets ) {
-        let left_freq_edge  = p*1000 - SENNHEISER_CHANNEL_WIDTH/2;
-        let right_freq_edge = p*1000 + SENNHEISER_CHANNEL_WIDTH/2;
+    for ( let i = 0 ; i < presets.length ; i++ ) {
+        let left_freq_edge  = presets[i]*1000 - SENNHEISER_CHANNEL_WIDTH/2;
+        let right_freq_edge = presets[i]*1000 + SENNHEISER_CHANNEL_WIDTH/2;
 
-        if ( isForbidden ( left_freq_edge, right_freq_edge ) || !isInRange ( left_freq_edge, right_freq_edge) )
+//        if ( isForbidden ( left_freq_edge, right_freq_edge ) || !isInRange ( left_freq_edge, right_freq_edge) )
+        if ( !isInRange ( left_freq_edge, right_freq_edge) )
             continue;
 
         let left_data_point  = alignToBoundary ( Math.round ( (left_freq_edge  - START_FREQ) / FREQ_STEP ) );
         let right_data_point = alignToBoundary ( Math.round ( (right_freq_edge - START_FREQ) / FREQ_STEP ) );
         let data_point       = left_data_point;
-        
+        let f = presets[i].toString().split('');
+        f.splice( 3, 0, "." );
+        f = f.join('');
+        myChart.config.options.scales.xAxes[2].labels[left_data_point] = 'B'+(bank.length===1?'0':'')+bank+'.C'+(i.toString().length===1?'0':'')+(i+1)+'  ('+f+')';
+
         if ( left_data_point - 1 >= 0 )
             myChart.data.datasets[LINE_RECOMMENDED].data[left_data_point-1] = MIN_DBM;
         
@@ -117,6 +163,9 @@ function setVendorChannels ( presets ) {
         if ( right_data_point + 1 < SWEEP_POINTS )
             myChart.data.datasets[LINE_RECOMMENDED].data[right_data_point+1] = MIN_DBM;
     }
+
+    myChart.config.options.scales.xAxes[2].labels[0]   = '.'
+    myChart.config.options.scales.xAxes[2].labels[112] = '.'
 }
 
 function isInRange ( start, stop ) {
@@ -169,21 +218,12 @@ function InitChart () {
         myChart.data.datasets[LINE_FORBIDDEN].data[i] = undefined; // Forbidden
     }
 
-    // Forbidden frequencies
-    for ( var f of FREQUENCIES.forbidden ) {
-        if ( !isInRange ( f.start*1000, f.stop*1000) )
-            continue;
-
-        let left_data_point  = alignToBoundary ( Math.round ( (f.start * 1000 - START_FREQ) / FREQ_STEP ) );
-        let right_data_point = alignToBoundary ( Math.round ( (f.stop  * 1000 - START_FREQ) / FREQ_STEP ) );
-        let data_point = left_data_point;
- 
-        while ( data_point <= right_data_point ) {
-            myChart.data.datasets[LINE_FORBIDDEN].data[data_point] = MAX_DBM;
-            data_point++;
-        }
+    for ( let i = 0 ; i < SWEEP_POINTS ; i++ ) {
+        myChart.config.options.scales.xAxes[1].labels[i] = '';
+        myChart.config.options.scales.xAxes[2].labels[i] = '';
     }
 
+    setForbidden ();
     setVendorChannels ();
     myChart.update();
 }
@@ -236,51 +276,54 @@ var msg_id_array = [
     '$Sp',    // '$S' = sweep data, 'p' = ASCII code 112 ( 112 sweep points will be received)
     '#C2-F:'  // '#C2-F:' = config data from device
 ];
-var oldest_msg_idx = undefined; // first completely received message in the buffer ( in case there are more than one )
-var msgId = undefined; // Command prefix of the message (see msg_id_array[])
+var msgStart = -1;
+var msgEnd   = -1;
+var msgId    = -1; // Command prefix of the message (see msg_id_array[])
 
 port.on ( 'data', function ( data ) {
     Array.prototype.push.apply ( rec_buf, data ); //Add new data to receive buffer
     rec_buf_str = String.fromCharCode.apply ( null, rec_buf ); // Convert to characters
 
-    for ( var msg_id of msg_id_array ) {
-        let idx = rec_buf_str.indexOf ( msg_id );
+    if ( msgStart === -1 ) { // Look for message start
+        msgEnd = -1;
+        msgId  = -1;
 
-        if ( idx !== -1 ) {
-            if ( oldest_msg_idx === undefined ) {
-                oldest_msg_idx = idx;
-                msgId = msg_id;
-            } else if ( idx < oldest_msg_idx ) {
-                oldest_msg_idx = idx;
-                msgId = msg_id;
+        for ( var msg_id of msg_id_array ) {
+            let tmpMsgStart = rec_buf_str.indexOf ( msg_id );
+
+            if ( tmpMsgStart !== -1 ) {
+                if ( msgStart === -1 ) {
+                    msgStart = tmpMsgStart;
+                    msgId    = msg_id;
+                } else if ( tmpMsgStart < msgStart ) {
+                    msgStart = tmpMsgStart;
+                    msgId    = msg_id;
+                }
             }
         }
     }
 
-    if ( oldest_msg_idx === undefined ) // If undefined, there is no new message.
+    if ( msgStart === -1 ) { // No message found?
         return;
+    } else {
+        msgEnd = rec_buf_str.indexOf ( '\r\n', msgStart + msgId.length );
 
-    let msg_end = rec_buf_str.indexOf ('\r\n');
-
-    if ( msg_end != -1 ) {
-        msg_buf = rec_buf.slice ( oldest_msg_idx + msgId.length, msg_end );
-        rec_buf = rec_buf.slice ( msg_end + 2 ); // Ignore CR LF
-    } else
-        msg_buf = [];
-
-
-    oldest_msg_idx = undefined;
-
-    if ( !msg_buf.length )
-        return;
+        if ( msgEnd != -1 ) {
+            msg_buf = rec_buf.slice ( msgStart + msgId.length, msgEnd );
+            rec_buf = rec_buf.slice ( msgEnd + 2 ); // Remove oldest message from rec_buf and ignore CR LF#
+//console.log ( "ID: "+msgId+" LEN: "+msg_buf.length+"   " + String.fromCharCode.apply ( null, msg_buf) );
+//console.log ( "REMOVE START: 0 END: " + msgEnd );
+        } else
+            return;
+    }
 
     switch ( msgId ) {
-        case '$Sp':
+        case '$Sp': // Received scan data
             var val_changed = false;
 
             for ( let i = 0 ; i < msg_buf.length ; i++ ) {
                 msg_buf[i] = -( msg_buf[i] / 2 );
-        
+
                 if ( msg_buf[i] > myChart.data.datasets[LINE_LIVE].data[i] || myChart.data.datasets[LINE_LIVE].data[i] === undefined ) {
                     myChart.data.datasets[LINE_LIVE].data[i] = msg_buf[i];
                     val_changed = true;
@@ -291,7 +334,7 @@ port.on ( 'data', function ( data ) {
             }
             break;
 
-        case '#C2-F:':
+        case '#C2-F:': // Received config data from device
             let msg_buf_str = String.fromCharCode.apply ( null, msg_buf ); // Convert to characters
             let start_freq_step_idx = msg_buf_str.indexOf(',') + 1;
             START_FREQ = parseInt ( msg_buf_str.slice ( 0, start_freq_step_idx) ) * 1000;
@@ -303,6 +346,10 @@ port.on ( 'data', function ( data ) {
         default:
             console.log ( "Unknown command!");
     }
+
+    msgStart = -1;            
+    msgEnd   = -1;
+    msgId    = -1;
 });
 
 ipcRenderer.on ( 'CHANGE_BAND', (event, message) => {
@@ -339,7 +386,24 @@ ipcRenderer.on ( 'SET_CHAN_PRESET', (event, message) => {
     let band   = preset_arr[1];
     let series = preset_arr[2];
     let preset = preset_arr[3];
-    
-    setVendorChannels ( FREQUENCIES[vendor+'_'+band+'_'+series][parseInt(preset)-1] );
+    //myChart.config.options.scales.xAxes[2].labels = [];
+    setVendorChannels ( FREQUENCIES[vendor+'_'+band+'_'+series][parseInt(preset)-1], preset );
     myChart.update();
+});
+
+document.addEventListener ( "wheel", function ( e ) {
+    let start_f, stop_f;
+    let delta_freq = ( Math.abs(e.deltaY) / 100 ) * 10000;
+
+    if ( e.deltaY > 0 ) { // Zoom out
+        start_f = (START_FREQ/1000) - delta_freq;
+        stop_f  = (STOP_FREQ /1000) + delta_freq;
+        console.log ( "ZOOM OUT ", delta_freq, start_f, stop_f)
+    } else { // Zoom in
+        start_f = (START_FREQ/1000) + delta_freq;
+        stop_f  = (STOP_FREQ /1000) - delta_freq;
+        console.log ( "ZOOM IN ", delta_freq, start_f, stop_f)
+    }
+
+    sendAnalyzer_SetConfig ( start_f, stop_f, "", "" );
 });
