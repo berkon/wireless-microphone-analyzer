@@ -70,6 +70,7 @@ var myChart = new Chart(ctx, {
         ]
     },
     options: {
+//        animation: false,
         responsive: true,
         scales: {
             xAxes: [{
@@ -328,7 +329,11 @@ port.on ( 'data', function ( data ) {
     if ( msgStart === -1 ) { // No message found?
         return;
     } else {
-        msgEnd = rec_buf_str.indexOf ( '\r\n', msgStart + msgId.length );
+        if ( msgId === '$Sp' ) {
+            if ( rec_buf.length - msgStart >= 114 )
+                msgEnd = msgStart + 114;
+        } else
+            msgEnd = rec_buf_str.indexOf ( '\r\n', msgStart + msgId.length );
 
         if ( msgEnd != -1 ) {
             msg_buf = rec_buf.slice ( msgStart + msgId.length, msgEnd );
