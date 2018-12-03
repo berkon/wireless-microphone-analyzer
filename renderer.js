@@ -98,6 +98,10 @@ var myChart = new Chart(ctx, {
                 }
             }],
             yAxes: [{
+                ticks: {
+                    min : MIN_DBM,
+                    suggestedMax : MAX_DBM
+                },
                 scaleLabel: {
                     display: true,
                     labelString: 'dBm'
