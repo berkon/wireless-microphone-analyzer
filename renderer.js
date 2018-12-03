@@ -396,17 +396,38 @@ ipcRenderer.on ( 'SET_CHAN_PRESET', (event, message) => {
 });
 
 document.addEventListener ( "wheel", function ( e ) {
-    let start_f, stop_f;
-    let delta_freq = ( Math.abs(e.deltaY) / 100 ) * 10000;
+    let start_f = 0, stop_f = 0;
+    //let delta_freq = ( Math.abs(e.deltaY) / 100 ) * 5000;
+    let delta_freq = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 10 ); // 10% of freq range
 
     if ( e.deltaY > 0 ) { // Zoom out
-        start_f = (START_FREQ/1000) - delta_freq;
-        stop_f  = (STOP_FREQ /1000) + delta_freq;
-        console.log ( "ZOOM OUT ", delta_freq, start_f, stop_f)
+        start_f = Math.floor ( START_FREQ/1000 ) - delta_freq;
+        stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq;
     } else { // Zoom in
-        start_f = (START_FREQ/1000) + delta_freq;
-        stop_f  = (STOP_FREQ /1000) - delta_freq;
-        console.log ( "ZOOM IN ", delta_freq, start_f, stop_f)
+        start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
+        stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
+    }
+
+    sendAnalyzer_SetConfig ( start_f, stop_f, "", "" );
+});
+
+document.addEventListener ( "keydown", function ( e ) {
+    let start_f = 0, stop_f = 0;
+    //let delta_freq = 10000;
+    let delta_freq = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 10 ); // 10% of freq range
+
+    switch ( e.keyCode ) {
+        case 37: // Arrow left
+            start_f = Math.floor ( START_FREQ/1000 ) - delta_freq;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
+            break;
+
+        case 39: // Arrow right
+            start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq;
+            break;
+
+        default:
     }
 
     sendAnalyzer_SetConfig ( start_f, stop_f, "", "" );
