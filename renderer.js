@@ -9,7 +9,7 @@ var START_FREQ = undefined;
 var STOP_FREQ  = undefined;
 var FREQ_STEP  = undefined;
 var MAX_DBM    = -20;
-var MIN_DBM    = -110;
+var MIN_DBM    = -100;
 var SWEEP_POINTS = 112;
 var BAND = undefined;
 var VENDOR_ID  = 'NON';
@@ -267,10 +267,8 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
     let start_freq_str = start_freq.toString();
     let stop_freq_str  = stop_freq.toString();
 
-    while ( start_freq_str.length < 7 ) {
-        console.log ( start_freq_str.length)
+    while ( start_freq_str.length < 7 )
         start_freq_str = "0" + start_freq_str;
-    }
 
     while ( stop_freq_str.length < 7 )
         stop_freq_str = "0" + stop_freq_str;
@@ -350,6 +348,9 @@ port.on ( 'data', function ( data ) {
 
             for ( let i = 0 ; i < msg_buf.length ; i++ ) {
                 msg_buf[i] = -( msg_buf[i] / 2 );
+                
+                if ( msg_buf[i] < MIN_DBM)
+                    msg_buf[i] = MIN_DBM;
 
                 if ( msg_buf[i] > myChart.data.datasets[LINE_LIVE].data[i] || myChart.data.datasets[LINE_LIVE].data[i] === undefined ) {
                     myChart.data.datasets[LINE_LIVE].data[i] = msg_buf[i];
