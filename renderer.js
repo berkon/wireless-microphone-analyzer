@@ -257,16 +257,34 @@ function sendAnalyzer_GetConfig () {
 
 // Configure analyzer device
 function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
-    var config_buf = Buffer.from ( '#0C2-F:0'+start_freq+',0'+stop_freq+',-0'+Math.abs(MAX_DBM).toString()+','+MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
+    rec_buf = []; // Buffer for continuosly receiving data
+    rec_buf_str = []; // rec_buf converted to string so that we can check for commands
+    msg_buf = []; // Once a message is complete, it will be placed in this buffer
+    msgStart = -1;
+    msgEnd   = -1;
+    msgId    = -1;
+    let start_freq_str = start_freq.toString();
+    let stop_freq_str  = stop_freq.toString();
+
+    while ( start_freq_str.length < 7 ) {
+        console.log ( start_freq_str.length)
+        start_freq_str = "0" + start_freq_str;
+    }
+
+    while ( stop_freq_str.length < 7 )
+        stop_freq_str = "0" + stop_freq_str;
+
+    var config_buf = Buffer.from ( '#0C2-F:'+start_freq_str+','+stop_freq_str+',-0'+Math.abs(MAX_DBM).toString()+','+MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
     START_FREQ = start_freq * 1000;
     STOP_FREQ  = stop_freq  * 1000;
     BAND = band;
     config_buf.writeUInt8 ( 0x20, 1 );
     port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
-    setTimeout ( () => { sendAnalyzer_GetConfig().then ( () => {
+
+    sendAnalyzer_GetConfig().then ( () => {
         myChart.options.scales.xAxes[0].scaleLabel.labelString = label;
         InitChart ();        
-    });}, 500 );
+    });
 }
 
 
