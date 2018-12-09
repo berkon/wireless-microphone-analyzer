@@ -449,16 +449,25 @@ document.addEventListener ( "keydown", function ( e ) {
     let delta_freq = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 10 ); // 10% of freq range
 
     switch ( e.keyCode ) {
-        case 37: // Arrow left
+        case 37: // Arrow left (move freq band to left)
             start_f = Math.floor ( START_FREQ/1000 ) - delta_freq;
             stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
             break;
 
-        case 39: // Arrow right
+        case 39: // Arrow right (move freq band to right)
             start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
             stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq;
             break;
 
+        case 38: // Zoom in
+            start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
+            break;
+
+        case 40: // Zoom out
+            start_f = Math.floor ( START_FREQ/1000 ) - delta_freq;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq;
+            break;
         default:
     }
 
