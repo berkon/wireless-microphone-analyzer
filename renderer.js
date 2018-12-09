@@ -9,7 +9,7 @@ var START_FREQ = undefined;
 var STOP_FREQ  = undefined;
 var FREQ_STEP  = undefined;
 var MAX_DBM    = -20;
-var MIN_DBM    = -100;
+var MIN_DBM    = -110;
 var SWEEP_POINTS = 112;
 var BAND = undefined;
 var VENDOR_ID  = 'NON';
@@ -70,7 +70,7 @@ var myChart = new Chart(ctx, {
         ]
     },
     options: {
-//        animation: false,
+    //    animation: false,
         responsive: true,
         scales: {
             xAxes: [{
@@ -129,8 +129,11 @@ function setForbidden () {
             data_point++;
         }
 
-        myChart.data.datasets[LINE_FORBIDDEN].data[left_data_point] = MIN_DBM;
-        myChart.data.datasets[LINE_FORBIDDEN].data[right_data_point] = MIN_DBM;
+        if ( left_data_point !== 0)
+            myChart.data.datasets[LINE_FORBIDDEN].data[left_data_point] = MIN_DBM;
+
+        if ( right_data_point !== SWEEP_POINTS -1 )
+            myChart.data.datasets[LINE_FORBIDDEN].data[right_data_point] = MIN_DBM;
     }
 }
 
@@ -300,6 +303,7 @@ var msg_id_array = [
 var msgStart = -1;
 var msgEnd   = -1;
 var msgId    = -1; // Command prefix of the message (see msg_id_array[])
+var rec_buf_sweep_poi = 0;
 
 port.on ( 'data', function ( data ) {
     Array.prototype.push.apply ( rec_buf, data ); //Add new data to receive buffer
@@ -312,30 +316,53 @@ port.on ( 'data', function ( data ) {
         for ( var msg_id of msg_id_array ) {
             let tmpMsgStart = rec_buf_str.indexOf ( msg_id );
 
-            if ( tmpMsgStart !== -1 ) {
-                if ( msgStart === -1 ) {
-                    msgStart = tmpMsgStart;
-                    msgId    = msg_id;
-                } else if ( tmpMsgStart < msgStart ) {
-                    msgStart = tmpMsgStart;
-                    msgId    = msg_id;
-                }
+            if ( tmpMsgStart !== -1 && (msgStart === -1 || tmpMsgStart < msgStart) ) {
+                msgStart = tmpMsgStart;
+                msgId    = msg_id;
             }
         }
     }
 
-    if ( msgStart === -1 ) { // No message found?
+    if ( msgStart === -1 ) // Message found?
+        return;
+
+    if ( msgId === '$Sp' ) {
+        var dataStart = msgStart + msgId.length;
+        var val_changed = false;
+
+        msg_buf = rec_buf.slice ( dataStart + rec_buf_sweep_poi, dataStart + 112 );
+
+        for ( let i = 0 ; i < msg_buf.length ; i++ ) {
+            msg_buf[i] = -( msg_buf[i] / 2 );
+            
+            if ( msg_buf[i] < MIN_DBM)
+                msg_buf[i] = MIN_DBM;
+
+            if ( msg_buf[i] > myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] || myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] === undefined ) {
+                myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] = msg_buf[i];
+                val_changed = true;
+            }
+    
+            rec_buf_sweep_poi++;
+        }
+
+        if ( val_changed )
+            myChart.update();
+
+        if ( rec_buf_sweep_poi === 112 ) { // Not waiting to get CR LF here since logic would be more complicated. Instead CR LF will automatically be skipped anyway when searching for next message!
+            rec_buf = rec_buf.slice ( dataStart + 112 ); // Remove message from rec_buf including CR LF at end of line
+            rec_buf_sweep_poi = 0;
+            msgStart = -1;            
+            msgId    = -1;
+        }
+
         return;
     } else {
-        if ( msgId === '$Sp' ) {
-            if ( rec_buf.length - msgStart >= 114 )
-                msgEnd = msgStart + 114;
-        } else
-            msgEnd = rec_buf_str.indexOf ( '\r\n', msgStart + msgId.length );
+        msgEnd = rec_buf_str.indexOf ( '\r\n', msgStart + msgId.length );
 
-        if ( msgEnd != -1 ) {
+        if ( msgEnd !== -1 ) {
             msg_buf = rec_buf.slice ( msgStart + msgId.length, msgEnd );
-            rec_buf = rec_buf.slice ( msgEnd + 2 ); // Remove oldest message from rec_buf and ignore CR LF#
+            rec_buf = rec_buf.slice ( msgEnd + 2 ); // Remove oldest message from rec_buf including CR LF at end of line
 //console.log ( "ID: "+msgId+" LEN: "+msg_buf.length+"   " + String.fromCharCode.apply ( null, msg_buf) );
 //console.log ( "REMOVE START: 0 END: " + msgEnd );
         } else
@@ -343,25 +370,6 @@ port.on ( 'data', function ( data ) {
     }
 
     switch ( msgId ) {
-        case '$Sp': // Received scan data
-            var val_changed = false;
-
-            for ( let i = 0 ; i < msg_buf.length ; i++ ) {
-                msg_buf[i] = -( msg_buf[i] / 2 );
-                
-                if ( msg_buf[i] < MIN_DBM)
-                    msg_buf[i] = MIN_DBM;
-
-                if ( msg_buf[i] > myChart.data.datasets[LINE_LIVE].data[i] || myChart.data.datasets[LINE_LIVE].data[i] === undefined ) {
-                    myChart.data.datasets[LINE_LIVE].data[i] = msg_buf[i];
-                    val_changed = true;
-                }
-        
-                if ( val_changed )
-                    myChart.update();
-            }
-            break;
-
         case '#C2-F:': // Received config data from device
             let msg_buf_str = String.fromCharCode.apply ( null, msg_buf ); // Convert to characters
             let start_freq_step_idx = msg_buf_str.indexOf(',') + 1;
