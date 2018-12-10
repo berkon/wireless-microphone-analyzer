@@ -1,6 +1,8 @@
 'use strict'
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true; // Disable security warning on the console
 
+var SerialPort = require ( 'serialport' );
+
 const {app, BrowserWindow, Menu} = require('electron')
 let mainWindow
 
@@ -10,7 +12,7 @@ function createWindow () {
     let wc = mainWindow.webContents;
     wc.openDevTools();
 
-    var menu = Menu.buildFromTemplate ([
+    var menuJSON = [
         { label: 'Band', submenu: [
             { label:'Sennheiser', submenu: [
                 { label:'XS Wireless', submenu: [
@@ -188,9 +190,38 @@ function createWindow () {
             { label: 'Sennheiser channels', type: 'radio',                click () { wc.send ( 'SET_VENDOR_4_ANALYSIS', { vendor: 'SEN' } ); } },
             { label: 'Shure channels'     , type: 'radio',                click () { wc.send ( 'SET_VENDOR_4_ANALYSIS', { vendor: 'SHU' } ); } }
         ]},
+        { label: 'Port', submenu: [
+        ]},
         { label: 'Help' }
-    ])
-    Menu.setApplicationMenu(menu);
+    ];
+
+    // Add serial ports to the menu
+    SerialPort.list().then ( (ports, err) => {
+        let portNameArr = [];
+
+        if ( err ) {
+            console.log ( err );
+            return;
+        }
+        
+        ports.forEach ( ( port ) => {
+            portNameArr.push ( port.comName );
+        });
+
+        menuJSON[3].submenu[0] = { label: 'Auto', type: 'radio', click () { wc.send ( 'SET_PORT',  portNameArr ); } }
+
+        portNameArr.forEach ( ( port ) => {
+            menuJSON[3].submenu.push (
+                {
+                    'label' : port,
+                    'type'  : 'radio' ,
+                    click () { wc.send ( 'SET_PORT', { port : port } ); }
+                }
+            );
+        });
+
+        Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) );
+    });
 
     mainWindow.on('closed', function () {
         mainWindow = null;

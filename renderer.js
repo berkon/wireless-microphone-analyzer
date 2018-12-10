@@ -18,6 +18,8 @@ var LINE_LIVE        = 0;
 var LINE_RECOMMENDED = 1;
 var LINE_FORBIDDEN   = 2;
 
+var PORT_MENU_SELECTION = undefined;
+
 const chartColors = {
 	RED    : 'rgb(255, 99 , 132)',
 	ORANGE : 'rgb(255, 159, 64 )',
@@ -33,6 +35,10 @@ let FORBIDDEN_COLOR            = chartColors.RED;
 let SCAN_COLOR                 = chartColors.PURPLE;
 
 let SENNHEISER_CHANNEL_WIDTH   = 96000; // +/-48kHz Spitzenhub
+
+var analyzerGetConfigPromise_Resolve = null;
+var port = undefined;
+var autoPortCheckTimer = undefined;
 
 var ctx = document.getElementById("graph2d").getContext('2d');
 var myChart = new Chart(ctx, {
@@ -129,11 +135,11 @@ function setForbidden () {
             data_point++;
         }
 
-        if ( left_data_point !== 0)
-            myChart.data.datasets[LINE_FORBIDDEN].data[left_data_point] = MIN_DBM;
+//        if ( left_data_point !== 0)
+  //          myChart.data.datasets[LINE_FORBIDDEN].data[left_data_point] = MIN_DBM;
 
-        if ( right_data_point !== SWEEP_POINTS -1 )
-            myChart.data.datasets[LINE_FORBIDDEN].data[right_data_point] = MIN_DBM;
+    //    if ( right_data_point !== SWEEP_POINTS -1 )
+      //      myChart.data.datasets[LINE_FORBIDDEN].data[right_data_point] = MIN_DBM;
     }
 }
 
@@ -236,18 +242,56 @@ function InitChart () {
     myChart.update();
 }
 
-var port = new SerialPort ( "COM2", { baudRate : 500000 }, function ( err ) {
-    if ( err ) {
-        console.log ( 'Error: ', err.message );
-        return;
+function openPort () {
+    if( !PORT_MENU_SELECTION || PORT_MENU_SELECTION === 'AUTO' ) { // Automatic port selection
+        SerialPort.list().then ( (ports, err) => {
+            if ( err ) {
+                console.log ( err );
+                return;
+            }
+
+            let i = 0;
+            autoPortCheckTimer = setInterval ( () => {
+                if ( i === ports.length ) {
+                    clearInterval ( autoPortCheckTimer );
+                    console.log ( "Unable to find RF Explorer!");
+                    return;
+                }
+
+                port = new SerialPort ( ports[i].comName, { baudRate : 500000 }, function ( err ) {
+                    if ( err ) {
+                        console.log ( 'Error: ', err.message );
+                        return;
+                    }
+
+                    setCallbacks();
+
+                    sendAnalyzer_GetConfig ().then ( () => {
+                        clearInterval ( autoPortCheckTimer );
+                        console.log ( "RF Explorer found!" );
+                        InitChart ();
+                    });
+                });
+
+                i++;
+            }, 500);
+        });
+    } else  {
+        port = new SerialPort ( PORT_MENU_SELECTION, { baudRate : 500000 }, function ( err ) {
+            if ( err ) {
+                console.log ( 'Error: ', err.message );
+                return;
+            }
+
+            setCallbacks();
+
+            sendAnalyzer_GetConfig ().then ( () => {
+                console.log ( "RF Explorer found!" );
+                InitChart ();
+            });
+        });
     }
-
-    sendAnalyzer_GetConfig ().then ( () => {
-        InitChart ();
-    })
-});
-
-var analyzerGetConfigPromise_Resolve = null;
+}
 
 // Receive device configuration for confirming configured values and start receiving analyzer data.
 function sendAnalyzer_GetConfig () {
@@ -306,88 +350,92 @@ var msgEnd   = -1;
 var msgId    = -1; // Command prefix of the message (see msg_id_array[])
 var rec_buf_sweep_poi = 0;
 
-port.on ( 'data', function ( data ) {
-    Array.prototype.push.apply ( rec_buf, data ); //Add new data to receive buffer
-    rec_buf_str = String.fromCharCode.apply ( null, rec_buf ); // Convert to characters
+function setCallbacks () {
+    port.on ( 'data', function ( data ) {
+        Array.prototype.push.apply ( rec_buf, data ); //Add new data to receive buffer
+        rec_buf_str = String.fromCharCode.apply ( null, rec_buf ); // Convert to characters
 
-    if ( msgStart === -1 ) { // Look for message start
-        msgEnd = -1;
-        msgId  = -1;
+        if ( msgStart === -1 ) { // Look for message start
+            msgEnd = -1;
+            msgId  = -1;
 
-        for ( var msg_id of msg_id_array ) {
-            let tmpMsgStart = rec_buf_str.indexOf ( msg_id );
+            for ( var msg_id of msg_id_array ) {
+                let tmpMsgStart = rec_buf_str.indexOf ( msg_id );
 
-            if ( tmpMsgStart !== -1 && (msgStart === -1 || tmpMsgStart < msgStart) ) {
-                msgStart = tmpMsgStart;
-                msgId    = msg_id;
+                if ( tmpMsgStart !== -1 && (msgStart === -1 || tmpMsgStart < msgStart) ) {
+                    msgStart = tmpMsgStart;
+                    msgId    = msg_id;
+                }
             }
         }
-    }
 
-    if ( msgStart === -1 ) // Message found?
-        return;
-
-    if ( msgId === '$Sp' ) {
-        var dataStart = msgStart + msgId.length;
-        var val_changed = false;
-
-        msg_buf = rec_buf.slice ( dataStart + rec_buf_sweep_poi, dataStart + 112 );
-
-        for ( let i = 0 ; i < msg_buf.length ; i++ ) {
-            msg_buf[i] = -( msg_buf[i] / 2 );
-            
-            if ( msg_buf[i] < MIN_DBM)
-                msg_buf[i] = MIN_DBM;
-
-            if ( msg_buf[i] > myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] || myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] === undefined ) {
-                myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] = msg_buf[i];
-                val_changed = true;
-            }
-    
-            rec_buf_sweep_poi++;
-        }
-
-        if ( val_changed )
-            myChart.update();
-
-        if ( rec_buf_sweep_poi === 112 ) { // Not waiting to get CR LF here since logic would be more complicated. Instead CR LF will automatically be skipped anyway when searching for next message!
-            rec_buf = rec_buf.slice ( dataStart + 112 ); // Remove message from rec_buf including CR LF at end of line
-            rec_buf_sweep_poi = 0;
-            msgStart = -1;            
-            msgId    = -1;
-        }
-
-        return;
-    } else {
-        msgEnd = rec_buf_str.indexOf ( '\r\n', msgStart + msgId.length );
-
-        if ( msgEnd !== -1 ) {
-            msg_buf = rec_buf.slice ( msgStart + msgId.length, msgEnd );
-            rec_buf = rec_buf.slice ( msgEnd + 2 ); // Remove oldest message from rec_buf including CR LF at end of line
-//console.log ( "ID: "+msgId+" LEN: "+msg_buf.length+"   " + String.fromCharCode.apply ( null, msg_buf) );
-//console.log ( "REMOVE START: 0 END: " + msgEnd );
-        } else
+        if ( msgStart === -1 ) // Message found?
             return;
-    }
 
-    switch ( msgId ) {
-        case '#C2-F:': // Received config data from device
-            let msg_buf_str = String.fromCharCode.apply ( null, msg_buf ); // Convert to characters
-            let start_freq_step_idx = msg_buf_str.indexOf(',') + 1;
-            START_FREQ = parseInt ( msg_buf_str.slice ( 0, start_freq_step_idx) ) * 1000;
-            FREQ_STEP  = parseInt ( msg_buf_str.slice ( start_freq_step_idx, msg_buf_str.indexOf(',', start_freq_step_idx)) );
-            STOP_FREQ  = ( FREQ_STEP * (SWEEP_POINTS-1) ) + START_FREQ;
-            analyzerGetConfigPromise_Resolve();
-            break;
+        if ( msgId === '$Sp' ) {
+            var dataStart = msgStart + msgId.length;
+            var val_changed = false;
 
-        default:
-            console.log ( "Unknown command!");
-    }
+            msg_buf = rec_buf.slice ( dataStart + rec_buf_sweep_poi, dataStart + 112 );
 
-    msgStart = -1;            
-    msgEnd   = -1;
-    msgId    = -1;
-});
+            for ( let i = 0 ; i < msg_buf.length ; i++ ) {
+                msg_buf[i] = -( msg_buf[i] / 2 );
+                
+                if ( msg_buf[i] < MIN_DBM)
+                    msg_buf[i] = MIN_DBM;
+
+                if ( msg_buf[i] > myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] || myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] === undefined ) {
+                    myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] = msg_buf[i];
+                    val_changed = true;
+                }
+        
+                rec_buf_sweep_poi++;
+            }
+
+            if ( val_changed )
+                myChart.update();
+
+            if ( rec_buf_sweep_poi === 112 ) { // Not waiting to get CR LF here since logic would be more complicated. Instead CR LF will automatically be skipped anyway when searching for next message!
+                rec_buf = rec_buf.slice ( dataStart + 112 ); // Remove message from rec_buf including CR LF at end of line
+                rec_buf_sweep_poi = 0;
+                msgStart = -1;            
+                msgId    = -1;
+            }
+
+            return;
+        } else {
+            msgEnd = rec_buf_str.indexOf ( '\r\n', msgStart + msgId.length );
+
+            if ( msgEnd !== -1 ) {
+                msg_buf = rec_buf.slice ( msgStart + msgId.length, msgEnd );
+                rec_buf = rec_buf.slice ( msgEnd + 2 ); // Remove oldest message from rec_buf including CR LF at end of line
+    //console.log ( "ID: "+msgId+" LEN: "+msg_buf.length+"   " + String.fromCharCode.apply ( null, msg_buf) );
+    //console.log ( "REMOVE START: 0 END: " + msgEnd );
+            } else
+                return;
+        }
+
+        switch ( msgId ) {
+            case '#C2-F:': // Received config data from device
+                let msg_buf_str = String.fromCharCode.apply ( null, msg_buf ); // Convert to characters
+                let start_freq_step_idx = msg_buf_str.indexOf(',') + 1;
+                START_FREQ = parseInt ( msg_buf_str.slice ( 0, start_freq_step_idx) ) * 1000;
+                FREQ_STEP  = parseInt ( msg_buf_str.slice ( start_freq_step_idx, msg_buf_str.indexOf(',', start_freq_step_idx)) );
+                STOP_FREQ  = ( FREQ_STEP * (SWEEP_POINTS-1) ) + START_FREQ;
+                analyzerGetConfigPromise_Resolve();
+                break;
+
+            default:
+                console.log ( "Unknown command!");
+        }
+
+        msgStart = -1;            
+        msgEnd   = -1;
+        msgId    = -1;
+    });
+}
+
+openPort();
 
 ipcRenderer.on ( 'CHANGE_BAND', (event, message) => {
     sendAnalyzer_SetConfig ( message.start_freq, message.stop_freq, message.label, message.band );
@@ -426,6 +474,21 @@ ipcRenderer.on ( 'SET_CHAN_PRESET', (event, message) => {
     //myChart.config.options.scales.xAxes[2].labels = [];
     setVendorChannels ( FREQUENCIES[vendor+'_'+band+'_'+series][parseInt(preset)-1], preset );
     myChart.update();
+});
+
+ipcRenderer.on ( 'SET_PORT', (event, message) => {
+    if ( Array.isArray(message) ) // If this is an array => Auto mode was chosen
+        PORT_MENU_SELECTION = 'AUTO';
+    else
+        PORT_MENU_SELECTION = message.port;
+
+    if ( port && port.isOpen ) {
+        console.log ( "Closing open port ...");
+        port.close ( () => {
+            openPort();
+        });
+    } else
+        openPort();
 });
 
 document.addEventListener ( "wheel", function ( e ) {
