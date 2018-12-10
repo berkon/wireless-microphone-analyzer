@@ -11,7 +11,6 @@ var FREQ_STEP  = undefined;
 var MAX_DBM    = -20;
 var MIN_DBM    = -110;
 var SWEEP_POINTS = 112;
-var BAND = undefined;
 var VENDOR_ID  = 'NON';
 
 var LINE_LIVE        = 0;
@@ -324,7 +323,6 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
     var config_buf = Buffer.from ( '#0C2-F:'+start_freq_str+','+stop_freq_str+',-0'+Math.abs(MAX_DBM).toString()+','+MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
     START_FREQ = start_freq * 1000;
     STOP_FREQ  = stop_freq  * 1000;
-    BAND = band;
     config_buf.writeUInt8 ( 0x20, 1 );
     port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
 
@@ -504,7 +502,16 @@ document.addEventListener ( "wheel", function ( e ) {
         stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
     }
 
-    sendAnalyzer_SetConfig ( start_f, stop_f, "", "" );
+    let start_f_str = start_f / 1000;
+    start_f_str = start_f_str.toString();
+    
+    let stop_f_str = stop_f / 1000;
+    stop_f_str = stop_f_str.toString();
+
+    let span_f_str = (stop_f - start_f) / 1000;
+    span_f_str = span_f_str.toString();
+
+    sendAnalyzer_SetConfig ( start_f, stop_f, start_f_str + " - " + stop_f_str + " MHz  (Span: " + span_f_str + "MHz)", "" );
 });
 
 document.addEventListener ( "keydown", function ( e ) {
@@ -535,5 +542,14 @@ document.addEventListener ( "keydown", function ( e ) {
         default:
     }
 
-    sendAnalyzer_SetConfig ( start_f, stop_f, "", "" );
+    let start_f_str = start_f / 1000;
+    start_f_str = start_f_str.toString();
+    
+    let stop_f_str = stop_f / 1000;
+    stop_f_str = stop_f_str.toString();
+
+    let span_f_str = (stop_f - start_f) / 1000;
+    span_f_str = span_f_str.toString();
+
+    sendAnalyzer_SetConfig ( start_f, stop_f, start_f_str + " - " + stop_f_str + " MHz  (Span: " + span_f_str + "MHz)", "" );
 });
