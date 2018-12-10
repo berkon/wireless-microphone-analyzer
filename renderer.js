@@ -267,6 +267,7 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
     msgStart = -1;
     msgEnd   = -1;
     msgId    = -1;
+    rec_buf_sweep_poi = 0;
     let start_freq_str = start_freq.toString();
     let stop_freq_str  = stop_freq.toString();
 
