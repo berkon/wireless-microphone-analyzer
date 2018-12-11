@@ -497,10 +497,17 @@ document.addEventListener ( "wheel", function ( e ) {
     if ( e.deltaY > 0 ) { // Zoom out
         start_f = Math.floor ( START_FREQ/1000 ) - delta_freq;
         stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq;
-    } else { // Zoom in
+    } else if ( e.deltaY < 0 ) { // Zoom in
         start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
         stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
+    } else if ( e.deltaX < 0 ) { // Move left
+        start_f = Math.floor ( START_FREQ/1000 ) - delta_freq;
+        stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
+    } else if ( e.deltaX > 0 ) { // Move right
+        start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
+        stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq;
     }
+
 
     let start_f_str = start_f / 1000;
     start_f_str = start_f_str.toString();
