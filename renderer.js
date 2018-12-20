@@ -55,13 +55,13 @@ var myChart = new Chart(ctx, {
                 lineTension: 0.4
             },{
                 label: 'Recommended by manuf.',
-                backgroundColor: Chart.helpers.color(RECOMMENDED_CHANNELS_COLOR).alpha(0.2).rgbString(),
+                backgroundColor: Chart.helpers.color(RECOMMENDED_CHANNELS_COLOR).alpha(0.5).rgbString(),
                 borderColor: RECOMMENDED_CHANNELS_COLOR,
                 borderWidth: 2,
                 pointRadius: 0,
                 fill: 'start',
                 lineTension: 0,
-                spanGaps: true
+                spanGaps: false
             },{
                 label: 'Forbidden',
                 backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.2).rgbString(),
@@ -165,16 +165,16 @@ function setVendorChannels ( presets, bank ) {
         f = f.join('');
         myChart.config.options.scales.xAxes[2].labels[left_data_point] = 'B'+(bank.length===1?'0':'')+bank+'.C'+(i.toString().length===1?'0':'')+(i+1)+'  ('+f+')';
 
-        if ( left_data_point - 1 >= 0 )
-            myChart.data.datasets[LINE_RECOMMENDED].data[left_data_point-1] = MIN_DBM;
+//        if ( left_data_point - 1 >= 0 )
+  //          myChart.data.datasets[LINE_RECOMMENDED].data[left_data_point-1] = MIN_DBM;
         
         while ( data_point <= right_data_point ) {
             myChart.data.datasets[LINE_RECOMMENDED].data[data_point] = MAX_DBM;
             data_point++;
         }
 
-        if ( right_data_point + 1 < SWEEP_POINTS )
-            myChart.data.datasets[LINE_RECOMMENDED].data[right_data_point+1] = MIN_DBM;
+//        if ( right_data_point + 1 < SWEEP_POINTS )
+  //          myChart.data.datasets[LINE_RECOMMENDED].data[right_data_point+1] = MIN_DBM;
     }
 
     myChart.config.options.scales.xAxes[2].labels[0]   = '.'
