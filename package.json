@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "chart.js": "^2.7.2",
+    "configstore": "^4.0.0",
     "require-all": "^3.0.0",
     "serialport": "^7.0.2",
     "vis": "^4.21.0"

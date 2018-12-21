@@ -1,9 +1,13 @@
 'use strict'
 
-var { ipcRenderer } = require ( 'electron' );
-var SerialPort = require ( 'serialport' );
-var Chart      = require ( 'chart.js'   );
-const FREQUENCIES = require('require-all')(__dirname +'/frequency_data/presets');
+const { ipcRenderer } = require ( 'electron'    );
+const ConfigStore     = require ( 'configstore' );
+const SerialPort      = require ( 'serialport'  );
+const Chart           = require ( 'chart.js'    );
+const FREQUENCIES     = require ( 'require-all' )(__dirname +'/frequency_data/presets');
+const Pkg             = require ('./package.json');
+
+const configStore = new ConfigStore ( Pkg.name );
 
 var START_FREQ = undefined;
 var STOP_FREQ  = undefined;
@@ -39,10 +43,10 @@ var analyzerGetConfigPromise_Resolve = null;
 var port = undefined;
 var autoPortCheckTimer = undefined;
 
-let chPreset_Vendor = undefined;
-let chPreset_Band   = undefined;
-let chPreset_Series = undefined;
-let chPreset_Preset = undefined;
+let chPreset_Vendor = configStore.get('chPreset.vendor');
+let chPreset_Band   = configStore.get('chPreset.band'  );
+let chPreset_Series = configStore.get('chPreset.series');
+let chPreset_Preset = configStore.get('chPreset.preset');
 
 var ctx = document.getElementById("graph2d").getContext('2d');
 var myChart = new Chart(ctx, {
@@ -477,6 +481,12 @@ ipcRenderer.on ( 'SET_CHAN_PRESET', (event, message) => {
     chPreset_Band   = preset_arr[1];
     chPreset_Series = preset_arr[2];
     chPreset_Preset = preset_arr[3];
+
+    configStore.set ( 'chPreset.vendor', chPreset_Vendor );
+    configStore.set ( 'chPreset.band'  , chPreset_Band   );
+    configStore.set ( 'chPreset.series', chPreset_Series );
+    configStore.set ( 'chPreset.preset', chPreset_Preset );
+
     //myChart.config.options.scales.xAxes[2].labels = [];
     setVendorChannels ( FREQUENCIES[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
     myChart.update();
