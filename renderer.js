@@ -15,7 +15,7 @@ var FREQ_STEP  = undefined;
 
 var MAX_DBM    = -20;
 var MIN_DBM    = -110;
-var CONGESTION_LEVEL_DBM = -100;
+var CONGESTION_LEVEL_DBM = -85;
 
 var SWEEP_POINTS = 112;
 var VENDOR_ID  = 'NON';
@@ -145,13 +145,22 @@ var myChart = new Chart(ctx, {
 
 function setForbidden () {
     for ( var f of FREQUENCIES.forbidden ) {
-        if ( !isInRange ( f.start*1000, f.stop*1000) )
+        let range_res = isInRange ( f.start*1000, f.stop*1000);
+        let left_data_point  = undefined;
+        let right_data_point = undefined;
+
+        if ( !range_res )
             continue;
 
-        let left_data_point  = alignToBoundary ( Math.round ( (f.start * 1000 - START_FREQ) / FREQ_STEP ) );
-        let right_data_point = alignToBoundary ( Math.round ( (f.stop  * 1000 - START_FREQ) / FREQ_STEP ) );
-        let data_point = left_data_point;
+        if ( range_res === "FULL_COVERAGE" ) {
+            left_data_point  = 0;
+            right_data_point = SWEEP_POINTS - 1;
+        } else {
+            left_data_point  = alignToBoundary ( Math.round ( (f.start * 1000 - START_FREQ) / FREQ_STEP ) );
+            right_data_point = alignToBoundary ( Math.round ( (f.stop  * 1000 - START_FREQ) / FREQ_STEP ) );
+        }
 
+        let data_point = left_data_point;
         myChart.config.options.scales.xAxes[1].labels[left_data_point] = f.info;
 
         while ( data_point <= right_data_point ) {
@@ -208,6 +217,8 @@ function setVendorChannels ( presets, bank ) {
 function isInRange ( start, stop ) {
     if ( (start >= START_FREQ && start <= STOP_FREQ) || (stop >= START_FREQ && stop <= STOP_FREQ) )
         return true;
+    else if ( (start <= START_FREQ && stop >= STOP_FREQ) )
+        return "FULL_COVERAGE";
     else
         return false;
 }
