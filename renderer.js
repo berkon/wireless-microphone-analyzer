@@ -39,6 +39,11 @@ var analyzerGetConfigPromise_Resolve = null;
 var port = undefined;
 var autoPortCheckTimer = undefined;
 
+let chPreset_Vendor = undefined;
+let chPreset_Band   = undefined;
+let chPreset_Series = undefined;
+let chPreset_Preset = undefined;
+
 var ctx = document.getElementById("graph2d").getContext('2d');
 var myChart = new Chart(ctx, {
     type: 'line',
@@ -237,7 +242,10 @@ function InitChart () {
     }
 
     setForbidden ();
-    setVendorChannels ();
+
+    if ( chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset)
+        setVendorChannels ( FREQUENCIES[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+
     myChart.update();
 }
 
@@ -465,12 +473,12 @@ ipcRenderer.on ( 'SET_VENDOR_4_ANALYSIS', (event, message) => {
 
 ipcRenderer.on ( 'SET_CHAN_PRESET', (event, message) => {
     let preset_arr = message.preset.split ( '_' );
-    let vendor = preset_arr[0];
-    let band   = preset_arr[1];
-    let series = preset_arr[2];
-    let preset = preset_arr[3];
+    chPreset_Vendor = preset_arr[0];
+    chPreset_Band   = preset_arr[1];
+    chPreset_Series = preset_arr[2];
+    chPreset_Preset = preset_arr[3];
     //myChart.config.options.scales.xAxes[2].labels = [];
-    setVendorChannels ( FREQUENCIES[vendor+'_'+band+'_'+series][parseInt(preset)-1], preset );
+    setVendorChannels ( FREQUENCIES[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
     myChart.update();
 });
 
