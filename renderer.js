@@ -12,14 +12,18 @@ const configStore = new ConfigStore ( Pkg.name );
 var START_FREQ = undefined;
 var STOP_FREQ  = undefined;
 var FREQ_STEP  = undefined;
+
 var MAX_DBM    = -20;
 var MIN_DBM    = -110;
+var CONGESTION_LEVEL_DBM = -100;
+
 var SWEEP_POINTS = 112;
 var VENDOR_ID  = 'NON';
 
 var LINE_LIVE        = 0;
 var LINE_RECOMMENDED = 1;
 var LINE_FORBIDDEN   = 2;
+var LINE_CONGESTED   = 3;
 
 var PORT_MENU_SELECTION = undefined;
 
@@ -36,6 +40,7 @@ const chartColors = {
 let RECOMMENDED_CHANNELS_COLOR = chartColors.GREEN;
 let FORBIDDEN_COLOR            = chartColors.RED;
 let SCAN_COLOR                 = chartColors.PURPLE;
+let CONGESTED_COLOR            = chartColors.ORANGE;
 
 let SENNHEISER_CHANNEL_WIDTH   = 96000; // +/-48kHz Spitzenhub
 
@@ -47,6 +52,8 @@ let chPreset_Vendor = configStore.get('chPreset.vendor');
 let chPreset_Band   = configStore.get('chPreset.band'  );
 let chPreset_Series = configStore.get('chPreset.series');
 let chPreset_Preset = configStore.get('chPreset.preset');
+
+var chDispValShadowArr = [];
 
 var ctx = document.getElementById("graph2d").getContext('2d');
 var myChart = new Chart(ctx, {
@@ -66,7 +73,7 @@ var myChart = new Chart(ctx, {
                 label: 'Recommended by manuf.',
                 backgroundColor: Chart.helpers.color(RECOMMENDED_CHANNELS_COLOR).alpha(0.5).rgbString(),
                 borderColor: RECOMMENDED_CHANNELS_COLOR,
-                borderWidth: 2,
+                borderWidth: 0.01, // 0 is not working!
                 pointRadius: 0,
                 fill: 'start',
                 lineTension: 0,
@@ -75,7 +82,16 @@ var myChart = new Chart(ctx, {
                 label: 'Forbidden',
                 backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.2).rgbString(),
                 borderColor: FORBIDDEN_COLOR,
-                borderWidth: 2,
+                borderWidth: 0.01, // 0 is not working!
+                pointRadius: 0,
+                fill: 'start',
+                lineTension: 0,
+                spanGaps: false
+            },{
+                label: 'Congested',
+                backgroundColor: Chart.helpers.color(CONGESTED_COLOR).alpha(0.5).rgbString(),
+                borderColor: CONGESTED_COLOR,
+                borderWidth: 0.01, // 0 is not working!
                 pointRadius: 0,
                 fill: 'start',
                 lineTension: 0,
@@ -142,12 +158,6 @@ function setForbidden () {
             myChart.data.datasets[LINE_FORBIDDEN].data[data_point] = MAX_DBM;
             data_point++;
         }
-
-//        if ( left_data_point !== 0)
-  //          myChart.data.datasets[LINE_FORBIDDEN].data[left_data_point] = MIN_DBM;
-
-    //    if ( right_data_point !== SWEEP_POINTS -1 )
-      //      myChart.data.datasets[LINE_FORBIDDEN].data[right_data_point] = MIN_DBM;
     }
 }
 
@@ -157,7 +167,9 @@ function setVendorChannels ( presets, bank ) {
     
     for ( let i = 0 ; i < SWEEP_POINTS ; i++ ) {
         myChart.data.datasets[LINE_RECOMMENDED].data[i] = undefined;
+        myChart.data.datasets[LINE_CONGESTED].data[i]   = undefined;
         myChart.config.options.scales.xAxes[2].labels[i] = '';
+        chDispValShadowArr = [];
     }
 
     for ( let i = 0 ; i < presets.length ; i++ ) {
@@ -168,29 +180,25 @@ function setVendorChannels ( presets, bank ) {
         if ( !isInRange ( left_freq_edge, right_freq_edge) )
             continue;
 
-        let left_data_point  = alignToBoundary ( Math.floor ( (left_freq_edge  - START_FREQ) / FREQ_STEP ) );
-        let right_data_point = alignToBoundary ( Math.ceil ( (right_freq_edge - START_FREQ) / FREQ_STEP ) );
+        let left_data_point  = alignToBoundary ( Math.round ( (left_freq_edge  - START_FREQ) / FREQ_STEP ) );
+        let right_data_point = alignToBoundary ( Math.round ( (right_freq_edge - START_FREQ) / FREQ_STEP ) );
 
         if ( right_data_point === left_data_point && right_data_point < SWEEP_POINTS - 1)
             right_data_point++;
-
+        
+        chDispValShadowArr.push ([left_data_point, right_data_point, false]); // Last param shows if congested or not
+        
         let data_point       = left_data_point;
         let f = presets[i].toString().split('');
-        f.splice( 3, 0, "." );
-        f = f.join('');
+        f.splice ( 3, 0, "." );
+        f = f.join ( '' );
         let label_pos = left_data_point + Math.floor((right_data_point - left_data_point )/2);
         myChart.config.options.scales.xAxes[2].labels[label_pos] = 'B'+(bank.length===1?'0':'')+bank+'.C'+(i.toString().length===1?'0':'')+(i+1)+'  ('+f+')';
 
-//        if ( left_data_point - 1 >= 0 )
-  //          myChart.data.datasets[LINE_RECOMMENDED].data[left_data_point-1] = MIN_DBM;
-        
         while ( data_point <= right_data_point ) {
             myChart.data.datasets[LINE_RECOMMENDED].data[data_point] = MAX_DBM;
             data_point++;
         }
-
-//        if ( right_data_point + 1 < SWEEP_POINTS )
-  //          myChart.data.datasets[LINE_RECOMMENDED].data[right_data_point+1] = MIN_DBM;
     }
 
     myChart.config.options.scales.xAxes[2].labels[0]   = ' ';
@@ -242,9 +250,10 @@ function InitChart () {
 
     // Initialize all values of all graphs (except the scan graph) with lowest dBm value
     for ( let i = 0 ; i < SWEEP_POINTS ; i++ ) {
-        myChart.data.datasets[LINE_LIVE].data[i] = undefined; // Live scan
+        myChart.data.datasets[LINE_LIVE].data[i]        = undefined; // Live scan
         myChart.data.datasets[LINE_RECOMMENDED].data[i] = undefined; // Recommended
-        myChart.data.datasets[LINE_FORBIDDEN].data[i] = undefined; // Forbidden
+        myChart.data.datasets[LINE_FORBIDDEN].data[i]   = undefined; // Forbidden
+        myChart.data.datasets[LINE_CONGESTED].data[i]   = undefined; // Congested
     }
 
     for ( let i = 0 ; i < SWEEP_POINTS ; i++ ) {
@@ -351,6 +360,22 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
     });
 }
 
+function checkCongestion ( pos, val ) {
+    for ( let i = 0 ; i < chDispValShadowArr.length ; i++ ) {
+        let low_pos       = chDispValShadowArr[i][0];
+        let high_pos      = chDispValShadowArr[i][1];
+        let oldCongestVal = chDispValShadowArr[i][2];
+
+        if ( pos >= low_pos && pos <= high_pos && val >= CONGESTION_LEVEL_DBM ) {
+            chDispValShadowArr[i][2] = true;
+
+            if ( !oldCongestVal )
+                return [ low_pos, high_pos ];
+        }
+    }
+
+    return false;
+}
 
 /***********************************/
 /*    Receive data from device     */
@@ -404,8 +429,17 @@ function setCallbacks () {
                 if ( msg_buf[i] > myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] || myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] === undefined ) {
                     myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] = msg_buf[i];
                     val_changed = true;
+
+                    let congestedChannel = checkCongestion ( rec_buf_sweep_poi, msg_buf[i] );
+
+                    if ( congestedChannel ) {
+                        for ( let i = congestedChannel[0] ; i <= congestedChannel[1] ; i++ ) {
+                            myChart.data.datasets[LINE_RECOMMENDED].data[i] = undefined;
+                            myChart.data.datasets[LINE_CONGESTED  ].data[i] = MAX_DBM;
+                        }
+                    }
                 }
-        
+
                 rec_buf_sweep_poi++;
             }
 
