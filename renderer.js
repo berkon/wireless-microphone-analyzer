@@ -168,13 +168,18 @@ function setVendorChannels ( presets, bank ) {
         if ( !isInRange ( left_freq_edge, right_freq_edge) )
             continue;
 
-        let left_data_point  = alignToBoundary ( Math.round ( (left_freq_edge  - START_FREQ) / FREQ_STEP ) );
-        let right_data_point = alignToBoundary ( Math.round ( (right_freq_edge - START_FREQ) / FREQ_STEP ) );
+        let left_data_point  = alignToBoundary ( Math.floor ( (left_freq_edge  - START_FREQ) / FREQ_STEP ) );
+        let right_data_point = alignToBoundary ( Math.ceil ( (right_freq_edge - START_FREQ) / FREQ_STEP ) );
+
+        if ( right_data_point === left_data_point && right_data_point < SWEEP_POINTS - 1)
+            right_data_point++;
+
         let data_point       = left_data_point;
         let f = presets[i].toString().split('');
         f.splice( 3, 0, "." );
         f = f.join('');
-        myChart.config.options.scales.xAxes[2].labels[left_data_point] = 'B'+(bank.length===1?'0':'')+bank+'.C'+(i.toString().length===1?'0':'')+(i+1)+'  ('+f+')';
+        let label_pos = left_data_point + Math.floor((right_data_point - left_data_point )/2);
+        myChart.config.options.scales.xAxes[2].labels[label_pos] = 'B'+(bank.length===1?'0':'')+bank+'.C'+(i.toString().length===1?'0':'')+(i+1)+'  ('+f+')';
 
 //        if ( left_data_point - 1 >= 0 )
   //          myChart.data.datasets[LINE_RECOMMENDED].data[left_data_point-1] = MIN_DBM;
