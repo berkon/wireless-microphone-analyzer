@@ -572,6 +572,7 @@ document.addEventListener ( "keydown", function ( e ) {
             stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq;
             break;
         default:
+            return;
     }
 
     let start_f_str = start_f / 1000;
