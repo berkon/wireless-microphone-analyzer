@@ -359,7 +359,11 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
     while ( stop_freq_str.length < 7 )
         stop_freq_str = "0" + stop_freq_str;
 
-    var config_buf = Buffer.from ( '#0C2-F:'+start_freq_str+','+stop_freq_str+',-0'+Math.abs(MAX_DBM).toString()+','+MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
+    var config_buf = Buffer.from ( '#0Cp2', 'ascii' ); // Second character will be replaced in next line by a binary lenght value
+    config_buf.writeUInt8 ( 0x05, 1 );
+    port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
+
+    config_buf = Buffer.from ( '#0C2-F:'+start_freq_str+','+stop_freq_str+',-0'+Math.abs(MAX_DBM).toString()+','+MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
     START_FREQ = start_freq * 1000;
     STOP_FREQ  = stop_freq  * 1000;
     config_buf.writeUInt8 ( 0x20, 1 );
