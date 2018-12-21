@@ -155,8 +155,10 @@ function setVendorChannels ( presets, bank ) {
     if ( !presets )
         return;
     
-    for ( let i = 0 ; i < SWEEP_POINTS ; i++ )
+    for ( let i = 0 ; i < SWEEP_POINTS ; i++ ) {
         myChart.data.datasets[LINE_RECOMMENDED].data[i] = undefined;
+        myChart.config.options.scales.xAxes[2].labels[i] = '';
+    }
 
     for ( let i = 0 ; i < presets.length ; i++ ) {
         let left_freq_edge  = presets[i]*1000 - SENNHEISER_CHANNEL_WIDTH/2;
@@ -186,8 +188,8 @@ function setVendorChannels ( presets, bank ) {
   //          myChart.data.datasets[LINE_RECOMMENDED].data[right_data_point+1] = MIN_DBM;
     }
 
-    myChart.config.options.scales.xAxes[2].labels[0]   = '.'
-    myChart.config.options.scales.xAxes[2].labels[112] = '.'
+    myChart.config.options.scales.xAxes[2].labels[0]   = ' ';
+    myChart.config.options.scales.xAxes[2].labels[SWEEP_POINTS-1] = ' ';
 }
 
 function isInRange ( start, stop ) {
