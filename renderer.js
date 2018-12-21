@@ -552,14 +552,30 @@ document.addEventListener ( "keydown", function ( e ) {
     let delta_freq = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 10 ); // 10% of freq range
 
     switch ( e.keyCode ) {
-        case 37: // Arrow left (move freq band to left)
-            start_f = Math.floor ( START_FREQ/1000 ) - delta_freq;
-            stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
+        case 37: // Arrow left
+             if ( !e.ctrlKey ) { // Move freq band to left
+                start_f = Math.floor ( START_FREQ/1000 ) - delta_freq;
+                stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
+             } else { // Toggle vendor specific channel presets/banks down
+                if ( chPreset_Preset > 1 ) {
+                    chPreset_Preset--;
+                    setVendorChannels ( FREQUENCIES[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+                }
+                return;
+             }
             break;
 
-        case 39: // Arrow right (move freq band to right)
-            start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
-            stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq;
+        case 39: // Arrow right
+            if ( !e.ctrlKey ) { // Move freq band to right
+                start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
+                stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq;
+            } else { // Toggle vendor specific channel presets/banks up
+                if ( chPreset_Preset <  FREQUENCIES[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length ) {
+                    chPreset_Preset++;
+                    setVendorChannels ( FREQUENCIES[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+                }
+                return;
+            }
             break;
 
         case 38: // Zoom in
