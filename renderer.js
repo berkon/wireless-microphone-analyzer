@@ -24,6 +24,7 @@ var LINE_LIVE        = 0;
 var LINE_RECOMMENDED = 1;
 var LINE_FORBIDDEN   = 2;
 var LINE_CONGESTED   = 3;
+var LINE_CONGEST_TRESH = 4;
 
 var PORT_MENU_SELECTION = undefined;
 
@@ -96,12 +97,31 @@ var myChart = new Chart(ctx, {
                 fill: 'start',
                 lineTension: 0,
                 spanGaps: false
+            },{
+                label: 'Congest_Thresh',
+                backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.5).rgbString(),
+                borderColor: FORBIDDEN_COLOR,
+                borderWidth: 2, // 0 is not working!
+                pointRadius: 0,
+                fill: 'none',
+                lineTension: 0,
+                spanGaps: true
             }
         ]
     },
     options: {
     //    animation: false,
         responsive: true,
+        legend: {
+            labels :  {
+                filter: (legendItem, chartData) => {
+                    if ( legendItem.datasetIndex === 4 )
+                        return false;
+                    else
+                        return true;
+                }
+            }
+        },
         scales: {
             xAxes: [{
                 scaleLabel: {
@@ -265,6 +285,8 @@ function InitChart () {
         myChart.data.datasets[LINE_RECOMMENDED].data[i] = undefined; // Recommended
         myChart.data.datasets[LINE_FORBIDDEN].data[i]   = undefined; // Forbidden
         myChart.data.datasets[LINE_CONGESTED].data[i]   = undefined; // Congested
+        myChart.data.datasets[LINE_CONGEST_TRESH].data[0] = CONGESTION_LEVEL_DBM;
+        myChart.data.datasets[LINE_CONGEST_TRESH].data[SWEEP_POINTS-1] = CONGESTION_LEVEL_DBM;
     }
 
     for ( let i = 0 ; i < SWEEP_POINTS ; i++ ) {
