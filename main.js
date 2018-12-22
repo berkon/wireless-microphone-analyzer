@@ -16,6 +16,13 @@ function createWindow () {
         { label: 'Band', submenu: [
             { label:'Sennheiser', submenu: [
                 { label:'XS Wireless', submenu: [
+                    { label: 'A-Band   (548 - 572MHz)', click () { wc.send ( 'CHANGE_BAND', { start_freq: 548000, stop_freq: 572000, label: 'Sennheiser XS Wireless A-Band (548 - 572MHz)' , band: 'SEN_A_XS' } ); } },
+                    { label: 'GB-Band  (606 - 630MHz)', click () { wc.send ( 'CHANGE_BAND', { start_freq: 606000, stop_freq: 630000, label: 'Sennheiser XS Wireless GB-Band (606 - 630MHz)', band: 'SEN_GB_XS'} ); } },
+                    { label: 'B-Band   (614 - 638MHz)', click () { wc.send ( 'CHANGE_BAND', { start_freq: 614000, stop_freq: 638000, label: 'Sennheiser XS Wireless B-Band (614 - 638MHz)' , band: 'SEN_B_XS' } ); } },
+                    { label: 'C-Band   (766 - 790MHz)', click () { wc.send ( 'CHANGE_BAND', { start_freq: 766000, stop_freq: 790000, label: 'Sennheiser XS Wireless C-Band (766 - 790MHz)' , band: 'SEN_C_XS' } ); } },
+                    { label: 'D-Band   (794 - 806MHz)', click () { wc.send ( 'CHANGE_BAND', { start_freq: 794000, stop_freq: 806000, label: 'Sennheiser XS Wireless D-Band (794 - 806MHz)' , band: 'SEN_D_XS' } ); } },
+                    { label: 'E-Band   (821 - 865MHz)', click () { wc.send ( 'CHANGE_BAND', { start_freq: 821000, stop_freq: 865000, label: 'Sennheiser XS Wireless E-Band (821 - 865MHz)' , band: 'SEN_E_XS' } ); } },
+                    { label: 'K-Band   (925 - 937.5MHz)', click () { wc.send ( 'CHANGE_BAND', { start_freq: 925000, stop_freq: 937500, label: 'Sennheiser XS Wireless K-Band (925 - 937.5MHz)', band: 'SEN_K_XS' } ); } }
                 ]},
                 { label:'Evolution Wireless', submenu: [
                     { label:'G2 100/300/500', submenu: [
