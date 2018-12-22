@@ -596,6 +596,9 @@ document.addEventListener ( "wheel", function ( e ) {
     } else if ( e.deltaY < 0 ) { // Zoom in
         start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
         stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
+        
+        if ( stop_f - start_f < 112 )
+            return;
     } else if ( e.deltaX < 0 ) { // Move left
         start_f = Math.floor ( START_FREQ/1000 ) - delta_freq;
         stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
@@ -652,6 +655,9 @@ document.addEventListener ( "keydown", function ( e ) {
         case 38: // Zoom in
             start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
             stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
+
+            if ( stop_f - start_f < 112 )
+                return;
             break;
 
         case 40: // Zoom out
