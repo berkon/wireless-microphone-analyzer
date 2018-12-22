@@ -71,7 +71,7 @@ var myChart = new Chart(ctx, {
                 fill: 'start',
                 lineTension: 0.4
             },{
-                label: 'Recommended by manuf.',
+                label: 'Recommended manuf. channels',
                 backgroundColor: Chart.helpers.color(RECOMMENDED_CHANNELS_COLOR).alpha(0.5).rgbString(),
                 borderColor: RECOMMENDED_CHANNELS_COLOR,
                 borderWidth: 0.01, // 0 is not working!
@@ -80,7 +80,7 @@ var myChart = new Chart(ctx, {
                 lineTension: 0,
                 spanGaps: false
             },{
-                label: 'Forbidden',
+                label: 'Forbidden ranges',
                 backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.2).rgbString(),
                 borderColor: FORBIDDEN_COLOR,
                 borderWidth: 0.01, // 0 is not working!
@@ -89,7 +89,7 @@ var myChart = new Chart(ctx, {
                 lineTension: 0,
                 spanGaps: false
             },{
-                label: 'Congested',
+                label: 'Congested channels',
                 backgroundColor: Chart.helpers.color(CONGESTED_COLOR).alpha(0.5).rgbString(),
                 borderColor: CONGESTED_COLOR,
                 borderWidth: 0.01, // 0 is not working!
@@ -115,7 +115,7 @@ var myChart = new Chart(ctx, {
         legend: {
             labels :  {
                 filter: (legendItem, chartData) => {
-                    if ( legendItem.datasetIndex === 4 )
+                    if ( legendItem.datasetIndex === 0 || legendItem.datasetIndex === 4 )
                         return false;
                     else
                         return true;
