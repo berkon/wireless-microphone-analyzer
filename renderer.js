@@ -639,6 +639,7 @@ document.addEventListener ( "keydown", function ( e ) {
                 if ( chPreset_Preset > 1 ) {
                     chPreset_Preset--;
                     setVendorChannels ( FREQUENCIES[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+                    myChart.update();
                 }
                 return;
              }
@@ -652,6 +653,7 @@ document.addEventListener ( "keydown", function ( e ) {
                 if ( chPreset_Preset <  FREQUENCIES[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length ) {
                     chPreset_Preset++;
                     setVendorChannels ( FREQUENCIES[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+                    myChart.update();
                 }
                 return;
             }
