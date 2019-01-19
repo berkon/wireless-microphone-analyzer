@@ -3,14 +3,24 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true; // Disable security warni
 
 var SerialPort = require ( 'serialport' );
 
-const {app, BrowserWindow, Menu} = require('electron')
+const {app, BrowserWindow, Menu} = require('electron');
+const electronLocalshortcut = require ( 'electron-localshortcut' );
+
 let mainWindow
 
 function createWindow () {
     mainWindow = new BrowserWindow({width: 1200, height: 700});
     mainWindow.loadFile('index.html');
     let wc = mainWindow.webContents;
-    wc.openDevTools();
+    //wc.openDevTools();
+    
+    electronLocalshortcut.register ( mainWindow, 'Alt+CommandOrControl+Shift+I', () => {
+        mainWindow.toggleDevTools();
+    });
+
+    electronLocalshortcut.register ( mainWindow, 'CommandOrControl+R', () => {
+        mainWindow.reload();
+    });
 
     var menuJSON = [
         { label: 'Band', submenu: [
