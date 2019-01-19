@@ -215,7 +215,7 @@ function setVendorChannels ( presets, bank ) {
             right_data_point++;
         
         chDispValShadowArr.push ([left_data_point, right_data_point, false]); // Last param shows if congested or not
-        
+
         let data_point       = left_data_point;
         let f = presets[i].toString().split('');
         f.splice ( 3, 0, "." );
@@ -320,12 +320,13 @@ function openPort () {
                     console.log ( "Unable to find RF Explorer!");
                     return;
                 }
-
+                
+                console.log ( "Trying port " + ports[i].comName + " ...");
                 port = new SerialPort ( ports[i].comName, { baudRate : 500000 }, function ( err ) {
-                    if ( err ) {
+/*                    if ( err ) {
                         console.log ( 'Error: ', err.message );
                         return;
-                    }
+                    } */
 
                     setCallbacks();
 
@@ -384,7 +385,8 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
     while ( stop_freq_str.length < 7 )
         stop_freq_str = "0" + stop_freq_str;
 
-    var config_buf = Buffer.from ( '#0Cp2', 'ascii' ); // Second character will be replaced in next line by a binary lenght value
+    // Set DSP mode. Cp0 = Auto ; Cp1 = Filter ; Cp2 = Fast
+    var config_buf = Buffer.from ( '#0Cp0', 'ascii' ); // Second character will be replaced in next line by a binary lenght value
     config_buf.writeUInt8 ( 0x05, 1 );
     port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
 
