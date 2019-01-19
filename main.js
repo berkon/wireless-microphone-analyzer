@@ -306,11 +306,11 @@ function createWindow () {
             ]},
             { label: 'Shure'     , click () { wc.send ( 'SET_CHAN_PRESET', { vendor: 'SHU' } ); } }
         ]},
-        { label: 'Analyze', submenu: [
+/*        { label: 'Analyze', submenu: [
             { label: 'No channel analysis', type: 'radio', checked: true, click () { wc.send ( 'SET_VENDOR_4_ANALYSIS', { vendor: 'NON' } ); } },
             { label: 'Sennheiser channels', type: 'radio',                click () { wc.send ( 'SET_VENDOR_4_ANALYSIS', { vendor: 'SEN' } ); } },
             { label: 'Shure channels'     , type: 'radio',                click () { wc.send ( 'SET_VENDOR_4_ANALYSIS', { vendor: 'SHU' } ); } }
-        ]},
+        ]}, */
         { label: 'Port', submenu: [
         ]},
         { label: 'Help' }
@@ -329,10 +329,10 @@ function createWindow () {
             portNameArr.push ( port.comName );
         });
 
-        menuJSON[3].submenu[0] = { label: 'Auto', type: 'radio', click () { wc.send ( 'SET_PORT',  portNameArr ); } }
+        menuJSON[2].submenu[0] = { label: 'Auto', type: 'radio', click () { wc.send ( 'SET_PORT',  portNameArr ); } }
 
         portNameArr.forEach ( ( port ) => {
-            menuJSON[3].submenu.push (
+            menuJSON[2].submenu.push (
                 {
                     'label' : port,
                     'type'  : 'radio' ,
