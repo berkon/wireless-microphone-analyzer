@@ -89,7 +89,7 @@ var myChart = new Chart(ctx, {
                 lineTension: 0,
                 spanGaps: false
             },{
-                label: 'Congested channels',
+                label: 'Congested / forbidden channels',
                 backgroundColor: Chart.helpers.color(CONGESTED_COLOR).alpha(0.5).rgbString(),
                 borderColor: CONGESTED_COLOR,
                 borderWidth: 0.01, // 0 is not working!
@@ -205,7 +205,6 @@ function setVendorChannels ( presets, bank ) {
         let left_freq_edge  = presets[i]*1000 - SENNHEISER_CHANNEL_WIDTH/2;
         let right_freq_edge = presets[i]*1000 + SENNHEISER_CHANNEL_WIDTH/2;
 
-//        if ( isForbidden ( left_freq_edge, right_freq_edge ) || !isInRange ( left_freq_edge, right_freq_edge) )
         if ( !isInRange ( left_freq_edge, right_freq_edge) )
             continue;
 
@@ -225,7 +224,11 @@ function setVendorChannels ( presets, bank ) {
         myChart.config.options.scales.xAxes[2].labels[label_pos] = 'B'+(bank.length===1?'0':'')+bank+'.C'+(i.toString().length===1?'0':'')+(i+1)+'  ('+f+')';
 
         while ( data_point <= right_data_point ) {
-            myChart.data.datasets[LINE_RECOMMENDED].data[data_point] = MAX_DBM;
+            if ( isForbidden ( left_freq_edge, right_freq_edge ) )
+                myChart.data.datasets[LINE_CONGESTED  ].data[data_point] = MAX_DBM;
+            else
+                myChart.data.datasets[LINE_RECOMMENDED].data[data_point] = MAX_DBM;
+
             data_point++;
         }
     }
