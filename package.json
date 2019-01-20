@@ -1,23 +1,22 @@
 {
-  "name": "electron-quick-start",
+  "name": "wireless-microphone-analyzer",
+  "productName": "Wireless Microphone Analyzer",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "repository": "https://github.com/electron/electron-quick-start",
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
-  ],
-  "author": "GitHub",
   "license": "CC0-1.0",
+  "description": "Uses the RF-Explorer (a spectrum analyzer hardware) to check for free/congested wireless microphone frequencies",
+  "author": "Bernd Konnerth",
+  "main": "main.js",
+  "repository": "https://github.com/berkon/wireless-microphone-analyzer",
+  "keywords": [
+    "wireless",
+    "microphone",
+    "spectrum",
+    "analyzer"
+  ],
   "devDependencies": {
-    "electron": "^3.0.0"
+    "electron": "^3.0.0",
+    "electron-builder": "^20.38.5",
+    "electron-rebuild": "^1.8.2"
   },
   "dependencies": {
     "chart.js": "^2.7.2",
@@ -26,5 +25,20 @@
     "require-all": "^3.0.0",
     "serialport": "^7.0.2",
     "vis": "^4.21.0"
+  },
+  "scripts": {
+    "rebuild": "electron-rebuild --force",
+    "postinstall": "install-app-deps",
+    "start": "node_modules\\electron\\dist\\electron.exe .",
+    "install_start": "npm install && node_modules\\electron\\dist\\electron.exe .",
+    "pack": "build --dir",
+    "dist": "build"
+  },
+  "build": {
+    "appId": "wireless-microphone-analyzer",
+    "win": {
+      "target": "nsis",
+      "icon": "build/microphone-wave.ico"
+    }
   }
 }
