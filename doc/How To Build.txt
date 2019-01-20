@@ -1,9 +1,15 @@
 After cloning the repo run the following commands:
 
 - npm install
-- npm run rebuild    (to rebuild the native modules)
 - npm run dist       (Creates the installer in ./dist directory)
 
 OR
 
 - npm start          (to just start the app)
+
+
+The module electron-rebuild is not required when using electron-builder
+
+
+This link shows which Electron version contains which NodeJS and which Chromium version:
+https://www.npmjs.com/package/electron-releases

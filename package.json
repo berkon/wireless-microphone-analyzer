@@ -14,9 +14,8 @@
     "analyzer"
   ],
   "devDependencies": {
-    "electron": "^3.0.0",
-    "electron-builder": "^20.38.5",
-    "electron-rebuild": "^1.8.2"
+    "electron": "^4.0.0",
+    "electron-builder": "^20.38.5"
   },
   "dependencies": {
     "chart.js": "^2.7.2",
@@ -27,8 +26,7 @@
     "vis": "^4.21.0"
   },
   "scripts": {
-    "rebuild": "electron-rebuild --force",
-    "postinstall": "install-app-deps",
+    "postinstall": "electron-builder install-app-deps",
     "start": "node_modules\\electron\\dist\\electron.exe .",
     "install_start": "npm install && node_modules\\electron\\dist\\electron.exe .",
     "pack": "build --dir",
