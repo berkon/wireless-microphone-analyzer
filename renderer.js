@@ -6,6 +6,7 @@ const SerialPort      = require ( 'serialport'  );
 const Chart           = require ( 'chart.js'    );
 const FREQUENCIES     = require ( 'require-all' )(__dirname +'/frequency_data/presets');
 const Pkg             = require ('./package.json');
+const { dialog }      = require ('electron'     ).remote;
 
 const configStore = new ConfigStore ( Pkg.name );
 
@@ -317,6 +318,12 @@ function openPort () {
             autoPortCheckTimer = setInterval ( () => {
                 if ( i === ports.length ) {
                     clearInterval ( autoPortCheckTimer );
+                    const dialogOptions = {
+                        type: 'error',
+                        buttons: ['OK'],
+                        message: 'Unable to find RF Explorer hardware!',
+                        detail:  '- Make sure that the device is connected\n- Select the corresponding serial port (or leave default: \'Auto\')\n- If it still doesn\'t work please restart the app or press <CTRL><R>!'}
+                    dialog.showMessageBox ( dialogOptions, i => console.log("Button " + i + " was pressed!"));
                     console.log ( "Unable to find RF Explorer!");
                     return;
                 }
