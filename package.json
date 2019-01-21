@@ -36,7 +36,7 @@
     "appId": "wireless-microphone-analyzer",
     "win": {
       "target": "nsis",
-      "icon": "build/microphone-wave.ico"
+      "icon": "build/microphone-wave2.ico"
     }
   }
 }
