@@ -7,6 +7,7 @@ const {app, BrowserWindow, Menu} = require('electron');
 const electronLocalshortcut = require ( 'electron-localshortcut' );
 
 let mainWindow
+let helpWindow
 
 function createWindow () {
     mainWindow = new BrowserWindow({width: 1200, height: 700});
@@ -313,7 +314,7 @@ function createWindow () {
         ]}, */
         { label: 'Port', submenu: [
         ]},
-        { label: 'Help' }
+        { label: 'Help', click () { openHelpWindow(); } }
     ];
 
     // Add serial ports to the menu
@@ -343,6 +344,16 @@ function createWindow () {
 
         Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) );
     });
+
+    function openHelpWindow () {
+        helpWindow = new BrowserWindow({width: 800, height: 600});
+        helpWindow.setMenu ( null );
+        helpWindow.loadFile('help.html');
+
+        electronLocalshortcut.register ( helpWindow, 'CommandOrControl+R', () => {
+            helpWindow.reload();
+        });
+    }
 
     mainWindow.on('closed', function () {
         mainWindow = null;
