@@ -1,0 +1,4 @@
+V1.1.0
+    FEATURES
+        - Added help window
+        - Now showing error popup when no scanner hardware was detected
