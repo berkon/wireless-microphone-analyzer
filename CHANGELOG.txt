@@ -2,3 +2,4 @@ V1.1.0
     FEATURES
         - Added help window
         - Now showing error popup when no scanner hardware was detected
+        - Outsourced frequency band data to own files to enable users to enter own bands and simplify pull request

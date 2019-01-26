@@ -538,7 +538,7 @@ function setCallbacks () {
 openPort();
 
 ipcRenderer.on ( 'CHANGE_BAND', (event, message) => {
-    sendAnalyzer_SetConfig ( message.start_freq, message.stop_freq, message.label, message.band );
+    sendAnalyzer_SetConfig ( message.start_freq, message.stop_freq, message.details, message.band );
 });
 
 ipcRenderer.on ( 'SET_VENDOR_4_ANALYSIS', (event, message) => {
