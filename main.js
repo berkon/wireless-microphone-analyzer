@@ -6,9 +6,10 @@ const bandData = require ( 'require-all' )(__dirname +'/frequency_data/bands');
 
 const {app, BrowserWindow, Menu} = require('electron');
 const electronLocalshortcut = require ( 'electron-localshortcut' );
+var { productName, version } = require ( './package.json' );
 
-let mainWindow
-let helpWindow
+let mainWindow;
+let helpWindow;
 
 function createWindow () {
     mainWindow = new BrowserWindow({width: 1200, height: 700});
@@ -23,6 +24,8 @@ function createWindow () {
     electronLocalshortcut.register ( mainWindow, 'CommandOrControl+R', () => {
         mainWindow.reload();
     });
+
+    mainWindow.setTitle ( productName + " V" + version );
 
     var chanPresetMenuJSON =
         { label: 'Chan. Presets', submenu: [
@@ -177,6 +180,8 @@ function createWindow () {
         electronLocalshortcut.register ( helpWindow, 'CommandOrControl+R', () => {
             helpWindow.reload();
         });
+
+        helpWindow.setTitle ( productName + " V" + version );
     }
 
     mainWindow.on('closed', function () {
