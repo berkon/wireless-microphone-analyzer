@@ -21,3 +21,23 @@ The following mouse/keyboard commands zoom/move the frequency range:
 * **Mouse wheel tilt OR Arrow left/right** moves the frequency range down-/upwards
 
 * **\<CTRL> Arrow left/right** toggles between Vendor channel presets withing the seleted vendor specific frequency band.
+
+### Installation
+
+#### Windows
+Simply download and install the .exe installer.
+
+#### Linux (Debian/Ubuntu)
+Download the Debian installation package (.deb) and install as follows:
+    
+    sudo dpkg -i <package_name>.deb
+
+If the command above fails, you might need to update the dependencies with:
+
+    sudo apt install -f
+
+In order to run the tool as non-root, you have to add your username to the "dialout" group:
+
+    sudo gpasswd --add <your_username> dialout
+    
+IMPORTANT: After adding your username to the group you have to logout/login (or reboot)!
