@@ -25,7 +25,7 @@
             { "label": "C-Band   (734 - 776MHz)", "start_freq": 734000, "stop_freq": 776000, "details": "Sennheiser EW 100 G3 C-Band (734 - 776MHz)" , "band": "SEN_C_G3"  },
             { "label": "D-Band   (780 - 822MHz)", "start_freq": 780000, "stop_freq": 822000, "details": "Sennheiser EW 100 G3 D-Band (780 - 822MHz)" , "band": "SEN_D_G3"  },
             { "label": "E-Band   (823 - 865MHz)", "start_freq": 823000, "stop_freq": 865000, "details": "Sennheiser EW 100 G3 E-Band (823 - 865MHz)" , "band": "SEN_E_G3"  },
-            { "label": "1G8-Band (1785 - 1805MHz)", "start_freq": 1785000, "stop_freq": 1805000, "details": "Sennheiser EW 100 G3 1G8-Band (1785 - 1805MHz)" , "band": "SEN_1G8_G3" }
+            { "label": "1G8-Band (1785 - 1800MHz)", "start_freq": 1785000, "stop_freq": 1800000, "details": "Sennheiser EW 100 G3 1G8-Band (1785 - 1800MHz)" , "band": "SEN_1G8_G3" }
         ]},
         { "label":"G3 300/500", "submenu": [
             { "label": "A-Band   (516 - 558MHz)", "start_freq": 516000, "stop_freq": 558000, "details": "Sennheiser EW 300/500 G3 A-Band (516 - 558MHz)" , "band": "SEN_A_G3"  },

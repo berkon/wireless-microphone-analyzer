@@ -1,5 +1,5 @@
 [
     { "label": "ISM Band (863 - 865MHz)"   , "start_freq": 863000, "stop_freq": 865000, "details": "ISM Band (863 - 865MHz)"    },
     { "label": "ML 800 Band (823 - 832MHz)", "start_freq": 823000, "stop_freq": 832000, "details": "ML 800 Band (823 - 832MHz)" },
-    { "label": "VHF Band (174 - 230MHz)"   , "start_freq": 174000, "stop_freq": 230000, "details": "VHF Band (174 - 230MHz)"    }
+    { "label": "VHF Band (174 - 216MHz)"   , "start_freq": 174000, "stop_freq": 216000, "details": "VHF Band (174 - 230MHz)"    }
 ]

@@ -1,6 +1,9 @@
 [
-    { "start" : 703000, "stop" : 733000, "info": "LTE II Uplink"   },
-    { "start" : 758000, "stop" : 788000, "info": "LTE II Downlink" },
-    { "start" : 791000, "stop" : 821000, "info": "LTE I  Downlink" },
-    { "start" : 832000, "stop" : 862000, "info": "LTE I  Uplink"   }
+    { "start" : 216000, "stop" : 469000, "info": "Other services"   },
+    { "start" : 608000, "stop" : 614000, "info": "Radio astronomy"  },
+    { "start" : 703000, "stop" : 733000, "info": "LTE 700 Uplink"   },
+    { "start" : 758000, "stop" : 788000, "info": "LTE 700 Downlink" },
+    { "start" : 791000, "stop" : 821000, "info": "LTE 800 Downlink" },
+    { "start" : 832000, "stop" : 862000, "info": "LTE 800 Uplink"   },
+    { "start" : 866000, "stop" : 1785000,"info": "LTE 800 Uplink"   }
 ]
