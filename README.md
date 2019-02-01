@@ -25,10 +25,14 @@ The following mouse/keyboard commands zoom/move the frequency range:
 ### Installation
 
 #### Windows
-Simply download and install the .exe installer.
+Download and install the **.exe** installer.
+
+#### Mac
+Download and install the **.dmg** package. Also make sure to download and install the necessary USB-Serial driver according to this guide:
+https://j3.rf-explorer.com/43-rfe/how-to/205-h2-macosx-drivers
 
 #### Linux (Debian/Ubuntu)
-Download the Debian installation package (.deb) and install as follows:
+Download the **.deb** Debian installation package and install it as follows:
     
     sudo dpkg -i <package_name>.deb
 
