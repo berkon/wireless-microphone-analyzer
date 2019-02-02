@@ -5,5 +5,5 @@
     { "start" : 758000, "stop" : 788000, "info": "LTE 700 Downlink" },
     { "start" : 791000, "stop" : 821000, "info": "LTE 800 Downlink" },
     { "start" : 832000, "stop" : 862000, "info": "LTE 800 Uplink"   },
-    { "start" : 866000, "stop" : 1785000,"info": "LTE 800 Uplink"   }
+    { "start" : 866000, "stop" : 1785000,"info": "Other services"   }
 ]

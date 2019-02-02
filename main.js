@@ -2,7 +2,8 @@
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true; // Disable security warning on the console
 
 var SerialPort = require ( 'serialport' );
-const bandData = require ( 'require-all' )(__dirname +'/frequency_data/bands');
+const FREQ_VENDOR_BANDS   = require ( 'require-all' )(__dirname +'/frequency_data/bands'  );
+const FREQ_VENDOR_PRESETS = require ( 'require-all' )(__dirname +'/frequency_data/presets');
 
 const {app, BrowserWindow, Menu} = require('electron');
 const electronLocalshortcut = require ( 'electron-localshortcut' );
@@ -27,297 +28,6 @@ function createWindow () {
 
     mainWindow.setTitle ( productName + " V" + version );
 
-    var chanPresetMenuJSON =
-        { label: 'Chan. Presets', submenu: [
-            { label: 'Sennheiser', submenu: [
-                { label: 'A-Band', submenu: [
-                    { label: 'G2 Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G2_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G2_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G2_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G2_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G2_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G2_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G2_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G2_8'  } ); } },
-                        { label: 'Bank 9' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G2_9'  } ); } }
-                    ]},
-                    { label: 'G3 Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_8'  } ); } },
-                        { label: 'Bank 9' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_9'  } ); } },
-                        { label: 'Bank 10', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_10' } ); } },
-                        { label: 'Bank 11', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_11' } ); } },
-                        { label: 'Bank 12', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_12' } ); } },
-                        { label: 'Bank 13', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_13' } ); } },
-                        { label: 'Bank 14', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_14' } ); } },
-                        { label: 'Bank 15', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_15' } ); } },
-                        { label: 'Bank 16', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_16' } ); } },
-                        { label: 'Bank 17', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_17' } ); } },
-                        { label: 'Bank 18', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_18' } ); } },
-                        { label: 'Bank 19', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_19' } ); } },
-                        { label: 'Bank 20', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_G3_20' } ); } }
-                    ]},
-                    { label: 'XSW Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_XSW_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_XSW_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_XSW_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_XSW_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_XSW_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_XSW_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_XSW_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_A_XSW_8'  } ); } }
-                    ]}
-                ]},
-                { label: 'B-Band', submenu: [
-                    { label: 'G2 Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G2_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G2_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G2_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G2_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G2_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G2_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G2_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G2_8'  } ); } },
-                        { label: 'Bank 9' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G2_9'  } ); } }
-                    ]},
-                    { label: 'G3 Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_8'  } ); } },
-                        { label: 'Bank 9' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_9'  } ); } },
-                        { label: 'Bank 10', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_10' } ); } },
-                        { label: 'Bank 11', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_11' } ); } },
-                        { label: 'Bank 12', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_12' } ); } },
-                        { label: 'Bank 13', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_13' } ); } },
-                        { label: 'Bank 14', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_14' } ); } },
-                        { label: 'Bank 15', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_15' } ); } },
-                        { label: 'Bank 16', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_16' } ); } },
-                        { label: 'Bank 17', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_17' } ); } },
-                        { label: 'Bank 18', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_18' } ); } },
-                        { label: 'Bank 19', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_19' } ); } },
-                        { label: 'Bank 20', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_G3_20' } ); } }
-                    ]},
-                    { label: 'XSW Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_XSW_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_XSW_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_XSW_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_XSW_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_XSW_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_XSW_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_XSW_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_B_XSW_8'  } ); } }
-                    ]}
-                ]},
-                { label: 'C-Band', submenu: [
-                    { label: 'G2 Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G2_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G2_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G2_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G2_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G2_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G2_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G2_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G2_8'  } ); } },
-                        { label: 'Bank 9' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G2_9'  } ); } }
-                    ]},
-                    { label: 'G3 Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_8'  } ); } },
-                        { label: 'Bank 9' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_9'  } ); } },
-                        { label: 'Bank 10', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_10' } ); } },
-                        { label: 'Bank 11', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_11' } ); } },
-                        { label: 'Bank 12', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_12' } ); } },
-                        { label: 'Bank 13', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_13' } ); } },
-                        { label: 'Bank 14', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_14' } ); } },
-                        { label: 'Bank 15', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_15' } ); } },
-                        { label: 'Bank 16', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_16' } ); } },
-                        { label: 'Bank 17', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_17' } ); } },
-                        { label: 'Bank 18', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_18' } ); } },
-                        { label: 'Bank 19', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_19' } ); } },
-                        { label: 'Bank 20', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_G3_20' } ); } }
-                    ]},
-                    { label: 'XSW Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_XSW_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_XSW_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_XSW_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_XSW_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_XSW_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_XSW_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_XSW_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_C_XSW_8'  } ); } }
-                    ]}
-                ]},
-                { label: 'D-Band', submenu: [
-                    { label: 'G2 Series', submenu: [
-                        { label: 'Bank 1', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G2_1' } ); } },
-                        { label: 'Bank 2', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G2_2' } ); } },
-                        { label: 'Bank 3', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G2_3' } ); } },
-                        { label: 'Bank 4', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G2_4' } ); } },
-                        { label: 'Bank 5', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G2_5' } ); } },
-                        { label: 'Bank 6', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G2_6' } ); } },
-                        { label: 'Bank 7', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G2_7' } ); } },
-                        { label: 'Bank 8', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G2_8' } ); } }
-                    ]},
-                    { label: 'G3 Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_8'  } ); } },
-                        { label: 'Bank 9' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_9'  } ); } },
-                        { label: 'Bank 10', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_10' } ); } },
-                        { label: 'Bank 11', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_11' } ); } },
-                        { label: 'Bank 12', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_12' } ); } },
-                        { label: 'Bank 13', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_13' } ); } },
-                        { label: 'Bank 14', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_14' } ); } },
-                        { label: 'Bank 15', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_15' } ); } },
-                        { label: 'Bank 16', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_16' } ); } },
-                        { label: 'Bank 17', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_17' } ); } },
-                        { label: 'Bank 18', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_18' } ); } },
-                        { label: 'Bank 19', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_19' } ); } },
-                        { label: 'Bank 20', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_D_G3_20' } ); } }
-                    ]}
-                ]},
-                { label: 'E-Band', submenu: [
-                    { label: 'G2 Series', submenu: [
-                        { label: 'Bank 1', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G2_1' } ); } },
-                        { label: 'Bank 2', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G2_2' } ); } },
-                        { label: 'Bank 3', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G2_3' } ); } },
-                        { label: 'Bank 4', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G2_4' } ); } },
-                        { label: 'Bank 5', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G2_5' } ); } },
-                        { label: 'Bank 6', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G2_6' } ); } },
-                        { label: 'Bank 7', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G2_7' } ); } },
-                        { label: 'Bank 8', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G2_8' } ); } }
-                    ]},
-                    { label: 'G3 Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_8'  } ); } },
-                        { label: 'Bank 9' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_9'  } ); } },
-                        { label: 'Bank 10', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_10' } ); } },
-                        { label: 'Bank 11', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_11' } ); } },
-                        { label: 'Bank 12', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_12' } ); } },
-                        { label: 'Bank 13', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_13' } ); } },
-                        { label: 'Bank 14', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_14' } ); } },
-                        { label: 'Bank 15', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_15' } ); } },
-                        { label: 'Bank 16', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_16' } ); } },
-                        { label: 'Bank 17', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_17' } ); } },
-                        { label: 'Bank 18', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_18' } ); } },
-                        { label: 'Bank 19', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_19' } ); } },
-                        { label: 'Bank 20', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_G3_20' } ); } }
-                    ]},
-                    { label: 'XSW Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_XSW_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_XSW_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_XSW_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_XSW_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_XSW_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_XSW_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_XSW_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_E_XSW_8'  } ); } }
-                    ]}
-                ]},
-                { label: 'G-Band', submenu: [
-                    { label: 'G3 Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_8'  } ); } },
-                        { label: 'Bank 9' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_9'  } ); } },
-                        { label: 'Bank 10', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_10' } ); } },
-                        { label: 'Bank 11', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_11' } ); } },
-                        { label: 'Bank 12', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_12' } ); } },
-                        { label: 'Bank 13', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_13' } ); } },
-                        { label: 'Bank 14', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_14' } ); } },
-                        { label: 'Bank 15', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_15' } ); } },
-                        { label: 'Bank 16', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_16' } ); } },
-                        { label: 'Bank 17', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_17' } ); } },
-                        { label: 'Bank 18', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_18' } ); } },
-                        { label: 'Bank 19', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_19' } ); } },
-                        { label: 'Bank 20', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_G_G3_20' } ); } }
-                    ]}
-                ]},
-                { label: 'GB-Band', submenu: [
-                    { label: 'G3 Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_8'  } ); } },
-                        { label: 'Bank 9' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_9'  } ); } },
-                        { label: 'Bank 10', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_10' } ); } },
-                        { label: 'Bank 11', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_11' } ); } },
-                        { label: 'Bank 12', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_12' } ); } },
-                        { label: 'Bank 13', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_13' } ); } },
-                        { label: 'Bank 14', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_14' } ); } },
-                        { label: 'Bank 15', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_15' } ); } },
-                        { label: 'Bank 16', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_16' } ); } },
-                        { label: 'Bank 17', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_17' } ); } },
-                        { label: 'Bank 18', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_18' } ); } },
-                        { label: 'Bank 19', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_19' } ); } },
-                        { label: 'Bank 20', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_G3_20' } ); } }
-                    ]},
-                    { label: 'XSW Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_XSW_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_XSW_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_XSW_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_XSW_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_XSW_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_XSW_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_XSW_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_GB_XSW_8'  } ); } }
-                    ]}
-                ]},
-                { label: '1G8-Band', submenu: [
-                    { label: 'G3 Series', submenu: [
-                        { label: 'Bank 1' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_1G8_G3_1'  } ); } },
-                        { label: 'Bank 2' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_1G8_G3_2'  } ); } },
-                        { label: 'Bank 3' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_1G8_G3_3'  } ); } },
-                        { label: 'Bank 4' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_1G8_G3_4'  } ); } },
-                        { label: 'Bank 5' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_1G8_G3_5'  } ); } },
-                        { label: 'Bank 6' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_1G8_G3_6'  } ); } },
-                        { label: 'Bank 7' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_1G8_G3_7'  } ); } },
-                        { label: 'Bank 8' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_1G8_G3_8'  } ); } },
-                        { label: 'Bank 9' , click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_1G8_G3_9'  } ); } },
-                        { label: 'Bank 10', click () { wc.send ( 'SET_CHAN_PRESET', { preset: 'SEN_1G8_G3_10' } ); } }
-                    ]}
-                ]}
-            ]},
-            { label: 'Shure'     , click () { wc.send ( 'SET_CHAN_PRESET', { vendor: 'SHU' } ); } }
-        ]};
 /*        { label: 'Analyze', submenu: [
             { label: 'No channel analysis', type: 'radio', checked: true, click () { wc.send ( 'SET_VENDOR_4_ANALYSIS', { vendor: 'NON' } ); } },
             { label: 'Sennheiser channels', type: 'radio',                click () { wc.send ( 'SET_VENDOR_4_ANALYSIS', { vendor: 'SEN' } ); } },
@@ -363,7 +73,7 @@ function createWindow () {
     var menuJSON = [];
     menuJSON.push ({ label: 'Band', submenu: [] });
 
-    Object.entries ( bandData ).forEach ( vendorBandData => {
+    Object.entries ( FREQ_VENDOR_BANDS ).forEach ( vendorBandData => {
         let key   = vendorBandData[0];
         let value = vendorBandData[1];
 
@@ -379,7 +89,38 @@ function createWindow () {
             addMenuEntryOrSubmenu ( value.label, value, menuJSON[0].submenu );
     });
 
-    menuJSON.push ( chanPresetMenuJSON );
+    menuJSON.push ({ label: 'Chan. Presets', submenu: [] });
+
+    Object.entries ( FREQ_VENDOR_PRESETS ).forEach ( vendorPreset => {
+        let key        = vendorPreset[0].split("_");
+        let preset     = vendorPreset[1];
+        let vendor_idx = undefined;
+        let band_idx   = undefined;
+        let series_idx = undefined;
+
+        vendor_idx = menuJSON[1].submenu.findIndex ( ( elem ) => { return elem.label === key[0]; });
+
+        if ( vendor_idx === -1 ) // Does this vendor already exists as a submenu?
+            vendor_idx = menuJSON[1].submenu.push ({ label: key[0], submenu: [] }) - 1;
+        
+        band_idx = menuJSON[1].submenu[vendor_idx].submenu.findIndex ( ( elem ) => { return elem.label === key[1] + " - Band"; });
+        
+        if ( band_idx === -1 ) // Does this band already exist in this vendor submenu?
+            band_idx = menuJSON[1].submenu[vendor_idx].submenu.push ({ label: key[1] + " - Band", submenu: [] }) - 1;
+
+        series_idx = menuJSON[1].submenu[vendor_idx].submenu[band_idx].submenu.findIndex ( ( elem ) => { return elem.label === key[2]; });
+        
+        if ( series_idx ) // Does this series already exist in this band submenu?
+            series_idx = menuJSON[1].submenu[vendor_idx].submenu[band_idx].submenu.push ({ label: key[2], submenu: [] }) - 1;
+
+        preset.forEach ( (bank, i) => {
+            menuJSON[1].submenu[vendor_idx].submenu[band_idx].submenu[series_idx].submenu.push ({
+                label: "Bank " + (i+1),
+                click () { wc.send ( "SET_CHAN_PRESET", { preset: vendorPreset[0] + "_" + (i+1) }); }
+            });
+        });
+    });
+
     menuJSON.push ( portMenuJSON );
     menuJSON.push ( helpMenuJSON );
 

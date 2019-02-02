@@ -4,7 +4,8 @@ const { ipcRenderer } = require ( 'electron'    );
 const ConfigStore     = require ( 'configstore' );
 const SerialPort      = require ( 'serialport'  );
 const Chart           = require ( 'chart.js'    );
-const FREQUENCIES     = require ( 'require-all' )(__dirname +'/frequency_data/presets');
+const FREQ_VENDOR_PRESETS = require ( 'require-all' )(__dirname +'/frequency_data/presets'  );
+const FREQ_FORBIDDEN      = require ( 'require-all' )(__dirname +'/frequency_data/forbidden');
 const Pkg             = require ('./package.json');
 const { dialog }      = require ('electron'     ).remote;
 
@@ -165,7 +166,7 @@ var myChart = new Chart(ctx, {
 
 
 function setForbidden () {
-    for ( var f of FREQUENCIES.forbidden ) {
+    for ( var f of FREQ_FORBIDDEN.forbidden ) {
         let range_res = isInRange ( f.start*1000, f.stop*1000);
         let left_data_point  = undefined;
         let right_data_point = undefined;
@@ -248,7 +249,7 @@ function isInRange ( start, stop ) {
 }
 
 function isForbidden ( start, stop ) {
-    for ( var f of FREQUENCIES.forbidden ) {
+    for ( var f of FREQ_FORBIDDEN.forbidden ) {
         if ( (start >= f.start*1000 && start <= f.stop*1000) || (stop >= f.start*1000 && stop <= f.stop*1000) )
             return true;
     }
@@ -301,7 +302,7 @@ function InitChart () {
     setForbidden ();
 
     if ( chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset)
-        setVendorChannels ( FREQUENCIES[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+        setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
 
     myChart.update();
 }
@@ -578,7 +579,7 @@ ipcRenderer.on ( 'SET_CHAN_PRESET', (event, message) => {
     configStore.set ( 'chPreset.preset', chPreset_Preset );
 
     //myChart.config.options.scales.xAxes[2].labels = [];
-    setVendorChannels ( FREQUENCIES[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+    setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
     myChart.update();
 });
 
@@ -645,7 +646,7 @@ document.addEventListener ( "keydown", function ( e ) {
              } else { // Toggle vendor specific channel presets/banks down
                 if ( chPreset_Preset > 1 ) {
                     chPreset_Preset--;
-                    setVendorChannels ( FREQUENCIES[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+                    setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
                     myChart.update();
                 }
                 return;
@@ -657,9 +658,9 @@ document.addEventListener ( "keydown", function ( e ) {
                 start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
                 stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq;
             } else { // Toggle vendor specific channel presets/banks up
-                if ( chPreset_Preset <  FREQUENCIES[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length ) {
+                if ( chPreset_Preset <  FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length ) {
                     chPreset_Preset++;
-                    setVendorChannels ( FREQUENCIES[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+                    setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
                     myChart.update();
                 }
                 return;
