@@ -1,4 +1,4 @@
-# wireless-microphone-analyzer
+# Wireless Microphone Analyzer
 The Wireless Microphone Analyzer shows the frequency spectrum captured via the "RF Explorer" hardware. Wireless microphone vendors (e.g. Sennheiser, Shure etc.) have defined specific frequency ranges for their equipment which they gave proprietary names. This tool allows you to preselect these bands. E.g. if you bought a "Sennheiser WE 100 G3" in Sennheiser's E-Band, you select this range in the app, to check whether and were there are any interferences. You can also also overlay the vendor recommended channel frequency presets, which are optimized by vendors and guarantee a intermodulation free operation of multiple microphones in parallel. The app also shows forbidden frequency ranges in red. E.g. LTE up/downstream ranges which meanwhile overlap with microphone frequency bands. Currently the app only supports these frequency ranges for Germany. Other countries will follow.
 
 ### Connection
