@@ -166,7 +166,7 @@ var myChart = new Chart(ctx, {
 
 
 function setForbidden () {
-    for ( var f of FREQ_FORBIDDEN.forbidden ) {
+    for ( var f of FREQ_FORBIDDEN.forbidden_DE ) {
         let range_res = isInRange ( f.start*1000, f.stop*1000);
         let left_data_point  = undefined;
         let right_data_point = undefined;
@@ -249,7 +249,7 @@ function isInRange ( start, stop ) {
 }
 
 function isForbidden ( start, stop ) {
-    for ( var f of FREQ_FORBIDDEN.forbidden ) {
+    for ( var f of FREQ_FORBIDDEN.forbidden_DE ) {
         if ( (start >= f.start*1000 && start <= f.stop*1000) || (stop >= f.start*1000 && stop <= f.stop*1000) )
             return true;
     }
