@@ -1,0 +1,41 @@
+{ "label":"AKG", "submenu": [
+    { "label":"DSM 700", "submenu": [
+        { "label": "Band-1 (548 - 698MHz)", "start_freq": 548000, "stop_freq": 698000, "details": "AKG DSM 700 Band-1 (548 - 698MHz)" , "band": "AKG_1_NONE" },
+        { "label": "Band-2 (710 - 862MHz)", "start_freq": 710000, "stop_freq": 862000, "details": "AKG DSM 700 Band-2 (710 - 862MHz)" , "band": "AKG_2_NONE" }
+    ]},
+    { "label":"IVM 4 IEM", "submenu": [
+        { "label": "500 - 530MHz", "start_freq": 500000, "stop_freq": 530000, "details": "AKG IVM 4 IEM (548 - 698MHz)" , "band": "AKG_500_NONE" },
+        { "label": "570 - 600MHz", "start_freq": 570000, "stop_freq": 600000, "details": "AKG IVM 4 IEM (570 - 600MHz)" , "band": "AKG_570_NONE" },
+        { "label": "790 - 820MHz", "start_freq": 790000, "stop_freq": 820000, "details": "AKG IVM 4 IEM (790 - 820MHz)" , "band": "AKG_790_NONE" },
+        { "label": "835 - 865MHz", "start_freq": 835000, "stop_freq": 865000, "details": "AKG IVM 4 IEM (835 - 865MHz)" , "band": "AKG_835_NONE" }
+    ]},
+    { "label":"WMS 450", "submenu": [
+        { "label": "Band-1  (650 - 680MHz)", "start_freq": 650000, "stop_freq": 680000, "details": "AKG WMS 450 (650 - 680MHz)" , "band": "AKG_1_NONE"  },
+        { "label": "Band-2  (680 - 710MHz)", "start_freq": 680000, "stop_freq": 710000, "details": "AKG WMS 450 (680 - 710MHz)" , "band": "AKG_2_NONE"  },
+        { "label": "Band-3  (720 - 750MHz)", "start_freq": 720000, "stop_freq": 750000, "details": "AKG WMS 450 (720 - 750MHz)" , "band": "AKG_3_NONE"  },
+        { "label": "Band-5A (790 - 820MHz)", "start_freq": 790000, "stop_freq": 820000, "details": "AKG WMS 450 (790 - 820MHz)" , "band": "AKG_5A_NONE" },
+        { "label": "Band-5C (800 - 820MHz)", "start_freq": 800000, "stop_freq": 820000, "details": "AKG WMS 450 (800 - 820MHz)" , "band": "AKG_5C_NONE" },
+        { "label": "Band-6  (835 - 862MHz)", "start_freq": 835000, "stop_freq": 862000, "details": "AKG WMS 450 (835 - 862MHz)" , "band": "AKG_6_NONE"  },
+        { "label": "Band-7  (500 - 531MHz)", "start_freq": 500000, "stop_freq": 531000, "details": "AKG WMS 450 (500 - 531MHz)" , "band": "AKG_7_NONE"  },
+        { "label": "Band-8  (570 - 601MHz)", "start_freq": 570000, "stop_freq": 601000, "details": "AKG WMS 450 (570 - 601MHz)" , "band": "AKG_8_NONE"  }
+    ]},
+    { "label":"WMS 4000", "submenu": [
+        { "label": "650 - 680MHz", "start_freq": 650000, "stop_freq": 680000, "details": "AKG WMS 4000 (650 - 680MHz)" , "band": "AKG_650_NONE" },
+        { "label": "680 - 710MHz", "start_freq": 680000, "stop_freq": 710000, "details": "AKG WMS 4000 (680 - 710MHz)" , "band": "AKG_680_NONE" },
+        { "label": "720 - 750MHz", "start_freq": 720000, "stop_freq": 750000, "details": "AKG WMS 4000 (720 - 750MHz)" , "band": "AKG_720_NONE" },
+        { "label": "760 - 790MHz", "start_freq": 760000, "stop_freq": 790000, "details": "AKG WMS 4000 (760 - 790MHz)" , "band": "AKG_760_NONE" },
+        { "label": "790 - 820MHz", "start_freq": 790000, "stop_freq": 820000, "details": "AKG WMS 4000 (720 - 820MHz)" , "band": "AKG_790_NONE" },
+        { "label": "835 - 863MHz", "start_freq": 835000, "stop_freq": 863000, "details": "AKG WMS 4000 (835 - 863MHz)" , "band": "AKG_835_NONE" }
+    ]},
+    { "label":"WMS 4500", "submenu": [
+        { "label": "Band-1  (650 - 680MHz)", "start_freq": 650000, "stop_freq": 680000, "details": "AKG WMS 4500 (650 - 680MHz)" , "band": "AKG_1_NONE"  },
+        { "label": "Band-2  (680 - 710MHz)", "start_freq": 680000, "stop_freq": 710000, "details": "AKG WMS 4500 (680 - 710MHz)" , "band": "AKG_2_NONE"  },
+        { "label": "Band-3  (720 - 750MHz)", "start_freq": 720000, "stop_freq": 750000, "details": "AKG WMS 4500 (720 - 750MHz)" , "band": "AKG_3_NONE"  },
+        { "label": "Band-4  (760 - 790MHz)", "start_freq": 760000, "stop_freq": 790000, "details": "AKG WMS 4500 (760 - 790MHz)" , "band": "AKG_4_NONE"  },
+        { "label": "Band-5A (790 - 820MHz)", "start_freq": 790000, "stop_freq": 820000, "details": "AKG WMS 4500 (790 - 820MHz)" , "band": "AKG_5A_NONE" },
+        { "label": "Band-5C (800 - 820MHz)", "start_freq": 800000, "stop_freq": 820000, "details": "AKG WMS 4500 (800 - 820MHz)" , "band": "AKG_5C_NONE" },
+        { "label": "Band-6  (835 - 862MHz)", "start_freq": 835000, "stop_freq": 862000, "details": "AKG WMS 4500 (835 - 862MHz)" , "band": "AKG_6_NONE"  },
+        { "label": "Band-7  (500 - 531MHz)", "start_freq": 500000, "stop_freq": 531000, "details": "AKG WMS 4500 (500 - 531MHz)" , "band": "AKG_7_NONE"  },
+        { "label": "Band-8  (570 - 601MHz)", "start_freq": 570000, "stop_freq": 601000, "details": "AKG WMS 4500 (570 - 601MHz)" , "band": "AKG_8_NONE"  }
+    ]}
+]}
