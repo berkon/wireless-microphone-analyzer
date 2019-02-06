@@ -1,0 +1,37 @@
+{ "label":"Audio Technica", "submenu": [
+    { "label":"AT-One", "submenu": [
+    ]},
+    { "label":"1800", "submenu": [
+        { "label": "C-Band (541 - 567MHz)", "start_freq": 541000, "stop_freq": 567000, "details": "Audio Technica 1800 C-Band (541 - 567MHz)" , "band": "ATA_C_NONE" },
+        { "label": "D-Band (655 - 681MHz)", "start_freq": 655000, "stop_freq": 681000, "details": "Audio Technica 1800 D-Band (655 - 681MHz)" , "band": "ATA_D_NONE" }
+    ]},
+    { "label":"2000", "submenu": [
+        { "label": "D-Band (656 - 679MHz)", "start_freq": 656000, "stop_freq": 679000, "details": "Audio Technica 2000 D-Band (656 - 679MHz)" , "band": "ATA_D_NONE" },
+        { "label": "I-Band (487 - 507MHz)", "start_freq": 487000, "stop_freq": 507000, "details": "Audio Technica 2000 I-Band (487 - 507MHz)" , "band": "ATA_I_NONE" }
+    ]},
+    { "label":"2000b", "submenu": [
+    ]},
+    { "label":"3000", "submenu": [
+        { "label": "C-Band (541 - 567MHz)", "start_freq": 541000, "stop_freq": 567000, "details": "Audio Technica 3000 C-Band (541 - 567MHz)" , "band": "ATA_C_NONE" },
+        { "label": "D-Band (655 - 681MHz)", "start_freq": 655000, "stop_freq": 681000, "details": "Audio Technica 3000 D-Band (655 - 681MHz)" , "band": "ATA_D_NONE" },
+        { "label": "E-Band (795 - 820MHz)", "start_freq": 795000, "stop_freq": 820000, "details": "Audio Technica 3000 E-Band (795 - 820MHz)" , "band": "ATA_E_NONE" },
+        { "label": "F-Band (840 - 865MHz)", "start_freq": 840000, "stop_freq": 865000, "details": "Audio Technica 3000 F-Band (840 - 865MHz)" , "band": "ATA_F_NONE" },
+        { "label": "G-Band (721 - 747MHz)", "start_freq": 721000, "stop_freq": 747000, "details": "Audio Technica 3000 G-Band (721 - 747MHz)" , "band": "ATA_G_NONE" },
+        { "label": "I-Band (480 - 507MHz)", "start_freq": 480000, "stop_freq": 507000, "details": "Audio Technica 3000 I-Band (480 - 507MHz)" , "band": "ATA_I_NONE" },
+        { "label": "U-Band (606 - 631MHz)", "start_freq": 606000, "stop_freq": 631000, "details": "Audio Technica 3000 U-Band (606 - 631MHz)" , "band": "ATA_U_NONE" }
+    ]},
+    { "label":"4000/5000", "submenu": [
+        { "label": "C-Band (541 - 567MHz)", "start_freq": 541000, "stop_freq": 567000, "details": "Audio Technica 4000/5000 C-Band (541 - 567MHz)" , "band": "ATA_C_NONE" },
+        { "label": "D-Band (655 - 681MHz)", "start_freq": 655000, "stop_freq": 681000, "details": "Audio Technica 4000/5000 D-Band (655 - 681MHz)" , "band": "ATA_D_NONE" }
+    ]},
+    { "label":"M2 IEM", "submenu": [
+        { "label": "L-Band (575 - 608MHz)", "start_freq": 575000, "stop_freq": 608000, "details": "Audio Technica M2 IEM L-Band (575 - 608MHz)" , "band": "ATA_L_NONE" },
+        { "label": "M-Band (614 - 647MHz)", "start_freq": 614000, "stop_freq": 647000, "details": "Audio Technica M2 IEM M-Band (614 - 647MHz)" , "band": "ATA_M_NONE" },
+        { "label": "E-Band (790 - 822MHz)", "start_freq": 790000, "stop_freq": 822000, "details": "Audio Technica M2 IEM E-Band (790 - 822MHz)" , "band": "ATA_E_NONE" },
+        { "label": "F-Band (832 - 865MHz)", "start_freq": 832000, "stop_freq": 865000, "details": "Audio Technica M2 IEM F-Band (832 - 865MHz)" , "band": "ATA_F_NONE" }
+    ]},
+    { "label":"System 10", "submenu": [
+    ]},
+    { "label":"System 10 Pro", "submenu": [
+    ]}
+]}

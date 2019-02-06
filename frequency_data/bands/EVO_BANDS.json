@@ -1,0 +1,21 @@
+{ "label":"Electro Voice", "submenu": [
+    { "label":"R300", "submenu": [
+        { "label": "A-Band (618 - 634MHz)", "start_freq": 618000, "stop_freq": 634000, "details": "Electro Voice R300 A-Band (618 - 634MHz)" , "band": "EVO_A_NONE" },
+        { "label": "B-Band (678 - 694MHz)", "start_freq": 678000, "stop_freq": 694000, "details": "Electro Voice R300 B-Band (678 - 694MHz)" , "band": "EVO_B_NONE" },
+        { "label": "E-Band (850 - 865MHz)", "start_freq": 850000, "stop_freq": 865000, "details": "Electro Voice R300 E-Band (850 - 865MHz)" , "band": "EVO_E_NONE" },
+        { "label": "T-Band (794 - 806MHz)", "start_freq": 794000, "stop_freq": 806000, "details": "Electro Voice R300 T-Band (794 - 806MHz)" , "band": "EVO_T_NONE" }
+    ]},
+    { "label":"RE1", "submenu": [
+        { "label": "A-Band (680 - 704MHz)", "start_freq": 680000, "stop_freq": 704000, "details": "Electro Voice RE1 A-Band (680 - 704MHz)" , "band": "EVO_A_NONE" },
+        { "label": "B-Band (722 - 746MHz)", "start_freq": 722000, "stop_freq": 746000, "details": "Electro Voice RE1 B-Band (722 - 746MHz)" , "band": "EVO_B_NONE" },
+        { "label": "C-Band (776 - 800MHz)", "start_freq": 776000, "stop_freq": 800000, "details": "Electro Voice RE1 C-Band (776 - 800MHz)" , "band": "EVO_C_NONE" },
+        { "label": "F-Band (650 - 674MHz)", "start_freq": 650000, "stop_freq": 674000, "details": "Electro Voice RE1 F-Band (650 - 674MHz)" , "band": "EVO_F_NONE" },
+        { "label": "G-Band (614 - 638MHz)", "start_freq": 614000, "stop_freq": 638000, "details": "Electro Voice RE1 G-Band (614 - 638MHz)" , "band": "EVO_G_NONE" }
+    ]},
+    { "label":"REV", "submenu": [
+        { "label": "C1-Band (614 - 638MHz)", "start_freq": 614000, "stop_freq": 638000, "details": "Electro Voice REV C1-Band (614 - 638MHz)" , "band": "EVO_C1_NONE" },
+        { "label": "C2-Band (650 - 674MHz)", "start_freq": 650000, "stop_freq": 674000, "details": "Electro Voice REV C2-Band (650 - 674MHz)" , "band": "EVO_C2_NONE" },
+        { "label": "C3-Band (674 - 698MHz)", "start_freq": 674000, "stop_freq": 698000, "details": "Electro Voice REV C3-Band (674 - 698MHz)" , "band": "EVO_C3_NONE" },
+        { "label": "C5-Band (722 - 746MHz)", "start_freq": 722000, "stop_freq": 746000, "details": "Electro Voice REV C5-Band (722 - 746MHz)" , "band": "EVO_C5_NONE" }
+    ]}
+]}
