@@ -5,9 +5,9 @@ const ConfigStore     = require ( 'configstore' );
 const SerialPort      = require ( 'serialport'  );
 const Chart           = require ( 'chart.js'    );
 const FREQ_VENDOR_PRESETS = require ( 'require-all' )(__dirname +'/frequency_data/presets'  );
-const FREQ_FORBIDDEN      = require ( 'require-all' )(__dirname +'/frequency_data/forbidden');
 const Pkg             = require ('./package.json');
 const { dialog }      = require ('electron'     ).remote;
+const fs              = require ('fs');
 
 const configStore = new ConfigStore ( Pkg.name );
 
@@ -55,6 +55,14 @@ let chPreset_Vendor = configStore.get('chPreset.vendor');
 let chPreset_Band   = configStore.get('chPreset.band'  );
 let chPreset_Series = configStore.get('chPreset.series');
 let chPreset_Preset = configStore.get('chPreset.preset');
+let COUNTRY         = configStore.get('country'        );
+
+if ( !COUNTRY || !fs.existsSync ( './frequency_data/forbidden/FORBIDDEN_' + COUNTRY + '.json' ) ) {
+    COUNTRY = 'DE';
+    console.log ( "No country set or file with forbidden ranges for that country does not exist! Falling back to 'DE'");
+}
+
+var FREQ_FORBIDDEN = require ( './frequency_data/forbidden/FORBIDDEN_' + COUNTRY + '.json');
 
 var chDispValShadowArr = [];
 
@@ -166,7 +174,7 @@ var myChart = new Chart(ctx, {
 
 
 function setForbidden () {
-    for ( var f of FREQ_FORBIDDEN.forbidden_DE ) {
+    for ( var f of FREQ_FORBIDDEN ) {
         let range_res = isInRange ( f.start*1000, f.stop*1000);
         let left_data_point  = undefined;
         let right_data_point = undefined;
@@ -249,7 +257,7 @@ function isInRange ( start, stop ) {
 }
 
 function isForbidden ( start, stop ) {
-    for ( var f of FREQ_FORBIDDEN.forbidden_DE ) {
+    for ( var f of FREQ_FORBIDDEN ) {
         if ( (start >= f.start*1000 && start <= f.stop*1000) || (stop >= f.start*1000 && stop <= f.stop*1000) )
             return true;
     }
@@ -581,6 +589,38 @@ ipcRenderer.on ( 'SET_CHAN_PRESET', (event, message) => {
     //myChart.config.options.scales.xAxes[2].labels = [];
     setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
     myChart.update();
+});
+
+ipcRenderer.on ( 'SET_COUNTRY', (event, message) => {
+    if ( !message.country_code ) {
+        const dialogOptions = {
+            type: 'error',
+            buttons: ['OK'],
+            message: 'Empty or invalid country code!',
+            detail:  'country_code.json might be corrupted!'
+        }
+        dialog.showMessageBox ( dialogOptions, i => console.log("Button " + i + " was pressed!"));
+        console.log ( "Empty or invalid country code!" );
+        return;
+    }
+
+    if ( !fs.existsSync ( './frequency_data/forbidden/FORBIDDEN_' + message.country_code + '.json' ) ) {
+        COUNTRY = 'DE';
+        ipcRenderer.send ('SET_COUNTRY', { country_code : COUNTRY });
+        const dialogOptions = {
+            type: 'error',
+            buttons: ['OK'],
+            message: 'File not found!',
+            detail:  'The file corresponding to country code: "' + message.country_code + '",  which contains the forbidden frequency ranges for this country, was not found! Falling back to country "DE"'
+        }
+        dialog.showMessageBox ( dialogOptions, i => console.log("Button " + i + " was pressed!"));
+        console.log ( "File with forbidden ranges not found for country code: '" + message.country_code +"' => Falling back to: 'DE'");
+    } else
+        COUNTRY = message.country_code;
+    
+    configStore.set ( 'country', COUNTRY );
+    FREQ_FORBIDDEN = require ( './frequency_data/forbidden/FORBIDDEN_' + COUNTRY + '.json');
+    InitChart();
 });
 
 ipcRenderer.on ( 'SET_PORT', (event, message) => {

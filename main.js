@@ -4,13 +4,26 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true; // Disable security warni
 var SerialPort = require ( 'serialport' );
 const FREQ_VENDOR_BANDS   = require ( 'require-all' )(__dirname +'/frequency_data/bands'  );
 const FREQ_VENDOR_PRESETS = require ( 'require-all' )(__dirname +'/frequency_data/presets');
+const COUNTRIES           = require ( './country_codes');
 
+const {ipcMain} = require ("electron");
 const {app, BrowserWindow, Menu} = require('electron');
 const electronLocalshortcut = require ( 'electron-localshortcut' );
-var { productName, version } = require ( './package.json' );
+const { productName, name, version } = require ( './package.json' );
+
+const ConfigStore = require ( 'configstore' );
+const configStore = new ConfigStore ( name );
+
+let MENU_BAND     = 0;
+let MENU_CHANNELS = 1;
+let MENU_COUNTRY  = 2;
+let MENU_PORT     = 3;
+let MENU_HELP     = 4;
 
 let mainWindow;
 let helpWindow;
+
+let country = configStore.get('country');
 
 function createWindow () {
     mainWindow = new BrowserWindow({width: 1200, height: 700});
@@ -78,15 +91,15 @@ function createWindow () {
         let value = vendorBandData[1];
 
         if ( Array.isArray ( value ) ) {
-            menuJSON[0].submenu.push ({ type:'separator' });
+            menuJSON[MENU_BAND].submenu.push ({ type:'separator' });
             value.forEach ( (val) => {
-                addMenuEntryOrSubmenu ( val.label, val, menuJSON[0].submenu );
+                addMenuEntryOrSubmenu ( val.label, val, menuJSON[MENU_BAND].submenu );
             });
-            menuJSON[0].submenu.push ({ type:'separator' });
+            menuJSON[MENU_BAND].submenu.push ({ type:'separator' });
         } else if ( value.hasOwnProperty ('submenu') )
-            addMenuEntryOrSubmenu ( value.label, value.submenu, menuJSON[0].submenu );
+            addMenuEntryOrSubmenu ( value.label, value.submenu, menuJSON[MENU_BAND].submenu );
         else
-            addMenuEntryOrSubmenu ( value.label, value, menuJSON[0].submenu );
+            addMenuEntryOrSubmenu ( value.label, value, menuJSON[MENU_BAND].submenu );
     });
 
     menuJSON.push ({ label: 'Chan. Presets', submenu: [] });
@@ -98,26 +111,54 @@ function createWindow () {
         let band_idx   = undefined;
         let series_idx = undefined;
 
-        vendor_idx = menuJSON[1].submenu.findIndex ( ( elem ) => { return elem.label === key[0]; });
+        vendor_idx = menuJSON[MENU_CHANNELS].submenu.findIndex ( ( elem ) => { return elem.label === key[0]; });
 
         if ( vendor_idx === -1 ) // Does this vendor already exists as a submenu?
-            vendor_idx = menuJSON[1].submenu.push ({ label: key[0], submenu: [] }) - 1;
+            vendor_idx = menuJSON[MENU_CHANNELS].submenu.push ({ label: key[0], submenu: [] }) - 1;
         
-        band_idx = menuJSON[1].submenu[vendor_idx].submenu.findIndex ( ( elem ) => { return elem.label === key[1] + " - Band"; });
+        band_idx = menuJSON[MENU_CHANNELS].submenu[vendor_idx].submenu.findIndex ( ( elem ) => { return elem.label === key[1] + " - Band"; });
         
         if ( band_idx === -1 ) // Does this band already exist in this vendor submenu?
-            band_idx = menuJSON[1].submenu[vendor_idx].submenu.push ({ label: key[1] + " - Band", submenu: [] }) - 1;
+            band_idx = menuJSON[MENU_CHANNELS].submenu[vendor_idx].submenu.push ({ label: key[1] + " - Band", submenu: [] }) - 1;
 
-        series_idx = menuJSON[1].submenu[vendor_idx].submenu[band_idx].submenu.findIndex ( ( elem ) => { return elem.label === key[2]; });
+        series_idx = menuJSON[MENU_CHANNELS].submenu[vendor_idx].submenu[band_idx].submenu.findIndex ( ( elem ) => { return elem.label === key[2]; });
         
         if ( series_idx ) // Does this series already exist in this band submenu?
-            series_idx = menuJSON[1].submenu[vendor_idx].submenu[band_idx].submenu.push ({ label: key[2], submenu: [] }) - 1;
+            series_idx = menuJSON[MENU_CHANNELS].submenu[vendor_idx].submenu[band_idx].submenu.push ({ label: key[2], submenu: [] }) - 1;
 
         preset.forEach ( (bank, i) => {
-            menuJSON[1].submenu[vendor_idx].submenu[band_idx].submenu[series_idx].submenu.push ({
+            menuJSON[MENU_CHANNELS].submenu[vendor_idx].submenu[band_idx].submenu[series_idx].submenu.push ({
                 label: "Bank " + (i+1),
                 click () { wc.send ( "SET_CHAN_PRESET", { preset: vendorPreset[0] + "_" + (i+1) }); }
             });
+        });
+    });
+
+    menuJSON.push ({ label: 'Country', submenu: [] });
+
+    if ( !country ) {
+        console.log ( "No country setting saved! Using default: 'DE'");
+        country = "DE";
+    }
+
+    COUNTRIES.forEach ( ( c ) => {
+        menuJSON[MENU_COUNTRY].submenu.push (
+            {
+                'label' : c.label,
+                'code'  : c.code,
+                'type'  : 'radio' ,
+                'checked': country===c.code?true:false,
+                click () { wc.send ( 'SET_COUNTRY', { country_code : c.code } ); }
+            }
+        );
+    });
+
+    ipcMain.on ( "SET_COUNTRY", (event, message) => {
+        menuJSON[MENU_COUNTRY].submenu.forEach ( function ( elem ) {
+            if ( elem.code === message.country_code ) {
+                elem.checked = true;
+                Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) );
+            }
         });
     });
 
@@ -137,10 +178,10 @@ function createWindow () {
             portNameArr.push ( port.comName );
         });
 
-        menuJSON[2].submenu[0] = { label: 'Auto', type: 'radio', click () { wc.send ( 'SET_PORT',  portNameArr ); } }
+        menuJSON[MENU_PORT].submenu[0] = { label: 'Auto', type: 'radio', click () { wc.send ( 'SET_PORT',  portNameArr ); } }
 
         portNameArr.forEach ( ( port ) => {
-            menuJSON[2].submenu.push (
+            menuJSON[MENU_PORT].submenu.push (
                 {
                     'label' : port,
                     'type'  : 'radio' ,
