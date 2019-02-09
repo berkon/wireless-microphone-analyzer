@@ -1,0 +1,6 @@
+[
+    { "start": 830000 , "stop": 845000 , "info": "LTE-19 850 Down"  },
+    { "start": 875000 , "stop": 890000 , "info": "LTE-19 850 Up"    },
+    { "start": 880000 , "stop": 915000 , "info": "LTE-8 900 Down"   },
+    { "start": 925000 , "stop": 960000 , "info": "LTE-8 900 Up"     }
+]

@@ -1,0 +1,14 @@
+[
+    { "start": 452500 , "stop": 457500 , "info": "LTE-31 450 Down"   },
+    { "start": 462500 , "stop": 467500 , "info": "LTE-31 450 Up"     },
+    { "start": 703000 , "stop": 733000 , "info": "LTE-28 700 Down"   },
+    { "start": 758000 , "stop": 788000 , "info": "LTE-28 700 Up"     },
+    { "start": 791000 , "stop": 821000 , "info": "LTE-20 800 Down"   },
+    { "start": 832000 , "stop": 862000 , "info": "LTE-20 800 Up"     },
+    { "start": 1710000, "stop": 1785000, "info": "LTE-3 1800 Up"     },
+    { "start": 1805000, "stop": 1880000, "info": "LTE-3 1800 Down"   },
+    { "start": 1920000, "stop": 1980000, "info": "LTE-1 2100 Down"   },
+    { "start": 2110000, "stop": 2170000, "info": "LTE-1 2100 Up"     },
+    { "start": 2500000, "stop": 2570000, "info": "LTE-7 2600 Up"     },
+    { "start": 2620000, "stop": 2690000, "info": "LTE-7 2600 Down"   }
+]
