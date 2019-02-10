@@ -640,24 +640,23 @@ ipcRenderer.on ( 'SET_PORT', (event, message) => {
 
 document.addEventListener ( "wheel", function ( e ) {
     let start_f = 0, stop_f = 0;
-    //let delta_freq = ( Math.abs(e.deltaY) / 100 ) * 5000;
-    let delta_freq = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 10 ); // 10% of freq range
+    let delta_freq_10percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 10 ); // 10% of freq range
 
     if ( e.deltaY > 0 ) { // Zoom out
-        start_f = Math.floor ( START_FREQ/1000 ) - delta_freq;
-        stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq;
+        start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_10percent;
+        stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
     } else if ( e.deltaY < 0 ) { // Zoom in
-        start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
-        stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
+        start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
+        stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
         
         if ( stop_f - start_f < 112 )
             return;
     } else if ( e.deltaX < 0 ) { // Move left
-        start_f = Math.floor ( START_FREQ/1000 ) - delta_freq;
-        stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
+        start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_10percent;
+        stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
     } else if ( e.deltaX > 0 ) { // Move right
-        start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
-        stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq;
+        start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
+        stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
     }
 
 
@@ -675,49 +674,55 @@ document.addEventListener ( "wheel", function ( e ) {
 
 document.addEventListener ( "keydown", function ( e ) {
     let start_f = 0, stop_f = 0;
-    //let delta_freq = 10000;
-    let delta_freq = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 10 ); // 10% of freq range
+    let delta_freq_10percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 10 ); // 10% of freq range
+    let delta_freq_50percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 50 ); // 50% of freq range
 
     switch ( e.keyCode ) {
         case 37: // Arrow left
-             if ( !e.ctrlKey ) { // Move freq band to left
-                start_f = Math.floor ( START_FREQ/1000 ) - delta_freq;
-                stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
-             } else { // Toggle vendor specific channel presets/banks down
+            if ( e.ctrlKey && !e.shiftKey ) { // Toggle vendor specific channel presets/banks down
                 if ( chPreset_Preset > 1 ) {
                     chPreset_Preset--;
                     setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
                     myChart.update();
                 }
                 return;
-             }
+            } else if ( e.shiftKey && !e.ctrlKey ) { // Move frequency band to left by 50% of span
+                start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_50percent;
+                stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_50percent;
+            } else if ( !e.shiftKey && !e.ctrlKey ) { // Move frequency band to left by 10% of span
+                start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_10percent;
+                stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
+            }
             break;
 
         case 39: // Arrow right
-            if ( !e.ctrlKey ) { // Move freq band to right
-                start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
-                stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq;
-            } else { // Toggle vendor specific channel presets/banks up
+            if ( e.ctrlKey && !e.shiftKey ) { // Toggle vendor specific channel presets/banks up
                 if ( chPreset_Preset <  FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length ) {
                     chPreset_Preset++;
                     setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
                     myChart.update();
                 }
                 return;
+            } else if ( e.shiftKey && !e.ctrlKey ) { // Move frequency band to right by 50% of span
+                start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_50percent;
+                stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_50percent;
+            } else if ( !e.shiftKey && !e.ctrlKey ) { // Move frequency band to right by 10% of span
+                start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
+                stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
             }
             break;
 
         case 38: // Zoom in
-            start_f = Math.floor ( START_FREQ/1000 ) + delta_freq;
-            stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq;
+            start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
 
             if ( stop_f - start_f < 112 )
                 return;
             break;
 
         case 40: // Zoom out
-            start_f = Math.floor ( START_FREQ/1000 ) - delta_freq;
-            stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq;
+            start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_10percent;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
             break;
         default:
             return;
