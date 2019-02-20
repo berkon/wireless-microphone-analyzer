@@ -1,0 +1,13 @@
+{ "label":"Sony", "submenu": [
+    { "label": "TV1417 (470 - 494MHz)" , "start_freq": 470125, "stop_freq": 493875, "details": "Sony TV1417 (470 - 494MHz)" , "band": "SNY_TV1417_NONE" },
+    { "label": "TV1821 (494 - 518MHz)" , "start_freq": 494125, "stop_freq": 517875, "details": "Sony TV1821 (494 - 518MHz)" , "band": "SNY_TV1821_NONE" },
+    { "label": "TV2225 (518 - 542MHz)" , "start_freq": 518125, "stop_freq": 541875, "details": "Sony TV2225 (518 - 542MHz)" , "band": "SNY_TV2225_NONE" },
+    { "label": "TV3033 (566 - 590MHz)" , "start_freq": 566125, "stop_freq": 589875, "details": "Sony TV3033 (566 - 590MHz)" , "band": "SNY_TV3033_NONE" },
+    { "label": "TV3436 (590 - 608MHz)" , "start_freq": 590125, "stop_freq": 607875, "details": "Sony TV3436 (590 - 608MHz)" , "band": "SNY_TV3436_NONE" },
+    { "label": "TV3841 (614 - 638MHz)" , "start_freq": 614125, "stop_freq": 637875, "details": "Sony TV3841 (614 - 638MHz)" , "band": "SNY_TV3841_NONE" },
+    { "label": "TV4245 (638 - 662MHz)" , "start_freq": 638125, "stop_freq": 661875, "details": "Sony TV4245 (638 - 662MHz)" , "band": "SNY_TV4245_NONE" },
+    { "label": "TV4649 (662 - 686MHz)" , "start_freq": 662125, "stop_freq": 685875, "details": "Sony TV4649 (662 - 686MHz)" , "band": "SNY_TV4649_NONE" },
+    { "label": "TV5051 (686 - 698MHz)" , "start_freq": 686125, "stop_freq": 697875, "details": "Sony TV5051 (686 - 698MHz)" , "band": "SNY_TV5051_NONE" },
+    { "label": "TV6264 (798 - 822MHz)" , "start_freq": 798125, "stop_freq": 821875, "details": "Sony TV6264 (798 - 822MHz)" , "band": "SNY_TV6264_NONE" },
+    { "label": "TV6769 (838 - 862MHz)" , "start_freq": 838125, "stop_freq": 862000, "details": "Sony TV5051 (838 - 862MHz)" , "band": "SNY_TV6769_NONE" }
+]}
