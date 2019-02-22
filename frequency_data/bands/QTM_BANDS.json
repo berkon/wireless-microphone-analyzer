@@ -1,0 +1,20 @@
+{ "label":"Quantum", "submenu": [
+    { "label": "Block 0   (665 - 690MHz)", "start_freq": 665000, "stop_freq": 690000, "details": "Quantum Block 0 (665 - 690MHz)"  , "band": "QTM_0_NONE"   },
+    { "label": "Block 1   (690 - 715MHz)", "start_freq": 690000, "stop_freq": 715000, "details": "Quantum Block 1 (690 - 715MHz)"  , "band": "QTM_1_NONE"   },
+    { "label": "Block 2   (715 - 740MHz)", "start_freq": 715000, "stop_freq": 740000, "details": "Quantum Block 2 (715 - 740MHz)"  , "band": "QTM_2_NONE"   },
+    { "label": "Block 3   (730 - 765MHz)", "start_freq": 730000, "stop_freq": 765000, "details": "Quantum Block 3 (730 - 765MHz)"  , "band": "QTM_3_NONE"   },
+    { "label": "Block 600 (600 - 625MHz)", "start_freq": 600000, "stop_freq": 625000, "details": "Quantum Block 600 (600 - 625MHz)", "band": "QTM_600_NONE" },
+    { "label": "Block 625 (625 - 650MHz)", "start_freq": 625000, "stop_freq": 650000, "details": "Quantum Block 625 (625 - 650MHz)", "band": "QTM_625_NONE" },
+    { "label": "Block 650 (650 - 675MHz)", "start_freq": 650000, "stop_freq": 675000, "details": "Quantum Block 650 (650 - 675MHz)", "band": "QTM_650_NONE" },
+    { "label": "Block 675 (675 - 700MHz)", "start_freq": 675000, "stop_freq": 700000, "details": "Quantum Block 675 (675 - 700MHz)", "band": "QTM_675_NONE" },
+    { "label": "Block 700 (700 - 725MHz)", "start_freq": 700000, "stop_freq": 725000, "details": "Quantum Block 700 (700 - 725MHz)", "band": "QTM_700_NONE" },
+    { "label": "Block 725 (725 - 750MHz)", "start_freq": 725000, "stop_freq": 750000, "details": "Quantum Block 725 (725 - 750MHz)", "band": "QTM_725_NONE" },
+    { "label": "Block 750 (750 - 775MHz)", "start_freq": 750000, "stop_freq": 775000, "details": "Quantum Block 750 (750 - 775MHz)", "band": "QTM_750_NONE" },
+    { "label": "Block 775 (775 - 800MHz)", "start_freq": 775000, "stop_freq": 800000, "details": "Quantum Block 775 (775 - 800MHz)", "band": "QTM_775_NONE" },
+    { "label": "Block 800 (800 - 825MHz)", "start_freq": 800000, "stop_freq": 825000, "details": "Quantum Block 800 (800 - 825MHz)", "band": "QTM_800_NONE" },
+    { "label": "Block 825 (825 - 850MHz)", "start_freq": 825000, "stop_freq": 850000, "details": "Quantum Block 825 (825 - 850MHz)", "band": "QTM_825_NONE" },
+    { "label": "Block 850 (850 - 875MHz)", "start_freq": 850000, "stop_freq": 875000, "details": "Quantum Block 850 (850 - 875MHz)", "band": "QTM_850_NONE" },
+    { "label": "Block 875 (875 - 900MHz)", "start_freq": 875000, "stop_freq": 900000, "details": "Quantum Block 875 (875 - 900MHz)", "band": "QTM_875_NONE" },
+    { "label": "Block 900 (900 - 925MHz)", "start_freq": 900000, "stop_freq": 925000, "details": "Quantum Block 900 (900 - 925MHz)", "band": "QTM_900_NONE" },
+    { "label": "Block 925 (925 - 950MHz)", "start_freq": 925000, "stop_freq": 950000, "details": "Quantum Block 925 (925 - 950MHz)", "band": "QTM_925_NONE" }
+]}

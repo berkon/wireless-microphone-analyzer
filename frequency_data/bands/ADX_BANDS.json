@@ -1,0 +1,5 @@
+{ "label":"Audix", "submenu": [
+    { "label": "A-Band (566 - 590MHz)", "start_freq": 566000, "stop_freq": 590000, "details": "Audix A-Band (566 - 590MHz)", "band": "ADX_A_NONE" },    
+    { "label": "B-Band (614 - 638MHz)", "start_freq": 614000, "stop_freq": 638000, "details": "Audix B-Band (470 - 538MHz)", "band": "ADX_B_NONE" },
+    { "label": "C-Band (638 - 662MHz)", "start_freq": 638000, "stop_freq": 662000, "details": "Audix C-Band (638 - 662MHz)", "band": "ADX_C_NONE" }
+]}

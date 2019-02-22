@@ -1,0 +1,17 @@
+{ "label":"Zaxcom", "submenu": [
+    { "label": "Block 20 (518 - 542MHz)", "start_freq": 518000, "stop_freq": 542000, "details": "Zaxcom Block 20 (518 - 542MHz)", "band": "ZCM_20_NONE" },
+    { "label": "Block 21 (536 - 572MHz)", "start_freq": 536000, "stop_freq": 572000, "details": "Zaxcom Block 21 (536 - 572MHz)", "band": "ZCM_21_NONE" },
+    { "label": "Block 22 (560 - 590MHz)", "start_freq": 560000, "stop_freq": 590000, "details": "Zaxcom Block 22 (560 - 590MHz)", "band": "ZCM_22_NONE" },
+    { "label": "Block 23 (590 - 614MHz)", "start_freq": 590000, "stop_freq": 614000, "details": "Zaxcom Block 23 (590 - 614MHz)", "band": "ZCM_23_NONE" },
+    { "label": "Block 24 (614 - 644MHz)", "start_freq": 614000, "stop_freq": 644000, "details": "Zaxcom Block 24 (614 - 644MHz)", "band": "ZCM_24_NONE" },
+    { "label": "Block 25 (638 - 668MHz)", "start_freq": 638000, "stop_freq": 668000, "details": "Zaxcom Block 25 (638 - 668MHz)", "band": "ZCM_25_NONE" },
+    { "label": "Block 26 (662 - 692MHz)", "start_freq": 662000, "stop_freq": 692000, "details": "Zaxcom Block 26 (662 - 692MHz)", "band": "ZCM_26_NONE" },
+    { "label": "Block 27 (686 - 722MHz)", "start_freq": 686000, "stop_freq": 722000, "details": "Zaxcom Block 27 (686 - 722MHz)", "band": "ZCM_27_NONE" },
+    { "label": "Block 28 (722 - 746MHz)", "start_freq": 722000, "stop_freq": 746000, "details": "Zaxcom Block 28 (722 - 746MHz)", "band": "ZCM_28_NONE" },
+    { "label": "Block 29 (740 - 770MHz)", "start_freq": 740000, "stop_freq": 770000, "details": "Zaxcom Block 29 (740 - 770MHz)", "band": "ZCM_29_NONE" },
+    { "label": "Block 30 (764 - 794MHz)", "start_freq": 764000, "stop_freq": 794000, "details": "Zaxcom Block 30 (764 - 794MHz)", "band": "ZCM_30_NONE" },
+    { "label": "Block 31 (794 - 818MHz)", "start_freq": 794000, "stop_freq": 818000, "details": "Zaxcom Block 31 (794 - 818MHz)", "band": "ZCM_31_NONE" },
+    { "label": "Block 32 (818 - 842MHz)", "start_freq": 818000, "stop_freq": 842000, "details": "Zaxcom Block 32 (818 - 842MHz)", "band": "ZCM_32_NONE" },
+    { "label": "Block 33 (860 - 872MHz)", "start_freq": 860000, "stop_freq": 872000, "details": "Zaxcom Block 33 (860 - 872MHz)", "band": "ZCM_33_NONE" },
+    { "label": "2.4GHz   (2403 - 2475MHz)", "start_freq": 2403000, "stop_freq": 2475000, "details": "Zaxcom Block 2.4GHz (2403 - 2475MHz)", "band": "ZCM_2.4GHz_NONE" }
+]}
