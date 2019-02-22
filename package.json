@@ -39,6 +39,8 @@
       "icon": "build/microphone-wave.ico"
     },
     "linux": {
+      "icon": "./build/icons",
+      "category": "Utility",
       "target": [
         "AppImage",
         "deb"
