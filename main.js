@@ -48,7 +48,9 @@ function createWindow () {
         ]}, */
         
     var portMenuJSON = { label: 'Port', submenu: [] };
-    var helpMenuJSON = { label: 'Help', click () { openHelpWindow(); } };
+    var helpMenuJSON = { label: 'Help', submenu: [
+        { label: "Documentation", click () { openHelpWindow(); } }
+    ]};
 
     function addMenuEntryOrSubmenu ( menu_label, menu_data, menu_location ) {
         if ( !Array.isArray (menu_data) ) {
