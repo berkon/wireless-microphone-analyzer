@@ -21,7 +21,7 @@ The following mouse/keyboard commands zoom/move the frequency range:
 
 * **Mouse wheel scroll OR Arrow up/down** zooms in/out of the waveform. Which means decreasing/increasing the span width of the spectrum analyzer
 
-* **Mouse wheel tilt OR Arrow left/right** moves the frequency range down-/upwards
+* **Mouse wheel tilt OR Arrow left/right** moves the frequency range down-/upwards (when holding down <SHIFT> freqency range shifts by 50%)
 
 * **\<CTRL> Arrow left/right** toggles between vendor channel presets within the selected vendor specific frequency band.
 
