@@ -11,10 +11,6 @@ const fs              = require ('fs');
 
 const configStore = new ConfigStore ( Pkg.name );
 
-var START_FREQ = undefined;
-var STOP_FREQ  = undefined;
-var FREQ_STEP  = undefined;
-
 var MAX_DBM    = -20;
 var MIN_DBM    = -110;
 var CONGESTION_LEVEL_DBM = -85;
@@ -56,6 +52,12 @@ let chPreset_Band   = configStore.get('chPreset.band'  );
 let chPreset_Series = configStore.get('chPreset.series');
 let chPreset_Preset = configStore.get('chPreset.preset');
 let COUNTRY         = configStore.get('country'        );
+var START_FREQ      = configStore.get('start_freq'     );
+var STOP_FREQ       = configStore.get('stop_freq'      );
+var FREQ_STEP       = configStore.get('freq_step'      );
+var BAND_LABEL      = configStore.get('band_label'     );
+
+let received_first_answer = false;
 
 if ( !COUNTRY || !fs.existsSync ( './frequency_data/forbidden/FORBIDDEN_' + COUNTRY + '.json' ) ) {
     COUNTRY = 'DE';
@@ -136,7 +138,7 @@ var myChart = new Chart(ctx, {
             xAxes: [{
                 scaleLabel: {
                     display: true,
-                    labelString: 'MHz'
+                    labelString: BAND_LABEL?BAND_LABEL:'MHz'
                 }
             },{
                 position: "top",
@@ -317,6 +319,18 @@ function InitChart () {
 
 function openPort () {
     if( !PORT_MENU_SELECTION || PORT_MENU_SELECTION === 'AUTO' ) { // Automatic port selection
+        let start_f = Math.floor ( START_FREQ / 1000 );
+        let stop_f  = Math.floor ( STOP_FREQ  / 1000 );
+
+        let start_f_str = Math.floor ( start_f / 1000 );
+        start_f_str = start_f_str.toString();
+        
+        let stop_f_str = Math.floor ( stop_f / 1000 );
+        stop_f_str = stop_f_str.toString();
+    
+        let span_f_str = Math.floor ( (stop_f - start_f) / 1000 );
+        span_f_str = span_f_str.toString();
+
         SerialPort.list().then ( (ports, err) => {
             if ( err ) {
                 console.log ( err );
@@ -339,22 +353,17 @@ function openPort () {
                 
                 console.log ( "Trying port " + ports[i].comName + " ...");
                 port = new SerialPort ( ports[i].comName, { baudRate : 500000 }, function ( err ) {
-/*                    if ( err ) {
+/*                  if ( err ) {
                         console.log ( 'Error: ', err.message );
                         return;
                     } */
 
                     setCallbacks();
-
-                    sendAnalyzer_GetConfig ().then ( () => {
-                        clearInterval ( autoPortCheckTimer );
-                        console.log ( "RF Explorer found!" );
-                        InitChart ();
-                    });
+                    sendAnalyzer_SetConfig ( start_f, stop_f, "" );
                 });
 
                 i++;
-            }, 500);
+            }, 750);
         });
     } else  {
         port = new SerialPort ( PORT_MENU_SELECTION, { baudRate : 500000 }, function ( err ) {
@@ -364,11 +373,7 @@ function openPort () {
             }
 
             setCallbacks();
-
-            sendAnalyzer_GetConfig ().then ( () => {
-                console.log ( "RF Explorer found!" );
-                InitChart ();
-            });
+            sendAnalyzer_SetConfig ( start_f, stop_f, "" );
         });
     }
 }
@@ -410,11 +415,33 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
     START_FREQ = start_freq * 1000;
     STOP_FREQ  = stop_freq  * 1000;
     config_buf.writeUInt8 ( 0x20, 1 );
+
     port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
 
     sendAnalyzer_GetConfig().then ( () => {
+        if ( label === "" ) {
+            if ( BAND_LABEL )
+                label = BAND_LABEL;
+            else {
+                let start_f = Math.floor ( START_FREQ / 1000 );
+                let stop_f  = Math.floor ( STOP_FREQ  / 1000 );
+    
+                let start_f_str = Math.floor ( start_f / 1000 );
+                start_f_str = start_f_str.toString();
+                
+                let stop_f_str = Math.floor ( stop_f / 1000 );
+                stop_f_str = stop_f_str.toString();
+            
+                let span_f_str = Math.floor ( (stop_f - start_f) / 1000 );
+                span_f_str = span_f_str.toString();
+    
+                label = start_f_str + " - " + stop_f_str + " MHz  (Span: " + span_f_str + "MHz)";
+            }
+        }
+
         myChart.options.scales.xAxes[0].scaleLabel.labelString = label;
-        InitChart ();        
+        configStore.set ( 'band_label' , label );
+        InitChart ();
     });
 }
 
@@ -473,10 +500,19 @@ function setCallbacks () {
             return;
 
         if ( msgId === '$Sp' ) {
+            // If this is the first answer ever which we recieve from the device, this means that the serial port ist
+            // valid and working. So stop the port check timer and initialize the Chart ...
+            if ( !received_first_answer ) {
+                received_first_answer = true;
+                clearInterval ( autoPortCheckTimer );
+                console.log ( "RF Explorer found!" );
+                InitChart ();
+            }
+
             var dataStart = msgStart + msgId.length;
             var val_changed = false;
 
-            msg_buf = rec_buf.slice ( dataStart + rec_buf_sweep_poi, dataStart + 112 );
+            msg_buf = rec_buf.slice ( dataStart + rec_buf_sweep_poi, dataStart + SWEEP_POINTS );
 
             for ( let i = 0 ; i < msg_buf.length ; i++ ) {
                 msg_buf[i] = -( msg_buf[i] / 2 );
@@ -504,8 +540,8 @@ function setCallbacks () {
             if ( val_changed )
                 myChart.update();
 
-            if ( rec_buf_sweep_poi === 112 ) { // Not waiting to get CR LF here since logic would be more complicated. Instead CR LF will automatically be skipped anyway when searching for next message!
-                rec_buf = rec_buf.slice ( dataStart + 112 ); // Remove message from rec_buf including CR LF at end of line
+            if ( rec_buf_sweep_poi === SWEEP_POINTS ) { // Not waiting to get CR LF here since logic would be more complicated. Instead CR LF will automatically be skipped anyway when searching for next message!
+                rec_buf = rec_buf.slice ( dataStart + SWEEP_POINTS ); // Remove message from rec_buf including CR LF at end of line
                 rec_buf_sweep_poi = 0;
                 msgStart = -1;            
                 msgId    = -1;
@@ -526,11 +562,23 @@ function setCallbacks () {
 
         switch ( msgId ) {
             case '#C2-F:': // Received config data from device
+                // If this is the first answer ever which we recieve from the device, this means that the serial port ist
+                // valid and working. So stop the port check timer and initialize the Chart ...
+                if ( !received_first_answer ) {
+                    received_first_answer = true;
+                    clearInterval ( autoPortCheckTimer );
+                    console.log ( "RF Explorer found!" );
+                    InitChart ();
+                }
+
                 let msg_buf_str = String.fromCharCode.apply ( null, msg_buf ); // Convert to characters
                 let start_freq_step_idx = msg_buf_str.indexOf(',') + 1;
                 START_FREQ = parseInt ( msg_buf_str.slice ( 0, start_freq_step_idx) ) * 1000;
                 FREQ_STEP  = parseInt ( msg_buf_str.slice ( start_freq_step_idx, msg_buf_str.indexOf(',', start_freq_step_idx)) );
                 STOP_FREQ  = ( FREQ_STEP * (SWEEP_POINTS-1) ) + START_FREQ;
+                configStore.set ( 'start_freq', START_FREQ );
+                configStore.set ( 'stop_freq' , STOP_FREQ  );
+                configStore.set ( 'freq_step' , FREQ_STEP  );
                 analyzerGetConfigPromise_Resolve();
                 break;
 
@@ -649,7 +697,7 @@ document.addEventListener ( "wheel", function ( e ) {
         start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
         stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
         
-        if ( stop_f - start_f < 112 )
+        if ( stop_f - start_f < SWEEP_POINTS )
             return;
     } else if ( e.deltaX < 0 ) { // Move left
         start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_10percent;
@@ -716,7 +764,7 @@ document.addEventListener ( "keydown", function ( e ) {
             start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
             stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
 
-            if ( stop_f - start_f < 112 )
+            if ( stop_f - start_f < SWEEP_POINTS )
                 return;
             break;
 
