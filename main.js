@@ -148,7 +148,7 @@ function createWindow () {
                 'code'  : c.code,
                 'type'  : 'radio' ,
                 'checked': country===c.code?true:false,
-                click () { wc.send ( 'SET_COUNTRY', { country_code : c.code } ); }
+                click () { wc.send ( 'SET_COUNTRY', { country_code : c.code, country_label : c.label } ); }
             }
         );
     });

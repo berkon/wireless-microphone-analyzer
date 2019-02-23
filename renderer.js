@@ -608,10 +608,10 @@ ipcRenderer.on ( 'SET_COUNTRY', (event, message) => {
         COUNTRY = 'DE';
         ipcRenderer.send ('SET_COUNTRY', { country_code : COUNTRY });
         const dialogOptions = {
-            type: 'error',
+            type: 'warning',
             buttons: ['OK'],
-            message: 'File not found!',
-            detail:  'The file corresponding to country code: "' + message.country_code + '",  which contains the forbidden frequency ranges for this country, was not found! Falling back to country "DE"'
+            message: 'Country not available!',
+            detail:  'No frequency related information available for ' + message.country_label +' (' + message.country_code + ')' + '! Falling back to Germany (DE)'
         }
         dialog.showMessageBox ( dialogOptions, i => console.log("Button " + i + " was pressed!"));
         console.log ( "File with forbidden ranges not found for country code: '" + message.country_code +"' => Falling back to: 'DE'");
