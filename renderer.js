@@ -11,6 +11,8 @@ const fs              = require ('fs');
 
 const configStore = new ConfigStore ( Pkg.name );
 
+var MAX_FREQ   = 2700000; // 2700000 kHz (2.7 GHz)
+var MIN_FREQ   =   15000; //   15000 kHz ( 15 MHz)
 var MAX_DBM    = -20;
 var MIN_DBM    = -110;
 var CONGESTION_LEVEL_DBM = -85;
@@ -277,21 +279,28 @@ function alignToBoundary ( point ) {
         return point;
 }
 
+function formatFrequencyString ( str ) { // str as kHz
+    if ( str.length === 1 )
+        str = "0." + str + "00";
+    else if ( str.length === 2 )
+        str = "0." + str + "0";
+    else if ( str.length === 3 ) {
+        str = "0." + str;
+    } else {
+        let MHz  = str.substr ( 0, str.length - 3 ); 
+        let rest = str.substr ( -3 );
+        str = MHz + "." + rest;
+    }
+
+    return str;
+}
+
 function InitChart () {
     myChart.data.labels = [];
 
     for ( var freq = START_FREQ; freq <= STOP_FREQ ; freq += FREQ_STEP ) {
-        let val = Math.round ( freq / 1000 ) / 1000
-        val = val.toString();
-        
-        if ( val.length < 7 ) {
-            if ( !val.includes(".") )
-                val += ".000";
-            else
-                while ( val.length < 7 )
-                    val += "0";
-        }
-
+        let val = Math.round ( freq / 1000 );
+        val = formatFrequencyString ( val.toString() );
         myChart.data.labels.push ( val );
     }
 
@@ -321,15 +330,6 @@ function InitChart () {
 function openPort () {
     let start_f = Math.floor ( START_FREQ / 1000 );
     let stop_f  = Math.floor ( STOP_FREQ  / 1000 );
-
-        let start_f_str = Math.floor ( start_f / 1000 );
-        start_f_str = start_f_str.toString();
-        
-        let stop_f_str = Math.floor ( stop_f / 1000 );
-        stop_f_str = stop_f_str.toString();
-    
-    let span_f_str = Math.floor ( (stop_f - start_f) / 1000 );
-    span_f_str = span_f_str.toString();
 
     if( !PORT_MENU_SELECTION || PORT_MENU_SELECTION === 'AUTO' ) { // Automatic port selection
         SerialPort.list().then ( (ports, err) => {
@@ -433,7 +433,7 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
 //    var config_buf = Buffer.from ( '#0Cp0', 'ascii' ); // Second character will be replaced in next line by a binary lenght value
 //    config_buf.writeUInt8 ( 0x05, 1 );
 //    port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
-    
+
     let config_buf = Buffer.from ( '#0C2-F:'+start_freq_str+','+stop_freq_str+',-0'+Math.abs(MAX_DBM).toString()+','+MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
     START_FREQ = start_freq * 1000;
     STOP_FREQ  = stop_freq  * 1000;
@@ -445,8 +445,6 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
         console.error ("No Response!");
         responeCheckTimer = undefined;
     }, SERIAL_RESPONSE_TIMEOUT );
-    
-        myChart.options.scales.xAxes[0].scaleLabel.labelString = label;
 }
 
 function checkCongestion ( pos, val ) {
@@ -589,18 +587,9 @@ function setCallbacks () {
                 configStore.set ( 'freq_step' , FREQ_STEP  );
 
                 let start_f = Math.floor ( START_FREQ / 1000 );
-                let stop_f  = Math.ceil ( STOP_FREQ  / 1000 );
-
-                let start_f_str = Math.floor ( start_f / 1000 );
-                start_f_str = start_f_str.toString();
-                
-                let stop_f_str = Math.ceil ( stop_f / 1000 );
-                stop_f_str = stop_f_str.toString();
-            
-                let span_f_str = Math.ceil ( (stop_f - start_f) / 1000 );
-                span_f_str = span_f_str.toString();
-
-                let label = start_f_str + " - " + stop_f_str + " MHz  (Span: " + span_f_str + "MHz)";
+                let stop_f  = Math.ceil  ( STOP_FREQ  / 1000 );
+                let span_f  = Math.ceil  ( stop_f - start_f  );
+                let label   = formatFrequencyString(start_f.toString()) + " - " + formatFrequencyString(stop_f.toString()) + " MHz  (Span: " + formatFrequencyString(span_f.toString()) + "MHz)";
 
                 myChart.options.scales.xAxes[0].scaleLabel.labelString = label;
                 configStore.set ( 'band_label' , label );
