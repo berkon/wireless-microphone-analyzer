@@ -403,6 +403,23 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
     msgEnd   = -1;
     msgId    = -1;
     rec_buf_sweep_poi = 0;
+
+    if ( start_freq < MIN_FREQ ) {
+        stop_freq += MIN_FREQ - start_freq; // stay at current position
+        start_freq = MIN_FREQ; // don't move start_freq to frequencies lower than allowed
+
+        if ( stop_freq - start_freq < SWEEP_POINTS)
+            stop_freq = start_freq + SWEEP_POINTS;
+    }
+
+    if ( stop_freq > MAX_FREQ ) {
+        start_freq -= stop_freq - MAX_FREQ; // don't move to higher frequencies than allowed
+        stop_freq   = MAX_FREQ; // stay at current position
+
+        if ( stop_freq - start_freq < SWEEP_POINTS)
+            start_freq = stop_freq - SWEEP_POINTS;
+    }
+
     let start_freq_str = start_freq.toString();
     let stop_freq_str  = stop_freq.toString();
 
