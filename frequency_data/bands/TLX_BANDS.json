@@ -1,0 +1,26 @@
+{ "label":"Telex", "submenu": [
+    { "label":"BTR-80n", "submenu": [
+        { "label": "1 RX (614 - 632MHz)" , "start_freq": 614100, "stop_freq": 631900, "details": "Telex BTR-80n 1 RX (614 - 632MHz)" , "band": "TLX_1RX_NONE" },
+        { "label": "2 RX (632 - 650MHz)" , "start_freq": 632100, "stop_freq": 649900, "details": "Telex BTR-80n 2 RX (632 - 650MHz)" , "band": "TLX_2RX_NONE" },
+        { "label": "3 RX (650 - 668MHz)" , "start_freq": 650100, "stop_freq": 667900, "details": "Telex BTR-80n 3 RX (650 - 668MHz)" , "band": "TLX_3RX_NONE" },
+        { "label": "4 RX (668 - 686MHz)" , "start_freq": 668100, "stop_freq": 685900, "details": "Telex BTR-80n 4 RX (668 - 686MHz)" , "band": "TLX_4RX_NONE" },
+        { "label": "5 RX (686 - 704MHz)" , "start_freq": 686100, "stop_freq": 703900, "details": "Telex BTR-80n 5 RX (686 - 704MHz)" , "band": "TLX_5RX_NONE" },
+        { "label": "6 RX (704 - 722MHz)" , "start_freq": 704100, "stop_freq": 721900, "details": "Telex BTR-80n 6 RX (704 - 722MHz)" , "band": "TLX_6RX_NONE" },
+        { "label": "88 RX (470 - 488MHz)", "start_freq": 470100, "stop_freq": 487900, "details": "Telex BTR-80n 88 RX (470 - 488MHz)", "band": "TLX_8RX_NONE" },
+        { "label": "9 RX (844 - 862MHz)" , "start_freq": 844100, "stop_freq": 861900, "details": "Telex BTR-80n 9 RX (844 - 862MHz)" , "band": "TLX_9RX_NONE" },
+        { "label": "A TX (518 - 536MHz)" , "start_freq": 518100, "stop_freq": 535900, "details": "Telex BTR-80n A TX (518 - 536MHz)" , "band": "TLX_ATX_NONE" },
+        { "label": "B TX (536 - 554MHz)" , "start_freq": 536100, "stop_freq": 553900, "details": "Telex BTR-80n B TX (536 - 554MHz)" , "band": "TLX_BTX_NONE" },
+        { "label": "C TX (554 - 572MHz)" , "start_freq": 554100, "stop_freq": 571900, "details": "Telex BTR-80n C TX (554 - 572MHz)" , "band": "TLX_CTX_NONE" },
+        { "label": "D TX (572 - 590MHz)" , "start_freq": 572100, "stop_freq": 589900, "details": "Telex BTR-80n D TX (572 - 590MHz)" , "band": "TLX_DTX_NONE" },
+        { "label": "E TX (590 - 608MHz)" , "start_freq": 590100, "stop_freq": 607900, "details": "Telex BTR-80n E TX (590 - 608MHz)" , "band": "TLX_ETX_NONE" },
+        { "label": "F TX (482 - 500MHz)" , "start_freq": 482100, "stop_freq": 499900, "details": "Telex BTR-80n F TX (482 - 500MHz)" , "band": "TLX_FTX_NONE" },
+        { "label": "G TX (796 - 814MHz)" , "start_freq": 796100, "stop_freq": 813900, "details": "Telex BTR-80n G TX (796 - 814MHz)" , "band": "TLX_GTX_NONE" },
+        { "label": "H TX (500 - 518MHz)" , "start_freq": 500100, "stop_freq": 517900, "details": "Telex BTR-80n H TX (500 - 518MHz)" , "band": "TLX_HTX_NONE" }
+    ]},
+    { "label":"SAFE-1000", "submenu": [        
+        { "label": "A (680 - 704MHz)", "start_freq": 680100, "stop_freq": 703900, "details": "Telex SAFE-1000 A (614 - 632MHz)", "band": "TLX_A_NONE" },
+        { "label": "B (722 - 746MHz)", "start_freq": 722100, "stop_freq": 745900, "details": "Telex SAFE-1000 B (722 - 746MHz)", "band": "TLX_B_NONE" },
+        { "label": "F (650 - 674MHz)", "start_freq": 650100, "stop_freq": 673900, "details": "Telex SAFE-1000 F (650 - 674MHz)", "band": "TLX_F_NONE" },
+        { "label": "G (614 - 638MHz)", "start_freq": 614100, "stop_freq": 637900, "details": "Telex SAFE-1000 G (614 - 638MHz)", "band": "TLX_G_NONE" }
+    ]}
+]}
