@@ -2,14 +2,16 @@
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true; // Disable security warning on the console
 
 var SerialPort = require ( 'serialport' );
+
 const FREQ_VENDOR_BANDS   = require ( 'require-all' )(__dirname +'/frequency_data/bands'  );
 const FREQ_VENDOR_PRESETS = require ( 'require-all' )(__dirname +'/frequency_data/presets');
 const COUNTRIES           = require ( './country_codes');
 
-const {ipcMain} = require ("electron");
-const {app, BrowserWindow, Menu} = require('electron');
-const electronLocalshortcut = require ( 'electron-localshortcut' );
-const { productName, name, version } = require ( './package.json' );
+const {ipcMain}                      = require ( 'electron'               );
+const {app, BrowserWindow, Menu}     = require ( 'electron'               );
+const electronLocalshortcut          = require ( 'electron-localshortcut' );
+const { productName, name, author, version } = require ( './package.json'         );
+const { dialog }                     = require ( 'electron'               );
 
 const ConfigStore = require ( 'configstore' );
 const configStore = new ConfigStore ( name );
@@ -49,7 +51,8 @@ function createWindow () {
         
     var portMenuJSON = { label: 'Port', submenu: [] };
     var helpMenuJSON = { label: 'Help', submenu: [
-        { label: "Documentation", click () { openHelpWindow(); } }
+        { label: "Documentation", click () { openHelpWindow() ; } },
+        { label: "About"        , click () { openAboutWindow(); } }
     ]};
 
     function addMenuEntryOrSubmenu ( menu_label, menu_data, menu_location ) {
@@ -199,6 +202,18 @@ function createWindow () {
         helpWindow = new BrowserWindow({width: 800, height: 600});
         helpWindow.setMenu ( null );
         helpWindow.loadFile('help.html');
+
+        electronLocalshortcut.register ( helpWindow, 'CommandOrControl+R', () => {
+            helpWindow.reload();
+        });
+
+        helpWindow.setTitle ( productName + " V" + version );
+    }
+
+    function openAboutWindow () {
+        helpWindow = new BrowserWindow({width: 500, height: 190});
+        helpWindow.setMenu ( null );
+        helpWindow.loadFile('about.html');
 
         electronLocalshortcut.register ( helpWindow, 'CommandOrControl+R', () => {
             helpWindow.reload();

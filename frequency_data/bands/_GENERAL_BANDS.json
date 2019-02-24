@@ -1,5 +1,5 @@
 [
-    { "label": "LTE-28 700 Gap (733 - 758MHz)", "start_freq": 733000, "stop_freq": 758000, "details": "LTE 700 Gap (733 - 758MHz)" },
-    { "label": "LTE-20 800 Gap (823 - 832MHz)", "start_freq": 823000, "stop_freq": 832000, "details": "LTE 800 Gap (823 - 832MHz)" },
+    { "label": "LTE-28 700 Gap (733 - 758MHz)", "start_freq": 733000, "stop_freq": 758000, "details": "LTE-28 700 Gap (733 - 758MHz)" },
+    { "label": "LTE-20 800 Gap (823 - 832MHz)", "start_freq": 823000, "stop_freq": 832000, "details": "LTE-20 800 Gap (823 - 832MHz)" },
     { "label": "ISM Band           (863 - 865MHz)", "start_freq": 863000, "stop_freq": 865000, "details": "ISM Band (863 - 865MHz)"    }
 ]
