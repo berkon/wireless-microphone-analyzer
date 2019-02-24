@@ -1,0 +1,10 @@
+{ "label":"HME", "submenu": [
+    { "label":"Pro 850", "submenu": [
+        { "label": "1 TX (488 - 506MHz)" , "start_freq": 488000, "stop_freq": 505975, "details": "HME Pro 850 1 TX (488 - 506MHz)" , "band": "HME_1TX_NONE" },
+        { "label": "2 TX (506 - 524MHz)" , "start_freq": 506000, "stop_freq": 523975, "details": "HME Pro 850 2 TX (506 - 524MHz)" , "band": "HME_2TX_NONE" },
+        { "label": "4 TX (524 - 560MHz)" , "start_freq": 524000, "stop_freq": 559975, "details": "HME Pro 850 4 TX (524 - 560MHz)" , "band": "HME_4TX_NONE" },
+        { "label": "9 RX (632 - 650MHz)" , "start_freq": 632000, "stop_freq": 649975, "details": "HME Pro 850 9 RX (632 - 650MHz)" , "band": "HME_9RX_NONE" },
+        { "label": "A RX (650 - 668MHz)" , "start_freq": 650000, "stop_freq": 667975, "details": "HME Pro 850 A RX (650 - 668MHz)" , "band": "HME_ARX_NONE" },
+        { "label": "C RX (686 - 704MHz)" , "start_freq": 686000, "stop_freq": 703975, "details": "HME Pro 850 C RX (686 - 704MHz)" , "band": "HME_CRX_NONE" }
+    ]}
+]}
