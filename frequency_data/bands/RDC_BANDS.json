@@ -1,0 +1,4 @@
+{ "label":"RADcom", "submenu": [
+    { "label": "UHF-Band (470 - 698MHz)" , "start_freq": 470000, "stop_freq": 698000, "details": "RADcom UHF-Band (470 - 698MHz)" , "band": "MCN_UHF_NONE" },
+    { "label": "VHF-Band (174 - 216MHz)" , "start_freq": 174000, "stop_freq": 216000, "details": "RADcom VHF-Band (174 - 216MHz)" , "band": "MCN_VHF_NOVE" }
+]}

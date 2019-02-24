@@ -1,0 +1,15 @@
+{ "label":"Micron", "submenu": [
+    { "label":"Explorer 100 (16ch)", "submenu": [
+        { "label": "606 - 613MHz" , "start_freq": 606125, "stop_freq": 612300, "details": "Micron Explorer 100 16ch (606 - 613MHz)" , "band": "MCN_606-613_NONE" },
+        { "label": "606 - 631MHz" , "start_freq": 606125, "stop_freq": 630250, "details": "Micron Explorer 100 16ch (606 - 631MHz)" , "band": "MCN_606-631_NONE" }
+    ]},
+    { "label":"Explorer 100 (256ch)", "submenu": [
+        { "label": "606 - 638MHz" , "start_freq": 606125, "stop_freq": 638000, "details": "Micron Explorer 100 256ch (606 - 638MHz)" , "band": "MCN_606-638_NONE" },
+        { "label": "656 - 689MHz" , "start_freq": 656125, "stop_freq": 688125, "details": "Micron Explorer 100 256ch (656 - 689MHz)" , "band": "MCN_656-688_NONE" }
+    ]},
+    { "label":"TX700", "submenu": [
+        { "label": "606 - 631MHz" , "start_freq": 606125, "stop_freq": 630250, "details": "Micron TX700 (606 - 631MHz)" , "band": "MCN_606-631_NONE" },
+        { "label": "606 - 638MHz" , "start_freq": 606125, "stop_freq": 637850, "details": "Micron TX700 (606 - 638MHz)" , "band": "MCN_606-638_NONE" },
+        { "label": "656 - 700MHz" , "start_freq": 656125, "stop_freq": 699325, "details": "Micron TX700 (656 - 700MHz)" , "band": "MCN_656-700_NONE" }
+    ]}
+]}

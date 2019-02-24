@@ -1,0 +1,16 @@
+{ "label":"Mipro", "submenu": [
+    { "label":"ACT-311/312", "submenu": [
+        { "label": "6A-Band (620 - 644MHz)" , "start_freq": 620000, "stop_freq": 644000, "details": "Mipro ACT-311/312 (620 - 644MHz)" , "band": "MCN_6A_NONE" },
+        { "label": "6B-Band (644 - 668MHz)" , "start_freq": 644000, "stop_freq": 668000, "details": "Mipro ACT-311/312 (644 - 668MHz)" , "band": "MCN_6B_NONE" },
+        { "label": "6C-Band (668 - 692MHz)" , "start_freq": 668000, "stop_freq": 692000, "details": "Mipro ACT-311/312 (668 - 692MHz)" , "band": "MCN_6C_NONE" }
+    ]},
+    { "label":"ACT-7", "submenu": [
+        { "label": "5US (554 - 638MHz)" , "start_freq": 554000, "stop_freq": 638000, "details": "Mipro ACT-7 (554 - 638MHz)" , "band": "MCN_5US_NONE" },
+        { "label": "6UA (526 - 698MHz)" , "start_freq": 526000, "stop_freq": 698000, "details": "Mipro ACT-7 (526 - 698MHz)" , "band": "MCN_6UA_NONE" }
+    ]},
+    { "label":"ACT-818/828", "submenu": [
+        { "label": "5E (482 - 542MHz)" , "start_freq": 482000, "stop_freq": 542000, "details": "Mipro ACT-818/828 (482 - 542MHz)" , "band": "MCN_5E_NONE" },
+        { "label": "5F (542 - 603MHz)" , "start_freq": 542000, "stop_freq": 602675, "details": "Mipro ACT-818/828 (542 - 603MHz)" , "band": "MCN_5F_NONE" },
+        { "label": "6E (637 - 700MHz)" , "start_freq": 637325, "stop_freq": 699325, "details": "Mipro ACT-818/828 (637 - 700MHz)" , "band": "MCN_6E_NONE" }
+    ]}
+]}
