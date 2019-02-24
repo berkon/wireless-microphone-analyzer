@@ -24,6 +24,7 @@ let MENU_HELP     = 4;
 
 let mainWindow;
 let helpWindow;
+let aboutWindow;
 
 let country = configStore.get('country');
 
@@ -207,19 +208,35 @@ function createWindow () {
             helpWindow.reload();
         });
 
-        helpWindow.setTitle ( productName + " V" + version );
+        electronLocalshortcut.register ( helpWindow, 'Alt+CommandOrControl+Shift+I', () => {
+            helpWindow.toggleDevTools();
+        });
+
+        electronLocalshortcut.register ( helpWindow, 'Esc', () => {
+            helpWindow.close();
+        });
+
+        helpWindow.setTitle ( "Documentation" );
     }
 
     function openAboutWindow () {
-        helpWindow = new BrowserWindow({width: 500, height: 190});
-        helpWindow.setMenu ( null );
-        helpWindow.loadFile('about.html');
+        aboutWindow = new BrowserWindow({width: 500, height: 180});
+        aboutWindow.setMenu ( null );
+        aboutWindow.loadFile('about.html');
 
-        electronLocalshortcut.register ( helpWindow, 'CommandOrControl+R', () => {
-            helpWindow.reload();
+        electronLocalshortcut.register ( aboutWindow, 'CommandOrControl+R', () => {
+            aboutWindow.reload();
         });
 
-        helpWindow.setTitle ( productName + " V" + version );
+        electronLocalshortcut.register ( aboutWindow, 'Alt+CommandOrControl+Shift+I', () => {
+            aboutWindow.toggleDevTools();
+        });
+
+        electronLocalshortcut.register ( aboutWindow, 'Esc', () => {
+            aboutWindow.close();
+        });
+
+        aboutWindow.setTitle ( "About" );
     }
 
     mainWindow.on('closed', function () {
