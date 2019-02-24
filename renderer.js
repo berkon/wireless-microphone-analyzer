@@ -16,6 +16,7 @@ var MIN_DBM    = -110;
 var CONGESTION_LEVEL_DBM = -85;
 
 var SWEEP_POINTS = 112;
+var SERIAL_RESPONSE_TIMEOUT = 1500;
 var VENDOR_ID  = 'NON';
 
 var LINE_LIVE        = 0;
@@ -43,9 +44,9 @@ let CONGESTED_COLOR            = chartColors.ORANGE;
 
 let SENNHEISER_CHANNEL_WIDTH   = 96000; // +/-48kHz Spitzenhub
 
-var analyzerGetConfigPromise_Resolve = null;
 var port = undefined;
 var autoPortCheckTimer = undefined;
+var responeCheckTimer  = undefined;
 
 let chPreset_Vendor = configStore.get('chPreset.vendor');
 let chPreset_Band   = configStore.get('chPreset.band'  );
@@ -318,9 +319,8 @@ function InitChart () {
 }
 
 function openPort () {
-    if( !PORT_MENU_SELECTION || PORT_MENU_SELECTION === 'AUTO' ) { // Automatic port selection
-        let start_f = Math.floor ( START_FREQ / 1000 );
-        let stop_f  = Math.floor ( STOP_FREQ  / 1000 );
+    let start_f = Math.floor ( START_FREQ / 1000 );
+    let stop_f  = Math.floor ( STOP_FREQ  / 1000 );
 
         let start_f_str = Math.floor ( start_f / 1000 );
         start_f_str = start_f_str.toString();
@@ -328,9 +328,10 @@ function openPort () {
         let stop_f_str = Math.floor ( stop_f / 1000 );
         stop_f_str = stop_f_str.toString();
     
-        let span_f_str = Math.floor ( (stop_f - start_f) / 1000 );
-        span_f_str = span_f_str.toString();
+    let span_f_str = Math.floor ( (stop_f - start_f) / 1000 );
+    span_f_str = span_f_str.toString();
 
+    if( !PORT_MENU_SELECTION || PORT_MENU_SELECTION === 'AUTO' ) { // Automatic port selection
         SerialPort.list().then ( (ports, err) => {
             if ( err ) {
                 console.log ( err );
@@ -338,6 +339,18 @@ function openPort () {
             }
 
             let i = 0;
+
+            console.log ( "Trying port " + ports[i].comName + " ...");
+            port = new SerialPort ( ports[i].comName, { baudRate : 500000 }, function ( err ) {
+                if ( err ) // Most likely the reason for the error is that the RF Explorer is not connected to this port. So we don't print an error message here.
+                    return;
+
+                setCallbacks();
+                sendAnalyzer_SetConfig ( start_f, stop_f );
+            });
+
+            i++;
+
             autoPortCheckTimer = setInterval ( () => {
                 if ( i === ports.length ) {
                     clearInterval ( autoPortCheckTimer );
@@ -346,24 +359,24 @@ function openPort () {
                         buttons: ['OK'],
                         message: 'Unable to find RF Explorer hardware!',
                         detail:  '- Make sure that the device is connected\n- Select the corresponding serial port (or leave default: \'Auto\')\n- If it still doesn\'t work please restart the app or press <CTRL><R>!'}
-                    dialog.showMessageBox ( dialogOptions, i => console.log("Button " + i + " was pressed!"));
+                    dialog.showMessageBox ( dialogOptions, (i) => {
+                    //    console.log("Button " + i + " was pressed!")
+                    });
                     console.log ( "Unable to find RF Explorer!");
                     return;
                 }
                 
                 console.log ( "Trying port " + ports[i].comName + " ...");
                 port = new SerialPort ( ports[i].comName, { baudRate : 500000 }, function ( err ) {
-/*                  if ( err ) {
-                        console.log ( 'Error: ', err.message );
+                    if ( err ) // Most likely the reason for the error is that the RF Explorer is not connected to this port. So we don't print an error message here.
                         return;
-                    } */
 
                     setCallbacks();
-                    sendAnalyzer_SetConfig ( start_f, stop_f, "" );
+                    sendAnalyzer_SetConfig ( start_f, stop_f );
                 });
 
                 i++;
-            }, 750);
+            }, SERIAL_RESPONSE_TIMEOUT);
         });
     } else  {
         port = new SerialPort ( PORT_MENU_SELECTION, { baudRate : 500000 }, function ( err ) {
@@ -378,18 +391,11 @@ function openPort () {
     }
 }
 
-// Receive device configuration for confirming configured values and start receiving analyzer data.
-function sendAnalyzer_GetConfig () {
-    return new Promise ( (resolve, reject) => {
-        var buf = Buffer.from ( '#0C0', 'ascii' );
-        buf.writeUInt8 ( 0x4, 1 );
-        port.write ( buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
-        analyzerGetConfigPromise_Resolve = resolve;
-    });
-}
-
 // Configure analyzer device
 function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
+    if ( responeCheckTimer ) // Exit immediately in case another command is running
+        return;
+
     rec_buf = []; // Buffer for continuosly receiving data
     rec_buf_str = []; // rec_buf converted to string so that we can check for commands
     msg_buf = []; // Once a message is complete, it will be placed in this buffer
@@ -407,42 +413,23 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
         stop_freq_str = "0" + stop_freq_str;
 
     // Set DSP mode. Cp0 = Auto ; Cp1 = Filter ; Cp2 = Fast
-    var config_buf = Buffer.from ( '#0Cp0', 'ascii' ); // Second character will be replaced in next line by a binary lenght value
-    config_buf.writeUInt8 ( 0x05, 1 );
-    port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
-
-    config_buf = Buffer.from ( '#0C2-F:'+start_freq_str+','+stop_freq_str+',-0'+Math.abs(MAX_DBM).toString()+','+MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
+//    var config_buf = Buffer.from ( '#0Cp0', 'ascii' ); // Second character will be replaced in next line by a binary lenght value
+//    config_buf.writeUInt8 ( 0x05, 1 );
+//    port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
+    
+    let config_buf = Buffer.from ( '#0C2-F:'+start_freq_str+','+stop_freq_str+',-0'+Math.abs(MAX_DBM).toString()+','+MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
     START_FREQ = start_freq * 1000;
     STOP_FREQ  = stop_freq  * 1000;
     config_buf.writeUInt8 ( 0x20, 1 );
 
     port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
-
-    sendAnalyzer_GetConfig().then ( () => {
-        if ( label === "" ) {
-            if ( BAND_LABEL )
-                label = BAND_LABEL;
-            else {
-                let start_f = Math.floor ( START_FREQ / 1000 );
-                let stop_f  = Math.floor ( STOP_FREQ  / 1000 );
     
-                let start_f_str = Math.floor ( start_f / 1000 );
-                start_f_str = start_f_str.toString();
-                
-                let stop_f_str = Math.floor ( stop_f / 1000 );
-                stop_f_str = stop_f_str.toString();
-            
-                let span_f_str = Math.floor ( (stop_f - start_f) / 1000 );
-                span_f_str = span_f_str.toString();
+    responeCheckTimer = setTimeout ( function () {
+        console.error ("No Response!");
+        responeCheckTimer = undefined;
+    }, SERIAL_RESPONSE_TIMEOUT );
     
-                label = start_f_str + " - " + stop_f_str + " MHz  (Span: " + span_f_str + "MHz)";
-            }
-        }
-
         myChart.options.scales.xAxes[0].scaleLabel.labelString = label;
-        configStore.set ( 'band_label' , label );
-        InitChart ();
-    });
 }
 
 function checkCongestion ( pos, val ) {
@@ -505,6 +492,8 @@ function setCallbacks () {
             if ( !received_first_answer ) {
                 received_first_answer = true;
                 clearInterval ( autoPortCheckTimer );
+                clearTimeout  ( responeCheckTimer  );
+                responeCheckTimer = undefined;
                 console.log ( "RF Explorer found!" );
                 InitChart ();
             }
@@ -562,13 +551,15 @@ function setCallbacks () {
 
         switch ( msgId ) {
             case '#C2-F:': // Received config data from device
+                clearTimeout ( responeCheckTimer );
+                responeCheckTimer = undefined;
+
                 // If this is the first answer ever which we recieve from the device, this means that the serial port ist
                 // valid and working. So stop the port check timer and initialize the Chart ...
                 if ( !received_first_answer ) {
                     received_first_answer = true;
                     clearInterval ( autoPortCheckTimer );
                     console.log ( "RF Explorer found!" );
-                    InitChart ();
                 }
 
                 let msg_buf_str = String.fromCharCode.apply ( null, msg_buf ); // Convert to characters
@@ -579,7 +570,25 @@ function setCallbacks () {
                 configStore.set ( 'start_freq', START_FREQ );
                 configStore.set ( 'stop_freq' , STOP_FREQ  );
                 configStore.set ( 'freq_step' , FREQ_STEP  );
-                analyzerGetConfigPromise_Resolve();
+
+                let start_f = Math.floor ( START_FREQ / 1000 );
+                let stop_f  = Math.ceil ( STOP_FREQ  / 1000 );
+
+                let start_f_str = Math.floor ( start_f / 1000 );
+                start_f_str = start_f_str.toString();
+                
+                let stop_f_str = Math.ceil ( stop_f / 1000 );
+                stop_f_str = stop_f_str.toString();
+            
+                let span_f_str = Math.ceil ( (stop_f - start_f) / 1000 );
+                span_f_str = span_f_str.toString();
+
+                let label = start_f_str + " - " + stop_f_str + " MHz  (Span: " + span_f_str + "MHz)";
+
+                myChart.options.scales.xAxes[0].scaleLabel.labelString = label;
+                configStore.set ( 'band_label' , label );
+
+                InitChart ();
                 break;
 
             default:
@@ -647,7 +656,9 @@ ipcRenderer.on ( 'SET_COUNTRY', (event, message) => {
             message: 'Empty or invalid country code!',
             detail:  'country_code.json might be corrupted!'
         }
-        dialog.showMessageBox ( dialogOptions, i => console.log("Button " + i + " was pressed!"));
+        dialog.showMessageBox ( dialogOptions, (i) => {
+        //    console.log("Button " + i + " was pressed!")
+        });
         console.log ( "Empty or invalid country code!" );
         return;
     }
@@ -661,7 +672,9 @@ ipcRenderer.on ( 'SET_COUNTRY', (event, message) => {
             message: 'Country not available!',
             detail:  'No frequency related information available for ' + message.country_label +' (' + message.country_code + ')' + '! Falling back to Germany (DE)'
         }
-        dialog.showMessageBox ( dialogOptions, i => console.log("Button " + i + " was pressed!"));
+        dialog.showMessageBox ( dialogOptions, (i) => {
+        //    console.log("Button " + i + " was pressed!")
+        });
         console.log ( "File with forbidden ranges not found for country code: '" + message.country_code +"' => Falling back to: 'DE'");
     } else
         COUNTRY = message.country_code;
