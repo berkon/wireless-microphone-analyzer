@@ -705,6 +705,17 @@ ipcRenderer.on ( 'SET_PORT', (event, message) => {
         openPort();
 });
 
+ipcRenderer.on ( 'EXPORT_WW6_CSV', (event, message) => {
+    let i = 0;
+
+    for ( var freq = START_FREQ; freq <= STOP_FREQ ; freq += FREQ_STEP ) {
+        let val = Math.round ( freq / 1000 );
+        val = formatFrequencyString ( val.toString() );
+        fs.appendFileSync ( message.filename, val + ", " + myChart.data.datasets[LINE_LIVE].data[i] + "\n", 'utf-8');
+        i++;
+    }
+});
+
 document.addEventListener ( "wheel", function ( e ) {
     let start_f = 0, stop_f = 0;
     let delta_freq_10percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 10 ); // 10% of freq range

@@ -20,7 +20,8 @@ let MENU_BAND     = 0;
 let MENU_CHANNELS = 1;
 let MENU_COUNTRY  = 2;
 let MENU_PORT     = 3;
-let MENU_HELP     = 4;
+let MENU_TOOLS    = 4;
+let MENU_HELP     = 5;
 
 let mainWindow;
 let helpWindow;
@@ -51,6 +52,17 @@ function createWindow () {
         ]}, */
         
     var portMenuJSON = { label: 'Port', submenu: [] };
+    var toolsMenuJSON = { label: 'Tools', submenu: [
+        { label: 'Export', submenu: [
+            { label: "Wireless Worbench 6 (CSV)", click () {
+                dialog.showSaveDialog({
+                    title: "Export for Wireless Workbench 6 (CSV)",
+                    filters: [ {name: "Comma Separated Values", extensions: ["csv"]} ]
+                },
+                ( filename ) => { wc.send ( 'EXPORT_WW6_CSV', { filename : filename }); })
+            }}
+        ]}
+    ]};
     var helpMenuJSON = { label: 'Help', submenu: [
         { label: "Documentation", click () { openHelpWindow() ; } },
         { label: "About"        , click () { openAboutWindow(); } }
@@ -168,8 +180,9 @@ function createWindow () {
         });
     });
 
-    menuJSON.push ( portMenuJSON );
-    menuJSON.push ( helpMenuJSON );
+    menuJSON.push ( portMenuJSON  );
+    menuJSON.push ( toolsMenuJSON );
+    menuJSON.push ( helpMenuJSON  );
 
     // Add serial ports to the menu
     SerialPort.list().then ( (ports, err) => {
