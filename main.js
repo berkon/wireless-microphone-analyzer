@@ -220,7 +220,7 @@ function createWindow () {
     }
 
     function openAboutWindow () {
-        aboutWindow = new BrowserWindow({width: 500, height: 180});
+        aboutWindow = new BrowserWindow({width: 500, height: 170, resizable: false});
         aboutWindow.setMenu ( null );
         aboutWindow.loadFile('about.html');
 
