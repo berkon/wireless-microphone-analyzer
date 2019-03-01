@@ -38,8 +38,10 @@ Download and install the **.exe** installer.
 Download and install the **.dmg** package. Also make sure to download and install the necessary USB-Serial driver according to this guide:
 https://j3.rf-explorer.com/43-rfe/how-to/205-h2-macosx-drivers
 
-#### Linux (Debian/Ubuntu)
-Download the **.deb** Debian installation package and install it as follows:
+#### Linux
+For all common Linux distribuitions the **.AppImage** can be used without any installation (like a portable applications on Windows).
+
+For Linux distributions using Debian packages, a Debian package is available as well. Just download the **.deb** package and install it as follows:
     
     sudo dpkg -i <package_name>.deb
 
