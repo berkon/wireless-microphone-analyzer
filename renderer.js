@@ -67,6 +67,22 @@ if ( !COUNTRY || !fs.existsSync ( './frequency_data/forbidden/FORBIDDEN_' + COUN
     console.log ( "No country set or file with forbidden ranges for that country does not exist! Falling back to 'DE'");
 }
 
+// If value is not existing, just set to some initial value
+if ( !START_FREQ )
+    START_FREQ = 800000000;
+
+// If value is not existing, just set to some initial value
+if ( !STOP_FREQ )
+    STOP_FREQ  = 912000000;
+
+// If value is not existing, just set to some initial value
+if ( !FREQ_STEP )
+    FREQ_STEP  =   1000000;
+
+// If value is not existing, just set to some initial value
+if ( !BAND_LABEL )
+    BAND_LABEL = "800.000 - 912.000 MHz";
+
 var FREQ_FORBIDDEN = require ( './frequency_data/forbidden/FORBIDDEN_' + COUNTRY + '.json');
 
 var chDispValShadowArr = [];
@@ -321,7 +337,7 @@ function InitChart () {
 
     setForbidden ();
 
-    if ( chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset)
+    if ( FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series] && chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset)
         setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
 
     myChart.update();
@@ -760,7 +776,9 @@ document.addEventListener ( "keydown", function ( e ) {
             if ( e.ctrlKey && !e.shiftKey ) { // Toggle vendor specific channel presets/banks down
                 if ( chPreset_Preset > 1 ) {
                     chPreset_Preset--;
-                    setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+
+                    if ( FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series] && chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset)
+                        setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
                     myChart.update();
                 }
                 return;
@@ -775,10 +793,12 @@ document.addEventListener ( "keydown", function ( e ) {
 
         case 39: // Arrow right
             if ( e.ctrlKey && !e.shiftKey ) { // Toggle vendor specific channel presets/banks up
-                if ( chPreset_Preset <  FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length ) {
-                    chPreset_Preset++;
-                    setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
-                    myChart.update();
+                if ( FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series] && chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset) {
+                    if ( chPreset_Preset <  FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length ) {
+                        chPreset_Preset++;
+                        setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+                        myChart.update();
+                    }
                 }
                 return;
             } else if ( e.shiftKey && !e.ctrlKey ) { // Move frequency band to right by 50% of span
