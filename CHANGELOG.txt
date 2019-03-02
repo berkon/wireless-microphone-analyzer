@@ -1,9 +1,17 @@
+V1.3.0
+    FEATURES
+        - Added export for Shure Wireless Workbench 6 (CSV Format)
+        - Added frequency related information for different vendors
+    FIXES
+        - Greatly improved frequency zoom/shift performance and device recognition speed
+
 V1.2.0
     FEATURES
         - Added 'Country' menu for showing forbidden frequencies specific to a certain location .
         - Shift frequency display by 50% up/down (left/right) when holding down SHIFT key and pressing arrow keys
         - Added/updated frequency related information for different vendors and countries
         - Added Linux icon
+
 V1.1.0
     FEATURES
         - Added help window
