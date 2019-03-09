@@ -61,6 +61,7 @@ var START_FREQ      = configStore.get('start_freq'     );
 var STOP_FREQ       = configStore.get('stop_freq'      );
 var FREQ_STEP       = configStore.get('freq_step'      );
 var BAND_LABEL      = configStore.get('band_label'     );
+var BAND_DETAILS    = configStore.get('band_details'   );
 
 let received_first_answer = false;
 
@@ -476,13 +477,13 @@ function openPort () {
             }
 
             setCallbacks();
-            sendAnalyzer_SetConfig ( start_f, stop_f, "" );
+            sendAnalyzer_SetConfig ( start_f, stop_f );
         });
     }
 }
 
 // Configure analyzer device
-function sendAnalyzer_SetConfig ( start_freq, stop_freq, label, band ) {
+function sendAnalyzer_SetConfig ( start_freq, stop_freq ) {
     if ( responeCheckTimer ) // Exit immediately in case another command is running
         return;
 
@@ -679,7 +680,14 @@ function setCallbacks () {
                 let start_f = Math.floor ( START_FREQ / 1000 );
                 let stop_f  = Math.ceil  ( STOP_FREQ  / 1000 );
                 let span_f  = Math.ceil  ( stop_f - start_f  );
-                let label   = formatFrequencyString(start_f.toString()) + " - " + formatFrequencyString(stop_f.toString()) + " MHz  (Span: " + formatFrequencyString(span_f.toString()) + "MHz)";
+
+                let band_details = "";
+
+                if ( !BAND_DETAILS )
+                    band_details = "";
+                else 
+                    band_details = "    |    Band: " + BAND_DETAILS + "";
+                let label   = formatFrequencyString("Range: " + start_f.toString()) + " - " + formatFrequencyString(stop_f.toString()) + " MHz    |    Span: " + formatFrequencyString(span_f.toString()) + "MHz" + band_details;
 
                 myChart.options.scales.xAxes[0].scaleLabel.labelString = label;
                 configStore.set ( 'band_label' , label );
@@ -700,7 +708,9 @@ function setCallbacks () {
 openPort();
 
 ipcRenderer.on ( 'CHANGE_BAND', (event, message) => {
-    sendAnalyzer_SetConfig ( message.start_freq, message.stop_freq, message.details, message.band );
+    sendAnalyzer_SetConfig ( message.start_freq, message.stop_freq );
+    configStore.set ( 'band_details', message.details );
+    BAND_DETAILS = message.details;
 });
 
 ipcRenderer.on ( 'SET_VENDOR_4_ANALYSIS', (event, message) => {
