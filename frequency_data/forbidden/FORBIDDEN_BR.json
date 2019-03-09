@@ -1,0 +1,23 @@
+[
+    { "start": 450000  , "stop": 470000  , "info": "Mobile Radio"      },
+    { "start": 608000  , "stop": 614000  , "info": "Radio Astronomy"   },
+    { "start": 698000  , "stop": 703000  , "info": "Public Safety"     },
+    { "start": 703000  , "stop": 708000  , "info": "Guard Band"        },
+    { "start": 708000  , "stop": 718000  , "info": "Algar Uplink LTE"  },
+    { "start": 718000  , "stop": 728000  , "info": "TIM Uplink LTE"    },
+    { "start": 728000  , "stop": 738000  , "info": "Vivo Uplink LTE"   },
+    { "start": 738000  , "stop": 748000  , "info": "Claro Uplink LTE"  },
+    { "start": 748000  , "stop": 758000  , "info": "Guard Band"        },
+    { "start": 758000  , "stop": 763000  , "info": "Public Safety"     },
+    { "start": 763000  , "stop": 773000  , "info": "Algar Downlink LTE"},
+    { "start": 773000  , "stop": 783000  , "info": "TIM Downlink LTE"  },
+    { "start": 783000  , "stop": 793000  , "info": "Vivo Downlink LTE" },
+    { "start": 793000  , "stop": 803000  , "info": "Claro Downlink LTE"},
+    { "start": 803000  , "stop": 806000  , "info": "Guard Band"        },
+    { "start": 824000  , "stop": 901000  , "info": "GSM or 3G"         },
+    { "start": 908000  , "stop": 915000  , "info": "GSM or 3G"         },
+    { "start": 1710000 , "stop": 1785000 , "info": "GSM or 3G"         },
+    { "start": 1805000 , "stop": 1910000 , "info": "GSM or 3G"         },
+    { "start": 1920000 , "stop": 1980000 , "info": "GSM or 3G"         },
+    { "start": 2110000 , "stop": 2165000 , "info": "GSM or 3G"         }
+]
