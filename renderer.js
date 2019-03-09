@@ -797,7 +797,7 @@ ipcRenderer.on ( 'SET_PORT', (event, message) => {
         openPort();
 });
 
-ipcRenderer.on ( 'EXPORT_WW6_CSV', (event, message) => {
+ipcRenderer.on ( 'EXPORT_WW6_IAS_CSV', (event, message) => {
     let i = 0;
 
     for ( var freq = START_FREQ; freq <= STOP_FREQ ; freq += FREQ_STEP ) {

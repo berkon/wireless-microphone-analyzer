@@ -54,12 +54,12 @@ function createWindow () {
     var portMenuJSON = { label: 'Port', submenu: [] };
     var toolsMenuJSON = { label: 'Tools', submenu: [
         { label: 'Export', submenu: [
-            { label: "Wireless Worbench 6 (CSV)", click () {
+            { label: "Shure WW6 and IAS (CSV Format)", click () {
                 dialog.showSaveDialog({
-                    title: "Export for Wireless Workbench 6 (CSV)",
-                    filters: [ {name: "Comma Separated Values", extensions: ["csv"]} ]
+                    title: "Export for Shure WW6 and IAS (CSV Format)",
+                    filters: [ {name: "CSV", extensions: ["csv"]} ]
                 },
-                ( filename ) => { wc.send ( 'EXPORT_WW6_CSV', { filename : filename }); })
+                ( filename ) => { wc.send ( 'EXPORT_WW6_IAS_CSV', { filename : filename }); })
             }}
         ]}
     ]};
