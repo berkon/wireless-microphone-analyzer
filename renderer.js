@@ -777,6 +777,8 @@ ipcRenderer.on ( 'SET_COUNTRY', (event, message) => {
     
     configStore.set ( 'country', COUNTRY );
     FREQ_FORBIDDEN = require ( './frequency_data/forbidden/FORBIDDEN_' + COUNTRY + '.json');
+    FREQ_GRIDS     = require ( './frequency_data/grids/GRIDS_' + COUNTRY + '.json');
+
     InitChart();
 });
 
