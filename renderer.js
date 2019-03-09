@@ -818,6 +818,13 @@ ipcRenderer.on ( 'EXPORT_WW6_IAS_CSV', (event, message) => {
     }
 });
 
+ipcRenderer.on ( 'RESET_PEAK', (event, message) => {
+    for ( let i = 0 ; i < SWEEP_POINTS ; i++ )
+        myChart.data.datasets[LINE_LIVE].data[i] = undefined;
+
+    myChart.update();
+});
+
 document.addEventListener ( "wheel", function ( e ) {
     let start_f = 0, stop_f = 0;
     let delta_freq_10percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 10 ); // 10% of freq range
@@ -908,6 +915,14 @@ document.addEventListener ( "keydown", function ( e ) {
             start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_10percent;
             stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
             break;
+
+        case 82: // Reset peak
+            for ( let i = 0 ; i < SWEEP_POINTS ; i++ )
+                myChart.data.datasets[LINE_LIVE].data[i] = undefined;
+
+            myChart.update();
+            return;
+
         default:
             return;
     }

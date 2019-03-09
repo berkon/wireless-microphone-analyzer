@@ -61,7 +61,10 @@ function createWindow () {
                 },
                 ( filename ) => { wc.send ( 'EXPORT_WW6_IAS_CSV', { filename : filename }); })
             }}
-        ]}
+        ]},
+        { label: 'Reset Peak             R', click () {
+            wc.send ('RESET_PEAK', {});
+        }}
     ]};
     var helpMenuJSON = { label: 'Help', submenu: [
         { label: "Documentation", click () { openHelpWindow() ; } },
