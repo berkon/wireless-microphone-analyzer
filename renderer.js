@@ -56,7 +56,8 @@ let chPreset_Vendor = configStore.get('chPreset.vendor');
 let chPreset_Band   = configStore.get('chPreset.band'  );
 let chPreset_Series = configStore.get('chPreset.series');
 let chPreset_Preset = configStore.get('chPreset.preset');
-let COUNTRY         = configStore.get('country'        );
+let COUNTRY_CODE    = configStore.get('country_code'   );
+let COUNTRY_NAME    = configStore.get('country_name'   );
 var START_FREQ      = configStore.get('start_freq'     );
 var STOP_FREQ       = configStore.get('stop_freq'      );
 var FREQ_STEP       = configStore.get('freq_step'      );
@@ -65,8 +66,8 @@ var BAND_DETAILS    = configStore.get('band_details'   );
 
 let received_first_answer = false;
 
-if ( !COUNTRY || !fs.existsSync ( './frequency_data/forbidden/FORBIDDEN_' + COUNTRY + '.json' ) ) {
-    COUNTRY = 'DE';
+if ( !COUNTRY_CODE || !fs.existsSync ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + COUNTRY_CODE + '.json' ) ) {
+    COUNTRY_CODE = 'DE';
     console.log ( "No country set or file with forbidden ranges for that country does not exist! Falling back to 'DE'");
 }
 
@@ -86,8 +87,8 @@ if ( !FREQ_STEP )
 if ( !BAND_LABEL )
     BAND_LABEL = "800.000 - 912.000 MHz";
 
-var FREQ_FORBIDDEN = require ( './frequency_data/forbidden/FORBIDDEN_' + COUNTRY + '.json');
-var FREQ_GRIDS     = require ( './frequency_data/grids/GRIDS_' + COUNTRY + '.json');
+var FREQ_FORBIDDEN = require ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + COUNTRY_CODE + '.json');
+var FREQ_GRIDS     = require ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json');
 
 var chDispValShadowArr = [];
 
@@ -687,7 +688,15 @@ function setCallbacks () {
                     band_details = "";
                 else 
                     band_details = "    |    Band: " + BAND_DETAILS + "";
-                let label   = formatFrequencyString("Range: " + start_f.toString()) + " - " + formatFrequencyString(stop_f.toString()) + " MHz    |    Span: " + formatFrequencyString(span_f.toString()) + "MHz" + band_details;
+                
+                let country_information = "";
+
+                if ( !COUNTRY_CODE || !COUNTRY_NAME)
+                    country_information = "    |    Country: Germany (DE)";
+                else
+                    country_information = "    |    Country: " + COUNTRY_NAME + " (" + COUNTRY_CODE + ")";
+
+                let label   = formatFrequencyString("Range: " + start_f.toString()) + " - " + formatFrequencyString(stop_f.toString()) + " MHz    |    Span: " + formatFrequencyString(span_f.toString()) + "MHz" + band_details + country_information;
 
                 myChart.options.scales.xAxes[0].scaleLabel.labelString = label;
                 configStore.set ( 'band_label' , label );
@@ -769,9 +778,10 @@ ipcRenderer.on ( 'SET_COUNTRY', (event, message) => {
         return;
     }
 
-    if ( !fs.existsSync ( './frequency_data/forbidden/FORBIDDEN_' + message.country_code + '.json' ) ) {
-        COUNTRY = 'DE';
-        ipcRenderer.send ('SET_COUNTRY', { country_code : COUNTRY });
+    if ( !fs.existsSync ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + message.country_code + '.json' ) ) {
+        COUNTRY_CODE = 'DE';
+        COUNTRY_NAME = 'Germany';
+        ipcRenderer.send ('SET_COUNTRY', { country_code : COUNTRY_CODE });
         const dialogOptions = {
             type: 'warning',
             buttons: ['OK'],
@@ -782,14 +792,18 @@ ipcRenderer.on ( 'SET_COUNTRY', (event, message) => {
         //    console.log("Button " + i + " was pressed!")
         });
         console.log ( "File with forbidden ranges not found for country code: '" + message.country_code +"' => Falling back to: 'DE'");
-    } else
-        COUNTRY = message.country_code;
+    } else {
+        COUNTRY_CODE = message.country_code;
+        COUNTRY_NAME = message.country_label;
+    }
     
-    configStore.set ( 'country', COUNTRY );
-    FREQ_FORBIDDEN = require ( './frequency_data/forbidden/FORBIDDEN_' + COUNTRY + '.json');
-    FREQ_GRIDS     = require ( './frequency_data/grids/GRIDS_' + COUNTRY + '.json');
+    configStore.set ( 'country_code', COUNTRY_CODE );
+    configStore.set ( 'country_name', COUNTRY_NAME );
+    FREQ_FORBIDDEN = require ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + COUNTRY_CODE + '.json');
+    FREQ_GRIDS     = require ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json');
 
     InitChart();
+    sendAnalyzer_SetConfig ( Math.floor ( START_FREQ/1000 ), Math.floor ( STOP_FREQ /1000 ) ); // Need this to refresh country name on x-axis
 });
 
 ipcRenderer.on ( 'SET_PORT', (event, message) => {
@@ -856,7 +870,7 @@ document.addEventListener ( "wheel", function ( e ) {
     let span_f_str = (stop_f - start_f) / 1000;
     span_f_str = span_f_str.toString();
 
-    sendAnalyzer_SetConfig ( start_f, stop_f, start_f_str + " - " + stop_f_str + " MHz  (Span: " + span_f_str + "MHz)", "" );
+    sendAnalyzer_SetConfig ( start_f, stop_f );
 });
 
 document.addEventListener ( "keydown", function ( e ) {
@@ -936,5 +950,5 @@ document.addEventListener ( "keydown", function ( e ) {
     let span_f_str = (stop_f - start_f) / 1000;
     span_f_str = span_f_str.toString();
 
-    sendAnalyzer_SetConfig ( start_f, stop_f, start_f_str + " - " + stop_f_str + " MHz  (Span: " + span_f_str + "MHz)", "" );
+    sendAnalyzer_SetConfig ( start_f, stop_f );
 });
