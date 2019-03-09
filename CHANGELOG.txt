@@ -1,3 +1,12 @@
+V1.4.0
+    FEATURES
+        - Added TV channel grids (country dependent)
+        - Added menu entry and <R> shortcut to reset peak live scan
+        - CSV export now works for IAS as well
+        - Added / updated a lot of frequency related data
+    FIXES
+        - No showing band name again in bottom line
+
 V1.3.0
     FEATURES
         - Added export for Shure Wireless Workbench 6 (CSV Format)

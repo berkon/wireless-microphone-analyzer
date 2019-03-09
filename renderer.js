@@ -97,7 +97,7 @@ var myChart = new Chart(ctx, {
     data: {
         datasets: [
             {
-                label: 'Live scan (peak hold)',
+                label: 'Live Scan (Peak Hold)',
                 backgroundColor: Chart.helpers.color(SCAN_COLOR).alpha(0.2).rgbString(),
                 borderColor: SCAN_COLOR,
                 pointBackgroundColor: SCAN_COLOR,
@@ -106,7 +106,7 @@ var myChart = new Chart(ctx, {
                 fill: 'start',
                 lineTension: 0.4
             },{
-                label: 'Recommended manuf. channels',
+                label: 'Recommended Manuf. Channels',
                 backgroundColor: Chart.helpers.color(RECOMMENDED_CHANNELS_COLOR).alpha(0.5).rgbString(),
                 borderColor: RECOMMENDED_CHANNELS_COLOR,
                 borderWidth: 0.01, // 0 is not working!
@@ -115,7 +115,7 @@ var myChart = new Chart(ctx, {
                 lineTension: 0,
                 spanGaps: false
             },{
-                label: 'Forbidden ranges',
+                label: 'Forbidden Ranges',
                 backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.2).rgbString(),
                 borderColor: FORBIDDEN_COLOR,
                 borderWidth: 0.01, // 0 is not working!
@@ -124,7 +124,7 @@ var myChart = new Chart(ctx, {
                 lineTension: 0,
                 spanGaps: false
             },{
-                label: 'Congested / forbidden channels',
+                label: 'Congested / Forbidden Channels',
                 backgroundColor: Chart.helpers.color(CONGESTED_COLOR).alpha(0.5).rgbString(),
                 borderColor: CONGESTED_COLOR,
                 borderWidth: 0.01, // 0 is not working!
