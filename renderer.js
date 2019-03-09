@@ -26,6 +26,7 @@ var LINE_RECOMMENDED = 1;
 var LINE_FORBIDDEN   = 2;
 var LINE_CONGESTED   = 3;
 var LINE_CONGEST_TRESH = 4;
+var LINE_GRIDS       = 5;
 
 var PORT_MENU_SELECTION = undefined;
 
@@ -43,6 +44,7 @@ let RECOMMENDED_CHANNELS_COLOR = chartColors.GREEN;
 let FORBIDDEN_COLOR            = chartColors.RED;
 let SCAN_COLOR                 = chartColors.PURPLE;
 let CONGESTED_COLOR            = chartColors.ORANGE;
+let CHAN_GRID_COLOR            = chartColors.GREY;
 
 let SENNHEISER_CHANNEL_WIDTH   = 96000; // +/-48kHz Spitzenhub
 
@@ -84,6 +86,7 @@ if ( !BAND_LABEL )
     BAND_LABEL = "800.000 - 912.000 MHz";
 
 var FREQ_FORBIDDEN = require ( './frequency_data/forbidden/FORBIDDEN_' + COUNTRY + '.json');
+var FREQ_GRIDS     = require ( './frequency_data/grids/GRIDS_' + COUNTRY + '.json');
 
 var chDispValShadowArr = [];
 
@@ -137,6 +140,15 @@ var myChart = new Chart(ctx, {
                 fill: 'none',
                 lineTension: 0,
                 spanGaps: true
+            },{
+                label: 'TV Chan. Grid',
+                backgroundColor: Chart.helpers.color(CHAN_GRID_COLOR).alpha(0.3).rgbString(),
+                borderColor: CHAN_GRID_COLOR,
+                borderWidth: 0.01, // 0 is not working!
+                pointRadius: 0,
+                fill: 'start',
+                lineTension: 0,
+                spanGaps: false
             }
         ]
     },
@@ -161,7 +173,7 @@ var myChart = new Chart(ctx, {
                 }
             },{
                 position: "top",
-                weight: 1,
+                weight: 2,
                 labels: [],
                 offset: true,
                 gridLines: { display: false },
@@ -171,12 +183,23 @@ var myChart = new Chart(ctx, {
                 }
             },{
                 position: "top",
+                weight: 1,
+                labels: [],
+                offset: true,
+                gridLines: { display: false },
+                ticks: { 
+                    autoSkip: false,
+                    fontColor: '#4BDEC0'
+                }
+            },{
+                position: "top",
                 weight: 0,
                 labels: [],
                 gridLines: { display: false },
                 ticks: { 
                     autoSkip: false,
-                    fontColor: '#4BDEC0'
+                    fontColor: '#BBBBBB',
+                    maxRotation: 0
                 }
             }],
             yAxes: [{
@@ -219,6 +242,53 @@ function setForbidden () {
             data_point++;
         }
     }
+}
+
+function setChannelGrids () {
+    let even = true;
+    let last_data_point  = undefined; //avoid overwriting edge values
+
+    for ( var f of FREQ_GRIDS ) {
+        let range_res = isInRange ( f.start*1000, f.stop*1000);
+        let left_data_point  = undefined;
+        let right_data_point = undefined;
+        let data_point       = undefined;
+
+        if ( !range_res )
+            continue;
+
+        if ( range_res === "FULL_COVERAGE" ) {
+            left_data_point  = 0;
+            right_data_point = SWEEP_POINTS - 1;
+        } else {
+            left_data_point  = alignToBoundary ( Math.round ( (f.start * 1000 - START_FREQ) / FREQ_STEP ) );
+            right_data_point = alignToBoundary ( Math.round ( (f.stop  * 1000 - START_FREQ) / FREQ_STEP ) );
+        }
+
+        data_point = left_data_point;
+
+        if ( f.start * 1000 >= START_FREQ )
+            myChart.config.options.scales.xAxes[3].labels[left_data_point] = '|';
+
+        myChart.config.options.scales.xAxes[3].labels[Math.floor((left_data_point+right_data_point)/2)] = f.label;
+
+        if ( !even ) { // Only draw even (gray) fields. Otherwise overlapping occours. For odd (white fields we simply do nothing)
+            even = !even;
+            last_data_point = right_data_point;
+            continue;
+        }
+
+        while ( data_point <= right_data_point ) {
+            myChart.data.datasets[LINE_GRIDS].data[data_point] = even?MAX_DBM:undefined;
+            last_data_point = data_point;
+            data_point++;
+        }
+
+        even = !even;
+    }
+
+    if ( last_data_point < SWEEP_POINTS - 1) // Draw last marker
+        myChart.config.options.scales.xAxes[3].labels[last_data_point] = '|';
 }
 
 function setVendorChannels ( presets, bank ) {
@@ -326,16 +396,20 @@ function InitChart () {
         myChart.data.datasets[LINE_RECOMMENDED].data[i] = undefined; // Recommended
         myChart.data.datasets[LINE_FORBIDDEN].data[i]   = undefined; // Forbidden
         myChart.data.datasets[LINE_CONGESTED].data[i]   = undefined; // Congested
-        myChart.data.datasets[LINE_CONGEST_TRESH].data[0] = CONGESTION_LEVEL_DBM;
-        myChart.data.datasets[LINE_CONGEST_TRESH].data[SWEEP_POINTS-1] = CONGESTION_LEVEL_DBM;
+        myChart.data.datasets[LINE_GRIDS].data[i]       = undefined; // Grids
     }
+
+    myChart.data.datasets[LINE_CONGEST_TRESH].data[0] = CONGESTION_LEVEL_DBM;
+    myChart.data.datasets[LINE_CONGEST_TRESH].data[SWEEP_POINTS-1] = CONGESTION_LEVEL_DBM;
 
     for ( let i = 0 ; i < SWEEP_POINTS ; i++ ) {
         myChart.config.options.scales.xAxes[1].labels[i] = '';
         myChart.config.options.scales.xAxes[2].labels[i] = '';
+        myChart.config.options.scales.xAxes[3].labels[i] = '';
     }
 
-    setForbidden ();
+    setForbidden    ();
+    setChannelGrids ();
 
     if ( FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series] && chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset)
         setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
