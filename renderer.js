@@ -685,7 +685,7 @@ function setCallbacks () {
                 let band_details = "";
 
                 if ( !BAND_DETAILS )
-                    band_details = "";
+                    band_details = "    |    Band: <NO BAND SELECTED>";
                 else 
                     band_details = "    |    Band: " + BAND_DETAILS + "";
                 
@@ -696,7 +696,7 @@ function setCallbacks () {
                 else
                     country_information = "    |    Country: " + COUNTRY_NAME + " (" + COUNTRY_CODE + ")";
 
-                let label   = formatFrequencyString("Range: " + start_f.toString()) + " - " + formatFrequencyString(stop_f.toString()) + " MHz    |    Span: " + formatFrequencyString(span_f.toString()) + "MHz" + band_details + country_information;
+                let label = formatFrequencyString("Range: " + start_f.toString()) + " - " + formatFrequencyString(stop_f.toString()) + " MHz    |    Span: " + formatFrequencyString(span_f.toString()) + "MHz" + country_information + band_details;
 
                 myChart.options.scales.xAxes[0].scaleLabel.labelString = label;
                 configStore.set ( 'band_label' , label );
@@ -870,6 +870,9 @@ document.addEventListener ( "wheel", function ( e ) {
     let span_f_str = (stop_f - start_f) / 1000;
     span_f_str = span_f_str.toString();
 
+    BAND_DETAILS = "";
+    configStore.set ( 'band_details', "" );
+
     sendAnalyzer_SetConfig ( start_f, stop_f );
 });
 
@@ -949,6 +952,9 @@ document.addEventListener ( "keydown", function ( e ) {
 
     let span_f_str = (stop_f - start_f) / 1000;
     span_f_str = span_f_str.toString();
+
+    BAND_DETAILS = "";
+    configStore.set ( 'band_details', "" );
 
     sendAnalyzer_SetConfig ( start_f, stop_f );
 });
