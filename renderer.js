@@ -88,7 +88,11 @@ if ( !BAND_LABEL )
     BAND_LABEL = "800.000 - 912.000 MHz";
 
 var FREQ_FORBIDDEN = require ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + COUNTRY_CODE + '.json');
-var FREQ_GRIDS     = require ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json');
+
+if ( fs.existsSync ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json' ) )
+    var FREQ_GRIDS = require ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json');
+else
+    var FREQ_GRIDS = null;
 
 var chDispValShadowArr = [];
 
@@ -247,6 +251,9 @@ function setForbidden () {
 }
 
 function setChannelGrids () {
+    if ( !FREQ_GRIDS )
+        return;
+
     let even = true;
     let last_data_point  = undefined; //avoid overwriting edge values
 
@@ -800,7 +807,11 @@ ipcRenderer.on ( 'SET_COUNTRY', (event, message) => {
     configStore.set ( 'country_code', COUNTRY_CODE );
     configStore.set ( 'country_name', COUNTRY_NAME );
     FREQ_FORBIDDEN = require ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + COUNTRY_CODE + '.json');
-    FREQ_GRIDS     = require ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json');
+
+    if ( fs.existsSync ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json' ) )
+        FREQ_GRIDS = require ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json');
+    else
+        FREQ_GRIDS = undefined;
 
     InitChart();
     sendAnalyzer_SetConfig ( Math.floor ( START_FREQ/1000 ), Math.floor ( STOP_FREQ /1000 ) ); // Need this to refresh country name on x-axis
