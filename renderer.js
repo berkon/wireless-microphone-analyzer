@@ -59,10 +59,13 @@ let chPreset_Preset = configStore.get('chPreset.preset');
 let COUNTRY_CODE    = configStore.get('country_code'   );
 let COUNTRY_NAME    = configStore.get('country_name'   );
 var START_FREQ      = configStore.get('start_freq'     );
+var LAST_START_FREQ = START_FREQ;
 var STOP_FREQ       = configStore.get('stop_freq'      );
+var LAST_STOP_FREQ  = STOP_FREQ;
 var FREQ_STEP       = configStore.get('freq_step'      );
 var BAND_LABEL      = configStore.get('band_label'     );
 var BAND_DETAILS    = configStore.get('band_details'   );
+var LAST_BAND_DETAILS = BAND_DETAILS;
 var VIS_MANUF_CHAN  = configStore.get('graphVisibility.recommended');
 var VIS_FORBIDDEN   = configStore.get('graphVisibility.forbidden'  );
 var VIS_CONGEST     = configStore.get('graphVisibility.congested'  );
@@ -81,12 +84,16 @@ if ( !COUNTRY_CODE || !fs.existsSync ( __dirname + '/frequency_data/forbidden/FO
 }
 
 // If value is not existing, just set to some initial value
-if ( !START_FREQ )
+if ( !START_FREQ ) {
     START_FREQ = 800000000;
+    LAST_START_FREQ = START_FREQ;
+}
 
 // If value is not existing, just set to some initial value
-if ( !STOP_FREQ )
+if ( !STOP_FREQ ) {
     STOP_FREQ  = 912000000;
+    LAST_STOP_FREQ = STOP_FREQ;
+}
 
 // If value is not existing, just set to some initial value
 if ( !FREQ_STEP )
@@ -760,6 +767,7 @@ openPort();
 ipcRenderer.on ( 'CHANGE_BAND', (event, message) => {
     sendAnalyzer_SetConfig ( message.start_freq, message.stop_freq );
     configStore.set ( 'band_details', message.details );
+    LAST_BAND_DETAILS = BAND_DETAILS;
     BAND_DETAILS = message.details;
 });
 
@@ -905,16 +913,6 @@ document.addEventListener ( "wheel", function ( e ) {
         stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
     }
 
-
-    let start_f_str = start_f / 1000;
-    start_f_str = start_f_str.toString();
-    
-    let stop_f_str = stop_f / 1000;
-    stop_f_str = stop_f_str.toString();
-
-    let span_f_str = (stop_f - start_f) / 1000;
-    span_f_str = span_f_str.toString();
-
     BAND_DETAILS = "";
     configStore.set ( 'band_details', "" );
 
@@ -944,6 +942,10 @@ document.addEventListener ( "keydown", function ( e ) {
                 start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_10percent;
                 stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
             }
+
+            LAST_START_FREQ = START_FREQ;
+            LAST_STOP_FREQ  = STOP_FREQ;
+            BAND_DETAILS    = "";
             break;
 
         case 39: // Arrow right
@@ -963,19 +965,30 @@ document.addEventListener ( "keydown", function ( e ) {
                 start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
                 stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
             }
+
+            LAST_START_FREQ = START_FREQ;
+            LAST_STOP_FREQ  = STOP_FREQ;
+            BAND_DETAILS    = "";
             break;
 
         case 38: // Zoom in
             start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
             stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
-
+            
             if ( stop_f - start_f < SWEEP_POINTS )
                 return;
+
+            LAST_START_FREQ = START_FREQ;
+            LAST_STOP_FREQ  = STOP_FREQ;
+            BAND_DETAILS    = "";    
             break;
 
         case 40: // Zoom out
             start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_10percent;
             stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
+            LAST_START_FREQ = START_FREQ;
+            LAST_STOP_FREQ  = STOP_FREQ;
+            BAND_DETAILS    = "";
             break;
 
         case 82: // Reset peak
@@ -985,21 +998,18 @@ document.addEventListener ( "keydown", function ( e ) {
             myChart.update();
             return;
 
+        case 66: // Go back to last vendor band
+            START_FREQ = LAST_START_FREQ;
+            STOP_FREQ  = LAST_STOP_FREQ;
+            BAND_DETAILS = LAST_BAND_DETAILS;
+            start_f = Math.floor ( START_FREQ/1000 );
+            stop_f  = Math.floor ( STOP_FREQ /1000 );
+            break;
+
         default:
             return;
     }
 
-    let start_f_str = start_f / 1000;
-    start_f_str = start_f_str.toString();
-    
-    let stop_f_str = stop_f / 1000;
-    stop_f_str = stop_f_str.toString();
-
-    let span_f_str = (stop_f - start_f) / 1000;
-    span_f_str = span_f_str.toString();
-
-    BAND_DETAILS = "";
-    configStore.set ( 'band_details', "" );
-
+    configStore.set ( 'band_details', BAND_DETAILS );
     sendAnalyzer_SetConfig ( start_f, stop_f );
 });
