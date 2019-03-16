@@ -152,6 +152,8 @@
     { "start": 2200000, "stop": 2300000, "info": "Space & Science"   },
     { "start": 2300000, "stop": 2320000, "info": "Telemetry"         },
     { "start": 2320000, "stop": 2400000, "info": "Reporter Broadcast"},
+    { "start": 2450000, "stop": 2483500, "info": "Reporter Broadcast"},
+    { "start": 2483500, "stop": 2500000, "info": "Telemetry"         },
     { "start": 2500000, "stop": 2520000, "info": "LTE-7 2600 Up D2"  },
     { "start": 2520000, "stop": 2540000, "info": "LTE-7 2600 Up D1"  },
     { "start": 2540000, "stop": 2580000, "info": "LTE-7 2600 Up O2"  },
