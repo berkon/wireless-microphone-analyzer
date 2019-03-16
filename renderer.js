@@ -63,6 +63,15 @@ var STOP_FREQ       = configStore.get('stop_freq'      );
 var FREQ_STEP       = configStore.get('freq_step'      );
 var BAND_LABEL      = configStore.get('band_label'     );
 var BAND_DETAILS    = configStore.get('band_details'   );
+var VIS_MANUF_CHAN  = configStore.get('graphVisibility.recommended');
+var VIS_FORBIDDEN   = configStore.get('graphVisibility.forbidden'  );
+var VIS_CONGEST     = configStore.get('graphVisibility.congested'  );
+var VIS_TV_CHAN     = configStore.get('graphVisibility.grids'      );
+
+if ( VIS_MANUF_CHAN === undefined ) VIS_MANUF_CHAN = true;
+if ( VIS_FORBIDDEN  === undefined ) VIS_FORBIDDEN  = true;
+if ( VIS_CONGEST    === undefined ) VIS_CONGEST    = true;
+if ( VIS_TV_CHAN    === undefined ) VIS_TV_CHAN    = true;
 
 let received_first_answer = false;
 
@@ -96,6 +105,23 @@ else
 
 var chDispValShadowArr = [];
 
+function legendClick ( e, legendItem ) {
+    var index = legendItem.datasetIndex;
+    var ci    = this.chart;
+    var meta  = ci.getDatasetMeta(index);
+    
+    switch ( index ) {
+        case LINE_RECOMMENDED: configStore.set('graphVisibility.recommended', legendItem.hidden?true:false ); break;
+        case LINE_FORBIDDEN  : configStore.set('graphVisibility.forbidden'  , legendItem.hidden?true:false ); break;
+        case LINE_CONGESTED  : configStore.set('graphVisibility.congested'  , legendItem.hidden?true:false ); break;
+        case LINE_GRIDS      : configStore.set('graphVisibility.grids'      , legendItem.hidden?true:false ); break;
+        default:
+    }
+
+    meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+    ci.update();
+}
+
 var ctx = document.getElementById("graph2d").getContext('2d');
 var myChart = new Chart(ctx, {
     type: 'line',
@@ -118,7 +144,8 @@ var myChart = new Chart(ctx, {
                 pointRadius: 0,
                 fill: 'start',
                 lineTension: 0,
-                spanGaps: false
+                spanGaps: false,
+                hidden: !VIS_MANUF_CHAN
             },{
                 label: 'Forbidden Ranges',
                 backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.2).rgbString(),
@@ -127,7 +154,8 @@ var myChart = new Chart(ctx, {
                 pointRadius: 0,
                 fill: 'start',
                 lineTension: 0,
-                spanGaps: false
+                spanGaps: false,
+                hidden: !VIS_FORBIDDEN
             },{
                 label: 'Congested / Forbidden Channels',
                 backgroundColor: Chart.helpers.color(CONGESTED_COLOR).alpha(0.5).rgbString(),
@@ -136,7 +164,8 @@ var myChart = new Chart(ctx, {
                 pointRadius: 0,
                 fill: 'start',
                 lineTension: 0,
-                spanGaps: false
+                spanGaps: false,
+                hidden: !VIS_CONGEST
             },{
                 label: 'Congest_Thresh',
                 backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.5).rgbString(),
@@ -154,7 +183,8 @@ var myChart = new Chart(ctx, {
                 pointRadius: 0,
                 fill: 'start',
                 lineTension: 0,
-                spanGaps: false
+                spanGaps: false,
+                hidden: !VIS_TV_CHAN
             }
         ]
     },
@@ -169,7 +199,8 @@ var myChart = new Chart(ctx, {
                     else
                         return true;
                 }
-            }
+            },
+            onClick: legendClick
         },
         scales: {
             xAxes: [{
@@ -534,6 +565,7 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq ) {
 //    port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
 
     let config_buf = Buffer.from ( '#0C2-F:'+start_freq_str+','+stop_freq_str+',-0'+Math.abs(MAX_DBM).toString()+','+MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
+
     START_FREQ = start_freq * 1000;
     STOP_FREQ  = stop_freq  * 1000;
     config_buf.writeUInt8 ( 0x20, 1 );
@@ -678,9 +710,11 @@ function setCallbacks () {
 
                 let msg_buf_str = String.fromCharCode.apply ( null, msg_buf ); // Convert to characters
                 let start_freq_step_idx = msg_buf_str.indexOf(',') + 1;
+
                 START_FREQ = parseInt ( msg_buf_str.slice ( 0, start_freq_step_idx) ) * 1000;
                 FREQ_STEP  = parseInt ( msg_buf_str.slice ( start_freq_step_idx, msg_buf_str.indexOf(',', start_freq_step_idx)) );
                 STOP_FREQ  = ( FREQ_STEP * (SWEEP_POINTS-1) ) + START_FREQ;
+
                 configStore.set ( 'start_freq', START_FREQ );
                 configStore.set ( 'stop_freq' , STOP_FREQ  );
                 configStore.set ( 'freq_step' , FREQ_STEP  );
