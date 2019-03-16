@@ -1,5 +1,11 @@
 [
-    { "label": "LTE-28 700 Gap (733 - 758MHz)", "start_freq": 733000, "stop_freq": 758000, "details": "LTE-28 700 Gap (733 - 758MHz)" },
-    { "label": "LTE-20 800 Gap (823 - 832MHz)", "start_freq": 823000, "stop_freq": 832000, "details": "LTE-20 800 Gap (823 - 832MHz)" },
-    { "label": "ISM Band           (863 - 865MHz)", "start_freq": 863000, "stop_freq": 865000, "details": "ISM Band (863 - 865MHz)"    }
+    { "label": "LTE Guard 1      (694 - 703MHz)"     , "start_freq": 694000 , "stop_freq": 703000 , "details": "LTE Guard 1 (694 - 703MHz)"    },
+    { "label": "LTE 700 Gap     (733 - 758MHz)"      , "start_freq": 733000 , "stop_freq": 758000 , "details": "LTE 700 Gap (733 - 758MHz)"    },
+    { "label": "LTE Guard 2      (788 - 791MHz)"     , "start_freq": 788000 , "stop_freq": 791000 , "details": "LTE Guard 2 (788 - 791MHz)"    },
+    { "label": "LTE Guard 3      (821 - 823MHz)"     , "start_freq": 821000 , "stop_freq": 823000 , "details": "LTE Guard 3 (821 - 823MHz)"    },
+    { "label": "LTE 800 Gap     (823 - 832MHz)"      , "start_freq": 823000 , "stop_freq": 832000 , "details": "LTE 800 Gap (823 - 832MHz)"    },
+    { "label": "ISM Band          (863 - 865MHz)"    , "start_freq": 863000 , "stop_freq": 865000 , "details": "ISM Band (863 - 865MHz)"       },
+    { "label": "LTE  1800 Gap  (1785 - 1805MHz)"     , "start_freq": 1785000, "stop_freq": 1805000, "details": "LTE 1800 Gap (1785 - 1805MHz)" },
+    { "label": "DECT                (1880 - 1900MHz)", "start_freq": 1880000, "stop_freq": 1900000, "details": "DECT (1880 - 1900MHz)"         },
+    { "label": "WLAN              (2400 - 2484MHz)"  , "start_freq": 2399500, "stop_freq": 2484500, "details": "WLAN (2400 - 2484MHz)"         }
 ]
