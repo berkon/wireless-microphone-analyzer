@@ -60,13 +60,12 @@ let chPreset_Preset = configStore.get('chPreset.preset');
 let COUNTRY_CODE    = configStore.get('country_code'   );
 let COUNTRY_NAME    = configStore.get('country_name'   );
 var START_FREQ      = configStore.get('start_freq'     );
-var LAST_START_FREQ = START_FREQ;
+var LAST_START_FREQ = configStore.get('last_start_freq');
 var STOP_FREQ       = configStore.get('stop_freq'      );
-var LAST_STOP_FREQ  = STOP_FREQ;
+var LAST_STOP_FREQ  = configStore.get('last_stop_freq' );
 var FREQ_STEP       = configStore.get('freq_step'      );
 var BAND_LABEL      = configStore.get('band_label'     );
 var BAND_DETAILS    = configStore.get('band_details'   );
-var LAST_BAND_DETAILS = BAND_DETAILS;
 var VIS_MANUF_CHAN  = configStore.get('graphVisibility.recommended');
 var VIS_FORBIDDEN   = configStore.get('graphVisibility.forbidden'  );
 var VIS_CONGEST     = configStore.get('graphVisibility.congested'  );
@@ -85,24 +84,15 @@ if ( !COUNTRY_CODE || !fs.existsSync ( __dirname + '/frequency_data/forbidden/FO
 }
 
 // If value is not existing, just set to some initial value
-if ( !START_FREQ ) {
-    START_FREQ = 800000000;
-    LAST_START_FREQ = START_FREQ;
-}
+if ( !START_FREQ      ) { START_FREQ      = 800000000 ; }
+if ( !LAST_START_FREQ ) { LAST_START_FREQ = START_FREQ; }
+if ( !STOP_FREQ       ) { STOP_FREQ       = 912000000 ; }
+if ( !LAST_STOP_FREQ  ) { LAST_STOP_FREQ  = STOP_FREQ ; }
+if ( !FREQ_STEP       ) { FREQ_STEP       = 1000000   ; }
+if ( !BAND_LABEL      ) { BAND_LABEL      = "800.000 - 912.000 MHz"; }
 
-// If value is not existing, just set to some initial value
-if ( !STOP_FREQ ) {
-    STOP_FREQ  = 912000000;
-    LAST_STOP_FREQ = STOP_FREQ;
-}
-
-// If value is not existing, just set to some initial value
-if ( !FREQ_STEP )
-    FREQ_STEP  =   1000000;
-
-// If value is not existing, just set to some initial value
-if ( !BAND_LABEL )
-    BAND_LABEL = "800.000 - 912.000 MHz";
+if ( START_FREQ !== LAST_START_FREQ && STOP_FREQ !== LAST_STOP_FREQ )
+    BAND_DETAILS = "";
 
 var FREQ_FORBIDDEN = require ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + COUNTRY_CODE + '.json');
 
@@ -231,7 +221,7 @@ var myChart = new Chart(ctx, {
                 label: 'Forbidden Start Marker',
                 backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.2).rgbString(),
                 borderColor: FORBIDDEN_COLOR,
-                borderWidth: 1.01, // 0 is not working!
+                borderWidth: 0.2,
                 pointRadius: 0,
                 lineTension: 0,
                 spanGaps: false,
@@ -823,10 +813,15 @@ function setCallbacks () {
 openPort();
 
 ipcRenderer.on ( 'CHANGE_BAND', (event, message) => {
+    LAST_START_FREQ = message.start_freq * 1000;
+    LAST_STOP_FREQ  = message.stop_freq  * 1000;
+
+    configStore.set ( 'last_start_freq', LAST_START_FREQ );
+    configStore.set ( 'last_stop_freq' , LAST_STOP_FREQ  );
+    configStore.set ( 'band_details '  , message.details );
+
+    BAND_DETAILS    = message.details;
     sendAnalyzer_SetConfig ( message.start_freq, message.stop_freq );
-    configStore.set ( 'band_details', message.details );
-    LAST_BAND_DETAILS = BAND_DETAILS;
-    BAND_DETAILS = message.details;
 });
 
 ipcRenderer.on ( 'SET_VENDOR_4_ANALYSIS', (event, message) => {
@@ -972,8 +967,6 @@ document.addEventListener ( "wheel", function ( e ) {
     }
 
     BAND_DETAILS = "";
-    configStore.set ( 'band_details', "" );
-
     sendAnalyzer_SetConfig ( start_f, stop_f );
 });
 
@@ -1002,8 +995,6 @@ document.addEventListener ( "keydown", function ( e ) {
                 stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
             }
 
-            LAST_START_FREQ = START_FREQ;
-            LAST_STOP_FREQ  = STOP_FREQ;
             BAND_DETAILS    = "";
             break;
 
@@ -1025,8 +1016,6 @@ document.addEventListener ( "keydown", function ( e ) {
                 stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
             }
 
-            LAST_START_FREQ = START_FREQ;
-            LAST_STOP_FREQ  = STOP_FREQ;
             BAND_DETAILS    = "";
             break;
 
@@ -1042,8 +1031,6 @@ document.addEventListener ( "keydown", function ( e ) {
             if ( stop_f - start_f < SWEEP_POINTS )
                 return;
 
-            LAST_START_FREQ = START_FREQ;
-            LAST_STOP_FREQ  = STOP_FREQ;
             BAND_DETAILS    = "";    
             break;
 
@@ -1056,8 +1043,6 @@ document.addEventListener ( "keydown", function ( e ) {
                 stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_30percent;
             }
 
-            LAST_START_FREQ = START_FREQ;
-            LAST_STOP_FREQ  = STOP_FREQ;
             BAND_DETAILS    = "";
             break;
 
@@ -1069,9 +1054,9 @@ document.addEventListener ( "keydown", function ( e ) {
             return;
 
         case 66: // Go back to last vendor band
-            START_FREQ = LAST_START_FREQ;
-            STOP_FREQ  = LAST_STOP_FREQ;
-            BAND_DETAILS = LAST_BAND_DETAILS;
+            START_FREQ   = LAST_START_FREQ;
+            STOP_FREQ    = LAST_STOP_FREQ;
+            BAND_DETAILS = configStore.get('band_details');
             start_f = Math.floor ( START_FREQ/1000 );
             stop_f  = Math.floor ( STOP_FREQ /1000 );
             break;
@@ -1080,6 +1065,5 @@ document.addEventListener ( "keydown", function ( e ) {
             return;
     }
 
-    configStore.set ( 'band_details', BAND_DETAILS );
     sendAnalyzer_SetConfig ( start_f, stop_f );
 });
