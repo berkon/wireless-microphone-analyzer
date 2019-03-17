@@ -27,6 +27,7 @@ var LINE_FORBIDDEN   = 2;
 var LINE_CONGESTED   = 3;
 var LINE_CONGEST_TRESH = 4;
 var LINE_GRIDS       = 5;
+var LINE_FORBIDDEN_MARKERS = 6;
 
 var PORT_MENU_SELECTION = undefined;
 
@@ -126,15 +127,44 @@ function legendClick ( e, legendItem ) {
     }
 
     meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+
+    if ( index === LINE_FORBIDDEN ) {
+        let meta_2 = ci.getDatasetMeta ( LINE_FORBIDDEN_MARKERS )
+        meta_2.hidden = meta_2.hidden === null ? !ci.data.datasets[LINE_FORBIDDEN_MARKERS].hidden : null;
+    }
+
     ci.update();
 }
 
+/*
+Chart.pluginService.register({
+    afterUpdate: function(chart) {
+        chart.config.data.datasets.forEach ( (dataset) => {
+            var offset = -4;
+
+            if ( !dataset._meta[0].data[0])
+                return;
+            
+    //        console.log(dataset._meta[0].data[0]._model);
+
+            for ( var i = 0 ; i < dataset._meta[0].data.length; i++ ) {
+                let model = dataset._meta[0].data[i]._model;
+                model.x += offset;
+                model.controlPointNextX += offset;
+                model.controlPointPreviousX += offset;
+            }
+        });
+    }
+});
+*/
+
 var ctx = document.getElementById("graph2d").getContext('2d');
 var myChart = new Chart(ctx, {
-    type: 'line',
+    type: 'bar',
     data: {
         datasets: [
             {
+                type: "line",
                 label: 'Live Scan (Peak Hold)',
                 backgroundColor: Chart.helpers.color(SCAN_COLOR).alpha(0.2).rgbString(),
                 borderColor: SCAN_COLOR,
@@ -144,6 +174,7 @@ var myChart = new Chart(ctx, {
                 fill: 'start',
                 lineTension: 0.4
             },{
+                type: "line",
                 label: 'Recommended Manuf. Channels',
                 backgroundColor: Chart.helpers.color(RECOMMENDED_CHANNELS_COLOR).alpha(0.5).rgbString(),
                 borderColor: RECOMMENDED_CHANNELS_COLOR,
@@ -154,6 +185,7 @@ var myChart = new Chart(ctx, {
                 spanGaps: false,
                 hidden: !VIS_MANUF_CHAN
             },{
+                type: "line",
                 label: 'Forbidden Ranges',
                 backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.2).rgbString(),
                 borderColor: FORBIDDEN_COLOR,
@@ -164,6 +196,7 @@ var myChart = new Chart(ctx, {
                 spanGaps: false,
                 hidden: !VIS_FORBIDDEN
             },{
+                type: "line",
                 label: 'Congested / Forbidden Channels',
                 backgroundColor: Chart.helpers.color(CONGESTED_COLOR).alpha(0.5).rgbString(),
                 borderColor: CONGESTED_COLOR,
@@ -174,6 +207,7 @@ var myChart = new Chart(ctx, {
                 spanGaps: false,
                 hidden: !VIS_CONGEST
             },{
+                type: "line",
                 label: 'Congest_Thresh',
                 backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.5).rgbString(),
                 borderColor: FORBIDDEN_COLOR,
@@ -183,6 +217,7 @@ var myChart = new Chart(ctx, {
                 lineTension: 0,
                 spanGaps: true
             },{
+                type: "line",
                 label: 'TV Chan. Grid',
                 backgroundColor: Chart.helpers.color(CHAN_GRID_COLOR).alpha(0.3).rgbString(),
                 borderColor: CHAN_GRID_COLOR,
@@ -192,6 +227,15 @@ var myChart = new Chart(ctx, {
                 lineTension: 0,
                 spanGaps: false,
                 hidden: !VIS_TV_CHAN
+            },{
+                label: 'Forbidden Start Marker',
+                backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.2).rgbString(),
+                borderColor: FORBIDDEN_COLOR,
+                borderWidth: 1.01, // 0 is not working!
+                pointRadius: 0,
+                lineTension: 0,
+                spanGaps: false,
+                hidden: !VIS_FORBIDDEN
             }
         ]
     },
@@ -201,7 +245,9 @@ var myChart = new Chart(ctx, {
         legend: {
             labels :  {
                 filter: (legendItem, chartData) => {
-                    if ( legendItem.datasetIndex === 0 || legendItem.datasetIndex === 4 )
+                    if ( legendItem.datasetIndex === 0 ||
+                         legendItem.datasetIndex === 4 ||
+                         legendItem.datasetIndex === 6)
                         return false;
                     else
                         return true;
@@ -214,7 +260,12 @@ var myChart = new Chart(ctx, {
                 scaleLabel: {
                     display: true,
                     labelString: BAND_LABEL?BAND_LABEL:'MHz'
-                }
+                },
+                barPercentage: 0.2,
+                gridLines : {
+                    offsetGridLines: false
+                },
+                offset: false
             },{
                 position: "top",
                 weight: 2,
@@ -281,10 +332,16 @@ function setForbidden () {
         let data_point = left_data_point;
         myChart.config.options.scales.xAxes[1].labels[left_data_point] = f.info;
 
+        if ( f.start * 1000 >= START_FREQ )
+            myChart.data.datasets[LINE_FORBIDDEN_MARKERS].data[left_data_point] = MIN_DBM;
+
         while ( data_point <= right_data_point ) {
             myChart.data.datasets[LINE_FORBIDDEN].data[data_point] = MAX_DBM;
             data_point++;
         }
+
+        if ( f.stop * 1000 <= STOP_FREQ )
+            myChart.data.datasets[LINE_FORBIDDEN_MARKERS].data[right_data_point] = MIN_DBM;
     }
 }
 
@@ -444,6 +501,7 @@ function InitChart () {
         myChart.data.datasets[LINE_FORBIDDEN].data[i]   = undefined; // Forbidden
         myChart.data.datasets[LINE_CONGESTED].data[i]   = undefined; // Congested
         myChart.data.datasets[LINE_GRIDS].data[i]       = undefined; // Grids
+        myChart.data.datasets[LINE_FORBIDDEN_MARKERS].data[i] = undefined; // Forbidden start markers
     }
 
     myChart.data.datasets[LINE_CONGEST_TRESH].data[0] = CONGESTION_LEVEL_DBM;
