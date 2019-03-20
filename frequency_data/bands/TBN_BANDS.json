@@ -1,0 +1,11 @@
+{ "label":"the t.bone", "submenu": [
+    { "label":"free solo", "submenu": [
+        { "label": "520 MHz (518 - 536MHz)"  , "start_freq": 518000 , "stop_freq": 536000 , "details": "the t.bone free solo 520MHz (518 - 536MHz)"  , "band": "TBN_518_NONE" },
+        { "label": "590 MHz (584 - 608MHz)"  , "start_freq": 584000 , "stop_freq": 608000 , "details": "the t.bone free solo 590MHz (584 - 608MHz)"  , "band": "TBN_590_NONE" },
+        { "label": "600 MHz (596 - 620MHz)"  , "start_freq": 596000 , "stop_freq": 620000 , "details": "the t.bone free solo 600MHz (596 - 620MHz)"  , "band": "TBN_600_NONE" },
+        { "label": "660 MHz (675 - 679MHz)"  , "start_freq": 675000 , "stop_freq": 679000 , "details": "the t.bone free solo 660MHz (675 - 679MHz)"  , "band": "TBN_660_NONE" },
+        { "label": "823 MHz (823 - 832MHz)"  , "start_freq": 823000 , "stop_freq": 832000 , "details": "the t.bone free solo 823MHz (823 - 832MHz)"  , "band": "TBN_823_NONE" },
+        { "label": "863 MHz (863 - 865MHz)"  , "start_freq": 863000 , "stop_freq": 865000 , "details": "the t.bone free solo 863MHz (863 - 865MHz)"  , "band": "TBN_863_NONE" },
+        { "label": "1.8 GHz (1781 - 1796MHz)", "start_freq": 1781500, "stop_freq": 1795500, "details": "the t.bone free solo 1.8GHz (1781 - 1796MHz)", "band": "TBN_1.8_NONE" }
+    ]}
+]}
