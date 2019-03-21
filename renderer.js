@@ -818,7 +818,7 @@ ipcRenderer.on ( 'CHANGE_BAND', (event, message) => {
 
     configStore.set ( 'last_start_freq', LAST_START_FREQ );
     configStore.set ( 'last_stop_freq' , LAST_STOP_FREQ  );
-    configStore.set ( 'band_details '  , message.details );
+    configStore.set ( 'band_details'   , message.details );
 
     BAND_DETAILS    = message.details;
     sendAnalyzer_SetConfig ( message.start_freq, message.stop_freq );
