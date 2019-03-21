@@ -142,16 +142,25 @@ function createWindow () {
         if ( band_idx === -1 ) // Does this band already exist in this vendor submenu?
             band_idx = menuJSON[MENU_CHANNELS].submenu[vendor_idx].submenu.push ({ label: key[1] + " - Band", submenu: [] }) - 1;
 
-        series_idx = menuJSON[MENU_CHANNELS].submenu[vendor_idx].submenu[band_idx].submenu.findIndex ( ( elem ) => { return elem.label === key[2]; });
+        if ( key[2] !== "NONE" ) {
+            series_idx = menuJSON[MENU_CHANNELS].submenu[vendor_idx].submenu[band_idx].submenu.findIndex ( ( elem ) => { return elem.label === key[2]; });
         
-        if ( series_idx ) // Does this series already exist in this band submenu?
-            series_idx = menuJSON[MENU_CHANNELS].submenu[vendor_idx].submenu[band_idx].submenu.push ({ label: key[2], submenu: [] }) - 1;
+            if ( series_idx ) // Does this series already exist in this band submenu?
+                series_idx = menuJSON[MENU_CHANNELS].submenu[vendor_idx].submenu[band_idx].submenu.push ({ label: key[2], submenu: [] }) - 1;
+        }
 
         preset.forEach ( (bank, i) => {
-            menuJSON[MENU_CHANNELS].submenu[vendor_idx].submenu[band_idx].submenu[series_idx].submenu.push ({
-                label: "Bank " + (i+1),
-                click () { wc.send ( "SET_CHAN_PRESET", { preset: vendorPreset[0] + "_" + (i+1) }); }
-            });
+            if ( key[2] !== "NONE" ) {
+                menuJSON[MENU_CHANNELS].submenu[vendor_idx].submenu[band_idx].submenu[series_idx].submenu.push ({
+                    label: "Bank " + (i+1),
+                    click () { wc.send ( "SET_CHAN_PRESET", { preset: vendorPreset[0] + "_" + (i+1) }); }
+                });
+            } else {
+                menuJSON[MENU_CHANNELS].submenu[vendor_idx].submenu[band_idx].submenu.push ({
+                    label: "Bank " + (i+1),
+                    click () { wc.send ( "SET_CHAN_PRESET", { preset: vendorPreset[0] + "_" + (i+1) }); }
+                });
+            }
         });
     });
 
