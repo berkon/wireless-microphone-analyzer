@@ -15,6 +15,7 @@ var MAX_FREQ   = 2700000; // 2700000 kHz (2.7 GHz)
 var MIN_FREQ   =   15000; //   15000 kHz ( 15 MHz)
 var MAX_DBM    = -20;
 var MIN_DBM    = -110;
+var MAX_SPAN   = undefined;
 var CONGESTION_LEVEL_DBM = -85;
 
 var SWEEP_POINTS = 112;
@@ -764,11 +765,15 @@ function setCallbacks () {
                 }
 
                 let msg_buf_str = String.fromCharCode.apply ( null, msg_buf ); // Convert to characters
-                let start_freq_step_idx = msg_buf_str.indexOf(',') + 1;
+                let res_arr = msg_buf_str.split ( "," );
 
-                START_FREQ = parseInt ( msg_buf_str.slice ( 0, start_freq_step_idx) ) * 1000;
-                FREQ_STEP  = parseInt ( msg_buf_str.slice ( start_freq_step_idx, msg_buf_str.indexOf(',', start_freq_step_idx)) );
+                START_FREQ = parseInt ( res_arr[0] ) * 1000; // Start frquency
+                FREQ_STEP  = parseInt ( res_arr[1] );        // Frequency step
                 STOP_FREQ  = ( FREQ_STEP * (SWEEP_POINTS-1) ) + START_FREQ;
+
+                MIN_FREQ   = parseInt ( res_arr[7] ); // Minimum frequency
+                MAX_FREQ   = parseInt ( res_arr[8] ); // Maximum frequency
+                MAX_SPAN   = parseInt ( res_arr[9] ); // Maximum span
 
                 configStore.set ( 'start_freq', START_FREQ );
                 configStore.set ( 'stop_freq' , STOP_FREQ  );
@@ -945,6 +950,19 @@ ipcRenderer.on ( 'RESET_PEAK', (event, message) => {
     myChart.update();
 });
 
+function checkSpanExceeded ( start_f, stop_f ) {
+    if ( stop_f - start_f > MAX_SPAN ) {
+        start_f = Math.floor ( START_FREQ/1000 );
+        stop_f  = Math.floor ( STOP_FREQ /1000 )
+        let fill = Math.floor ( (MAX_SPAN - (stop_f - start_f)) / 2 );
+        start_f = start_f - fill;
+        stop_f  = stop_f  + fill;
+        console.log ( "Maximum span reached!" );
+    }
+
+    return [ start_f, stop_f ];
+}
+
 document.addEventListener ( "wheel", function ( e ) {
     let start_f = 0, stop_f = 0;
     let delta_freq_10percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 10 ); // 10% of freq range
@@ -952,6 +970,8 @@ document.addEventListener ( "wheel", function ( e ) {
     if ( e.deltaY > 0 ) { // Zoom out
         start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_10percent;
         stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
+
+        [ start_f, stop_f ] = checkSpanExceeded ( start_f, stop_f );
     } else if ( e.deltaY < 0 ) { // Zoom in
         start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
         stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
@@ -1042,6 +1062,8 @@ document.addEventListener ( "keydown", function ( e ) {
                 start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_30percent;
                 stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_30percent;
             }
+
+            [ start_f, stop_f ] = checkSpanExceeded ( start_f, stop_f );
 
             BAND_DETAILS    = "";
             break;
