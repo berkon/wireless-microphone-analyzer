@@ -783,6 +783,17 @@ function setCallbacks () {
                 let stop_f  = Math.ceil  ( STOP_FREQ  / 1000 );
                 let span_f  = Math.ceil  ( stop_f - start_f  );
 
+                if ( start_f < MIN_FREQ || stop_f > MAX_FREQ ) {
+                    const dialogOptions = {
+                        type: 'error',
+                        buttons: ['OK'],
+                        message: 'Invalid frequency range!',
+                        detail:  'The currently selected frequency range is not valid for the selected antenna module! Make sure to select a valid frequency range!'}
+                    dialog.showMessageBox ( dialogOptions, (i) => {
+                    //    console.log("Button " + i + " was pressed!")
+                    });
+                }
+
                 let band_details = "";
 
                 if ( !BAND_DETAILS )
