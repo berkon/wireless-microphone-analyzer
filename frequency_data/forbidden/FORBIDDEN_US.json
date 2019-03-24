@@ -9,6 +9,7 @@
     { "start": 148000 , "stop": 164000 , "info": "Police/Fire/Ambul."},
     { "start": 216000 , "stop": 225000 , "info": "Radar"             },
     { "start": 225000 , "stop": 300000 , "info": "Government"        },
+    { "start": 462550 , "stop": 467725 , "info": "Family Radio Serv."},
     { "start": 608000 , "stop": 614000 , "info": "Raido Astronomy"   },
     { "start": 699000 , "stop": 716000 , "info": "LTE-12 700 Up"     },
     { "start": 729000 , "stop": 746000 , "info": "LTE-12 700 Down"   },
