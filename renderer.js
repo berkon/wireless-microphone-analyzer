@@ -11,6 +11,8 @@ const fs              = require ('fs');
 
 const configStore = new ConfigStore ( Pkg.name );
 
+const SAVED_DATA_VERSION = 1;
+
 var MAX_FREQ   = 2700000; // 2700000 kHz (2.7 GHz)
 var MIN_FREQ   =   15000; //   15000 kHz ( 15 MHz)
 var MAX_DBM    = -20;
@@ -53,6 +55,24 @@ let SENNHEISER_CHANNEL_WIDTH   = 96000; // +/-48kHz Spitzenhub
 var port = undefined;
 var autoPortCheckTimer = undefined;
 var responeCheckTimer  = undefined;
+
+let saved_data_version = configStore.get('saved_data_version');
+
+// Saved data version handling
+if ( !saved_data_version ) {
+    configStore.set ( 'saved_data_version', SAVED_DATA_VERSION );
+    saved_data_version = SAVED_DATA_VERSION;
+} else {
+    switch ( saved_data_version ) {
+        case 1: // Nothing to do
+            break;
+
+        default:
+            console.log ( "Unkonw version of saved data!");
+    }
+}
+
+
 
 let chPreset_Vendor = configStore.get('chPreset.vendor');
 let chPreset_Band   = configStore.get('chPreset.band'  );
