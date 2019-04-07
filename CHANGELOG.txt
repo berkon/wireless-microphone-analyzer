@@ -1,3 +1,16 @@
+V1.5.0
+    FEATURES
+        - Remember visibility settings for overlay graphs after restart
+        - Remember band name after restart
+        - Faster zooming with Arrow + <SHIFT> key
+        - Show red vertical marker lines at start of forbidden range
+        - Updated country specific frequency data
+        - Go back to last selected band with <B> key
+        - Added t.bone bands and channel presets
+    FIXES
+        - Remove band name if start/stop frequency changed
+        - Avoid exceeding span or frequency limits of a certain antenna module
+
 V1.4.0
     FEATURES
         - Added TV channel grids (country dependent)
