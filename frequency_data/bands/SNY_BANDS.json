@@ -1,24 +1,76 @@
 { "label":"Sony", "submenu": [
-    { "label":"DWR", "submenu": [
-        { "label": "TV1417 (470 - 494MHz)" , "start_freq": 470125, "stop_freq": 493875, "details": "Sony DWR TV1417 (470 - 494MHz)" , "band": "SNY_TV1417_NONE" },
-        { "label": "TV1821 (494 - 518MHz)" , "start_freq": 494125, "stop_freq": 517875, "details": "Sony DWR TV1821 (494 - 518MHz)" , "band": "SNY_TV1821_NONE" },
-        { "label": "TV2225 (518 - 542MHz)" , "start_freq": 518125, "stop_freq": 541875, "details": "Sony DWR TV2225 (518 - 542MHz)" , "band": "SNY_TV2225_NONE" },
-        { "label": "TV3033 (566 - 590MHz)" , "start_freq": 566125, "stop_freq": 589875, "details": "Sony DWR TV3033 (566 - 590MHz)" , "band": "SNY_TV3033_NONE" },
-        { "label": "TV3436 (590 - 608MHz)" , "start_freq": 590125, "stop_freq": 607875, "details": "Sony DWR TV3436 (590 - 608MHz)" , "band": "SNY_TV3436_NONE" },
-        { "label": "TV3841 (614 - 638MHz)" , "start_freq": 614125, "stop_freq": 637875, "details": "Sony DWR TV3841 (614 - 638MHz)" , "band": "SNY_TV3841_NONE" },
-        { "label": "TV4245 (638 - 662MHz)" , "start_freq": 638125, "stop_freq": 661875, "details": "Sony DWR TV4245 (638 - 662MHz)" , "band": "SNY_TV4245_NONE" },
-        { "label": "TV4649 (662 - 686MHz)" , "start_freq": 662125, "stop_freq": 685875, "details": "Sony DWR TV4649 (662 - 686MHz)" , "band": "SNY_TV4649_NONE" },
-        { "label": "TV5051 (686 - 698MHz)" , "start_freq": 686125, "stop_freq": 697875, "details": "Sony DWR TV5051 (686 - 698MHz)" , "band": "SNY_TV5051_NONE" },
-        { "label": "TV6264 (798 - 822MHz)" , "start_freq": 798125, "stop_freq": 821875, "details": "Sony DWR TV6264 (798 - 822MHz)" , "band": "SNY_TV6264_NONE" },
-        { "label": "TV6769 (838 - 862MHz)" , "start_freq": 838125, "stop_freq": 862000, "details": "Sony DWR TV5051 (838 - 862MHz)" , "band": "SNY_TV6769_NONE" }
+    { "label":"DWR [US]", "submenu": [
+        { "label": "Full Range      (470 - 542MHz)", "start_freq": 470125, "stop_freq": 541875, "details": "Sony DWR TV 14-25 (470 - 542MHz)" , "band": "SNY_DWR_TV1425" },
+        { "label": "    TV 14-17    (470 - 494MHz)", "start_freq": 470125, "stop_freq": 493875, "details": "Sony DWR TV 14-17 (470 - 494MHz)" , "band": "SNY_DWR_TV1417" },
+        { "label": "    TV 18-21    (494 - 518MHz)", "start_freq": 494125, "stop_freq": 517875, "details": "Sony DWR TV 18-21 (494 - 518MHz)" , "band": "SNY_DWR_TV1821" },
+        { "label": "    TV 22-25    (518 - 542MHz)", "start_freq": 518125, "stop_freq": 541875, "details": "Sony DWR TV 22-25 (518 - 542MHz)" , "band": "SNY_DWR_TV2225" },
+        { "type" : "separator" },
+        { "label": "Full Range      (566 - 608MHz)", "start_freq": 566125, "stop_freq": 607875, "details": "Sony DWR TV 30-36 (566 - 608MHz)" , "band": "SNY_DWR_TV3036" },
+        { "label": "    TV 30-33    (566 - 590MHz)", "start_freq": 566125, "stop_freq": 589875, "details": "Sony DWR TV 30-33 (566 - 590MHz)" , "band": "SNY_DWR_TV3033" },
+        { "label": "    TV 34-36    (590 - 608MHz)", "start_freq": 590125, "stop_freq": 607875, "details": "Sony DWR TV 34-36 (590 - 608MHz)" , "band": "SNY_DWR_TV3436" },
+        { "type" : "separator" },
+        { "label": "Full Range      (614 - 698MHz)", "start_freq": 614125, "stop_freq": 697875, "details": "Sony DWR TV 38-51 (614 - 698MHz)" , "band": "SNY_DWR_TV3851" },
+        { "label": "    TV 38-41    (614 - 638MHz)", "start_freq": 614125, "stop_freq": 637875, "details": "Sony DWR TV 38-41 (614 - 638MHz)" , "band": "SNY_DWR_TV3841" },
+        { "label": "    TV 42-45    (638 - 662MHz)", "start_freq": 638125, "stop_freq": 661875, "details": "Sony DWR TV 42-45 (638 - 662MHz)" , "band": "SNY_DWR_TV4245" },
+        { "label": "    TV 46-49    (662 - 686MHz)", "start_freq": 662125, "stop_freq": 685875, "details": "Sony DWR TV 46-49 (662 - 686MHz)" , "band": "SNY_DWR_TV4649" },
+        { "label": "    TV 50-51    (686 - 698MHz)", "start_freq": 686125, "stop_freq": 697875, "details": "Sony DWR TV 50-51 (686 - 698MHz)" , "band": "SNY_DWR_TV5051" },
+        { "type" : "separator" },
+        { "label": "    TV 62-64    (798 - 822MHz)", "start_freq": 798125, "stop_freq": 821875, "details": "Sony DWR TV 62-64 (798 - 822MHz)" , "band": "SNY_DWR_TV6264" },
+        { "type" : "separator" },
+        { "label": "    TV 67-69    (838 - 862MHz)", "start_freq": 838125, "stop_freq": 862000, "details": "Sony DWR TV 67-69 (838 - 862MHz)" , "band": "SNY_DWR_TV6769" }
     ]},
-    { "label":"UWP", "submenu": [
-        { "label": "30/32 (566 - 590MHz)" , "start_freq": 566125, "stop_freq": 589875, "details": "Sony UWP 30/32 (566 - 590MHz)" , "band": "SNY_30-32_NONE" },
-        { "label": "42/44 (638 - 655MHz)" , "start_freq": 638125, "stop_freq": 654875, "details": "Sony UWP 42/44 (638 - 655MHz)" , "band": "SNY_42-44_NONE" }
+    { "label":"DWX Series", "submenu": [
+        { "label":"DWR-R01D", "submenu": [
+            { "label": "    TV 33-38    (566 - 630MHz)", "start_freq": 566025, "stop_freq": 630000, "details": "Sony DWR-R01D TV 33-38 (566 - 630MHz)", "band": "SNY_DWX_TV3338" },
+            { "type" : "separator" },
+            { "label": "Full Range      (638 - 782MHz)", "start_freq": 638025, "stop_freq": 782000, "details": "Sony DWR-R01D TV 42-59 (638 - 782MHz)", "band": "SNY_DWX_TV4250" },
+            { "label": "    TV 42-50    (638 - 710MHz)", "start_freq": 638025, "stop_freq": 710000, "details": "Sony DWR-R01D TV 42-50 (638 - 710MHz)", "band": "SNY_DWX_TV4250" },
+            { "label": "    TV 51-59    (710 - 782MHz)", "start_freq": 710025, "stop_freq": 782000, "details": "Sony DWR-R01D TV 51-59 (710 - 782MHz)", "band": "SNY_DWX_TV5159" },
+            { "type" : "separator" },
+            { "label": "    TV 62-64    (798 - 822MHz)", "start_freq": 798025, "stop_freq": 822000, "details": "Sony DWR-R01D TV 62-64 (798 - 822MHz)", "band": "SNY_DWX_TV6264" },
+            { "type" : "separator" },
+            { "label": "    TV 67-69    (838 - 862MHz)", "start_freq": 838025, "stop_freq": 862000, "details": "Sony DWR-R01D TV 67-69 (838 - 862MHz)", "band": "SNY_DWX_TV6769" }
+        ]},
+        { "label":"DWR-R02D", "submenu": [
+            { "label": "Full Range      (470 - 542MHz)", "start_freq": 470025, "stop_freq": 542000, "details": "Sony DWR-R02D TV 21-29 (470 - 542MHz)", "band": "SNY_DWX_TV2129" },
+            { "label": "    TV 21-23    (470 - 494MHz)", "start_freq": 470025, "stop_freq": 494000, "details": "Sony DWR-R02D TV 21-23 (470 - 494MHz)", "band": "SNY_DWX_TV2123" },
+            { "label": "    TV 24-26    (494 - 518MHz)", "start_freq": 494025, "stop_freq": 518000, "details": "Sony DWR-R02D TV 24-26 (494 - 518MHz)", "band": "SNY_DWX_TV2426" },
+            { "label": "    TV 27-29    (518 - 542MHz)", "start_freq": 518025, "stop_freq": 542000, "details": "Sony DWR-R02D TV 27-29 (518 - 542MHz)", "band": "SNY_DWX_TV2729" },
+            { "type" : "separator" },
+            { "label": "Full Range      (566 - 630MHz)", "start_freq": 566025, "stop_freq": 630000, "details": "Sony DWR-R02D TV 33-40 (566 - 630MHz)", "band": "SNY_DWX_TV3340" },
+            { "label": "    TV 33-35    (566 - 590MHz)", "start_freq": 566025, "stop_freq": 590000, "details": "Sony DWR-R02D TV 33-35 (566 - 590MHz)", "band": "SNY_DWX_TV3335" },
+            { "label": "    TV 36-37    (590 - 606MHz)", "start_freq": 590025, "stop_freq": 606000, "details": "Sony DWR-R02D TV 36-37 (590 - 606MHz)", "band": "SNY_DWX_TV3637" },
+            { "label": "    TV 38-40    (606 - 630MHz)", "start_freq": 606025, "stop_freq": 630000, "details": "Sony DWR-R02D TV 38-40 (606 - 630MHz)", "band": "SNY_DWX_TV3840" },
+            { "type" : "separator" },
+            { "label": "Full Range      (638 - 710MHz)", "start_freq": 638025, "stop_freq": 710000, "details": "Sony DWR-R02D TV 42-50 (638 - 710MHz)", "band": "SNY_DWX_TV4250" },
+            { "label": "    TV 42-44    (638 - 662MHz)", "start_freq": 638025, "stop_freq": 662000, "details": "Sony DWR-R02D TV 42-44 (638 - 662MHz)", "band": "SNY_DWX_TV4244" },
+            { "label": "    TV 45-47    (662 - 686MHz)", "start_freq": 662025, "stop_freq": 686000, "details": "Sony DWR-R02D TV 45-47 (662 - 686MHz)", "band": "SNY_DWX_TV4547" },
+            { "label": "    TV 48-50    (686 - 710MHz)", "start_freq": 686025, "stop_freq": 710000, "details": "Sony DWR-R02D TV 48-50 (686 - 710MHz)", "band": "SNY_DWX_TV4850" }
+        ]},
+        { "label":"DWR-R03D", "submenu": [
+            { "label": "Full Range      (470 - 614MHz)"       , "start_freq": 470025, "stop_freq": 614000, "details": "Sony DWR-R03D TV 21-38 (470 - 614MHz)", "band": "SNY_DWX_TV2138" },
+            { "label": "    TV 21-23    (470 - 494MHz)"       , "start_freq": 470025, "stop_freq": 494000, "details": "Sony DWR-R03D TV 21-23 (470 - 494MHz)", "band": "SNY_DWX_TV2123" },
+            { "label": "    TV 24-26    (494 - 518MHz)"       , "start_freq": 494025, "stop_freq": 518000, "details": "Sony DWR-R03D TV 24-26 (494 - 518MHz)", "band": "SNY_DWX_TV2426" },
+            { "label": "    TV 27-29    (518 - 542MHz)"       , "start_freq": 518025, "stop_freq": 542000, "details": "Sony DWR-R03D TV 27-29 (518 - 542MHz)", "band": "SNY_DWX_TV2729" },
+            { "label": "    TV 30-32    (542 - 566MHz)"       , "start_freq": 542025, "stop_freq": 566000, "details": "Sony DWR-R03D TV 30-32 (542 - 566MHz)", "band": "SNY_DWX_TV3032" },
+            { "label": "    TV 33-35    (566 - 590MHz)"       , "start_freq": 566025, "stop_freq": 590000, "details": "Sony DWR-R03D TV 33-35 (566 - 590MHz)", "band": "SNY_DWX_TV3335" },
+            { "label": "    TV 36-37    (590 - 606MHz)"       , "start_freq": 590025, "stop_freq": 606000, "details": "Sony DWR-R03D TV 36-37 (590 - 606MHz)", "band": "SNY_DWX_TV3637" },
+            { "label": "    TV 38         (606 - 614MHz)"     , "start_freq": 606025, "stop_freq": 614000, "details": "Sony DWR-R03D TV 38 (606 - 614MHz)"   , "band": "SNY_DWX_TV38"   },
+            { "type" : "separator" },
+            { "label": "Full Range     (606 - 714MHz)"       , "start_freq": 606025, "stop_freq": 714000, "details": "Sony DWR-R03D TV 38-51 (606 - 714MHz)", "band": "SNY_DWX_TV3851" },
+            { "label": "    TV 38-40    (606 - 630MHz) [UK only]", "start_freq": 606025, "stop_freq": 630000, "details": "Sony DWR-R03D TV 38-40 (606 - 630MHz) [UK only]", "band": "SNY_DWX_TV3840" },
+            { "label": "    TV 41         (530 - 638MHz)"        , "start_freq": 630025, "stop_freq": 638000, "details": "Sony DWR-R03D TV 41 (630 - 638MHz)"   , "band": "SNY_DWX_TV41"   },
+            { "label": "    TV 42-44    (638 - 662MHz)"          , "start_freq": 638025, "stop_freq": 662000, "details": "Sony DWR-R03D TV 42-44 (638 - 662MHz)", "band": "SNY_DWX_TV4244" },
+            { "label": "    TV 45-47    (662 - 686MHz)"          , "start_freq": 662025, "stop_freq": 686000, "details": "Sony DWR-R03D TV 45-47 (662 - 686MHz)", "band": "SNY_DWX_TV4547" },
+            { "label": "    TV 48-50    (686 - 710MHz)"          , "start_freq": 686025, "stop_freq": 710000, "details": "Sony DWR-R03D TV 48-50 (686 - 710MHz)", "band": "SNY_DWX_TV4850" },
+            { "label": "    TV 51         (710 - 714MHz)"        , "start_freq": 710025, "stop_freq": 714000, "details": "Sony DWR-R03D TV 51 (710 - 714MHz)"   , "band": "SNY_DWX_TV51"   }
+        ]}
     ]},
-    { "label":"WR", "submenu": [
-        { "label": "64/65 (770 - 782MHz)" , "start_freq": 770125, "stop_freq": 781875, "details": "Sony WR 64/65 (770 - 782MHz)" , "band": "SNY_64-65_NONE" },
-        { "label": "66/67 (782 - 794MHz)" , "start_freq": 782125, "stop_freq": 793875, "details": "Sony WR 66/67 (782 - 794MHz)" , "band": "SNY_66-67_NONE" },
-        { "label": "68/69 (794 - 806MHz)" , "start_freq": 794125, "stop_freq": 805875, "details": "Sony WR 68/69 (794 - 806MHz)" , "band": "SNY_68-69_NONE" }
+    { "label":"UWP-D Series", "submenu": [
+        { "label": "UC14-Band     (470 - 542MHz)" , "start_freq": 470125, "stop_freq": 541875, "details": "Sony URX-P03 UC14-Band (470 - 542MHz)" , "band": "SNY_UWP-D_UC14-BAND" },
+        { "label": "UC25-Band     (536 - 608MHz)" , "start_freq": 536125, "stop_freq": 607875, "details": "Sony URX-S03D UC25-Band (536 - 608MHz)" , "band": "SNY_UWP-D_UC25-BAND" },
+        { "label": "UC30-Band-1 (566 - 608MHz)" , "start_freq": 566125, "stop_freq": 607875, "details": "Sony URX-P03 UC30-Band-1 (566 - 608MHz)" , "band": "SNY_UWP-D_UC30-BAND-1" },
+        { "label": "UC30-Band-2 (614 - 638MHz)" , "start_freq": 614125, "stop_freq": 637875, "details": "Sony URX-P03 UC30-Band-2 (614 - 638MHz)" , "band": "SNY_UWP-D_UC30-BAND-2" },
+        { "label": "UC42-Band     (638 - 698MHz)" , "start_freq": 638125, "stop_freq": 697875, "details": "Sony URX-P03 UC42-Band (638 - 698MHz)" , "band": "SNY_UWP-D_UC42-BAND" }
     ]}
 ]}

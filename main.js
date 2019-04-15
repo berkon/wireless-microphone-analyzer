@@ -90,6 +90,8 @@ function createWindow () {
         menu_data.forEach ( (submenu_entry) => {
             if ( submenu_entry.hasOwnProperty ('submenu') ) {
                 addMenuEntryOrSubmenu ( submenu_entry.label, submenu_entry.submenu, menu_location[len-1].submenu );
+            } else if ( submenu_entry.hasOwnProperty ('type') && submenu_entry.type === 'separator' ) {
+                menu_location[len-1].submenu.push ({type: "separator"});
             } else {
                 menu_location[len-1].submenu.push ({
                     "label": submenu_entry.label,
