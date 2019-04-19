@@ -1,162 +1,265 @@
 { "label":"Shure", "submenu": [
-    { "label":"AXIENT", "submenu": [
-        { "label": "A(G56)-Band (470 - 636MHz)", "start_freq": 470000, "stop_freq": 636000, "details": "Shure AXIENT A(G56)-Band (470 - 636MHz)", "band": "SUR_A_G56" },
-        { "label": "B(K57)-Band (606 - 790MHz)", "start_freq": 606000, "stop_freq": 790000, "details": "Shure AXIENT B(K57)-Band (606 - 790MHz)", "band": "SUR_B_K57" }
+    { "label":"AXIENT-A", "submenu": [
+        { "label": "G1-Band       (470 - 530MHz)" , "start_freq": 470125, "stop_freq": 529875, "details": "Shure AXIENT G1-Band (470 - 530MHz)"  , "band": "SUR_AXIENT_G1"  },
+        { "label": "G7C-Band     (470 - 510MHz)"  , "start_freq": 470125, "stop_freq": 509875, "details": "Shure AXIENT G7C-Band (470 - 510MHz)" , "band": "SUR_AXIENT_G7C" },
+        { "label": "G12-Band     (479 - 530MHz)"  , "start_freq": 479000, "stop_freq": 530000, "details": "Shure AXIENT G12-Band (479 - 530MHz)" , "band": "SUR_AXIENT_G12" },
+        { "label": "G19-Band     (470 - 530MHz)"  , "start_freq": 470000, "stop_freq": 530000, "details": "Shure AXIENT G19-Band (470 - 530MHz)" , "band": "SUR_AXIENT_G19" },
+        { "label": "H4-Band       (518 - 578MHz)" , "start_freq": 518000, "stop_freq": 578000, "details": "Shure AXIENT H4-Band (518 - 578MHz)"  , "band": "SUR_AXIENT_H4"  },
+        { "label": "H12-Band     (518 - 565MHz)"  , "start_freq": 518000, "stop_freq": 565000, "details": "Shure AXIENT H12-Band (518 - 565MHz)" , "band": "SUR_AXIENT_H12" },
+        { "label": "H18-Band     (518 - 578MHz)"  , "start_freq": 518000, "stop_freq": 578000, "details": "Shure AXIENT H18-Band (518 - 578MHz)" , "band": "SUR_AXIENT_H18" },
+        { "label": "J5-Band        (578 - 638MHz)", "start_freq": 578000, "stop_freq": 638000, "details": "Shure AXIENT J5-Band (578 - 638MHz)"  , "band": "SUR_AXIENT_J5"  },
+        { "label": "J12-Band      (578 - 638MHz)" , "start_freq": 578000, "stop_freq": 638000, "details": "Shure AXIENT J12-Band (578 - 638MHz)" , "band": "SUR_AXIENT_J12" },
+        { "label": "K4E-Band      (606 - 666MHz)" , "start_freq": 606125, "stop_freq": 665875, "details": "Shure AXIENT K4E-Band (606 - 666MHz)" , "band": "SUR_AXIENT_K4E" },
+        { "label": "L3-Band        (638 - 698MHz)", "start_freq": 638000, "stop_freq": 697875, "details": "Shure AXIENT L3-Band (638 - 698MHz)"  , "band": "SUR_AXIENT_L3"  },
+        { "label": "L20-Band      (638 - 698MHz)" , "start_freq": 638000, "stop_freq": 698000, "details": "Shure AXIENT L20-Band (638 - 698MHz)" , "band": "SUR_AXIENT_L20" },
+        { "label": "M8-Band       (666 - 730MHz)" , "start_freq": 666000, "stop_freq": 730000, "details": "Shure AXIENT M8-Band (666 - 730MHz)"  , "band": "SUR_AXIENT_M8"  },
+        { "label": "MA24-Band   (779 - 806MHz)"   , "start_freq": 779125, "stop_freq": 805875, "details": "Shure AXIENT MA24-Band (779 - 806MHz)", "band": "SUR_AXIENT_MA24"},
+        { "label": "MJBX-Band    (806 - 810MHz)"  , "start_freq": 806125, "stop_freq": 809750, "details": "Shure AXIENT MJBX-Band (806 - 810MHz)", "band": "SUR_AXIENT_MJBX"},
+        { "label": "P8-Band        (710 - 790MHz)", "start_freq": 710000, "stop_freq": 790000, "details": "Shure AXIENT P8-Band (710 - 790MHz)"  , "band": "SUR_AXIENT_P8"  },
+        { "label": "P9-Band        (710 - 787MHz)", "start_freq": 710000, "stop_freq": 786875, "details": "Shure AXIENT P9-Band (710 - 787MHz)"  , "band": "SUR_AXIENT_P9"  },
+        { "label": "Q5-Band       (740 - 814MHz)" , "start_freq": 740000, "stop_freq": 814000, "details": "Shure AXIENT Q5-Band (740 - 814MHz)"  , "band": "SUR_AXIENT_Q5"  },
+        { "label": "R16-Band      (794 - 806MHz)" , "start_freq": 794000, "stop_freq": 806000, "details": "Shure AXIENT R16-Band (794 - 806MHz)" , "band": "SUR_AXIENT_R16" }
+    ]},
+    { "label":"AXIENT-D", "submenu": [
+        { "label": "G53-Band    (470 - 510MHz)" , "start_freq": 470000, "stop_freq": 510000, "details": "Shure AXIENT-D G53-Band (470 - 510MHz)", "band": "SUR_AXIENT-D_G53" },
+        { "label": "G54-Band    (479 - 565MHz)" , "start_freq": 479000, "stop_freq": 565000, "details": "Shure AXIENT-D G54-Band (479 - 565MHz)", "band": "SUR_AXIENT-D_G54" },
+        { "label": "G55-Band    (470 - 636MHz)" , "start_freq": 470000, "stop_freq": 636000, "details": "Shure AXIENT-D G55-Band (470 - 636MHz)", "band": "SUR_AXIENT-D_G55" },
+        { "label": "G56-Band    (470 - 636MHz)" , "start_freq": 470000, "stop_freq": 636000, "details": "Shure AXIENT-D G56-Band (470 - 636MHz)", "band": "SUR_AXIENT-D_G56" },
+        { "label": "G57-Band    (470 - 616MHz)" , "start_freq": 470000, "stop_freq": 616000, "details": "Shure AXIENT-D G57-Band (470 - 616MHz)", "band": "SUR_AXIENT-D_G57" },
+        { "label": "G62-Band    (510 - 530MHz)" , "start_freq": 510000, "stop_freq": 530000, "details": "Shure AXIENT-D G62-Band (510 - 530MHz)", "band": "SUR_AXIENT-D_G62" },
+        { "label": "H54-Band    (520 - 636MHz)" , "start_freq": 520000, "stop_freq": 636000, "details": "Shure AXIENT-D H54-Band (520 - 636MHz)", "band": "SUR_AXIENT-D_H54" },
+        { "label": "JB-Band      (806 - 810MHz)", "start_freq": 806000, "stop_freq": 810000, "details": "Shure AXIENT-D JB-Band (806 - 810MHz)" , "band": "SUR_AXIENT-D_JB"  },
+        { "label": "K53-Band    (606 - 698MHz)" , "start_freq": 606000, "stop_freq": 698000, "details": "Shure AXIENT-D K53-Band (606 - 698MHz)", "band": "SUR_AXIENT-D_K53" },
+        { "label": "K54-Band    (606 - 663MHz)" , "start_freq": 606000, "stop_freq": 663000, "details": "Shure AXIENT-D K54-Band (606 - 663MHz)", "band": "SUR_AXIENT-D_K54" },
+        { "label": "K55-Band    (606 - 694MHz)" , "start_freq": 606000, "stop_freq": 694000, "details": "Shure AXIENT-D K55-Band (606 - 694MHz)", "band": "SUR_AXIENT-D_K55" },
+        { "label": "K56-Band    (606 - 714MHz)" , "start_freq": 606000, "stop_freq": 714000, "details": "Shure AXIENT-D K56-Band (606 - 714MHz)", "band": "SUR_AXIENT-D_K56" },
+        { "label": "K57-Band    (606 - 790MHz)" , "start_freq": 606000, "stop_freq": 790000, "details": "Shure AXIENT-D K57-Band (606 - 790MHz)", "band": "SUR_AXIENT-D_K57" },
+        { "label": "K58-Band    (622 - 698MHz)" , "start_freq": 622000, "stop_freq": 698000, "details": "Shure AXIENT-D K58-Band (622 - 698MHz)", "band": "SUR_AXIENT-D_K58" },
+        { "label": "L54-Band    (630 - 787MHz)" , "start_freq": 630000, "stop_freq": 787000, "details": "Shure AXIENT-D L54-Band (630 - 787MHz)", "band": "SUR_AXIENT-D_L54" },
+        { "label": "R52-Band    (794 - 806MHz)" , "start_freq": 794000, "stop_freq": 806000, "details": "Shure AXIENT-D R52-Band (794 - 806MHz)", "band": "SUR_AXIENT-D_R52" },
+        { "label": "X51-Band    (925 - 938MHz)" , "start_freq": 925000, "stop_freq": 937500, "details": "Shure AXIENT-D X51-Band (925 - 938MHz)", "band": "SUR_AXIENT-D_X51" },
+        { "label": "X55-Band    (941 - 960MHz)" , "start_freq": 941000, "stop_freq": 960000, "details": "Shure AXIENT-D X55-Band (941 - 960MHz)", "band": "SUR_AXIENT-D_X55" }
     ]},
     { "label":"BLX", "submenu": [
-        { "label": "H8E-Band (518 - 542MHz)", "start_freq": 518000, "stop_freq": 542000, "details": "Shure BLX H8E-Band (518 - 542MHz)", "band": "SUR_H8E" },
-        { "label": "K3E-Band (606 - 630MHz)", "start_freq": 606000, "stop_freq": 630000, "details": "Shure BLX K3E-Band (606 - 630MHz)", "band": "SUR_K3E" },
-        { "label": "K14-Band (614 - 638MHz)", "start_freq": 614000, "stop_freq": 638000, "details": "Shure BLX K14-Band (614 - 638MHz)", "band": "SUR_K14" },
-        { "label": "M17-Band (662 - 686MHz)", "start_freq": 662000, "stop_freq": 686000, "details": "Shure BLX M17-Band (662 - 686MHz)", "band": "SUR_M17" },
-        { "label": "Q25-Band (742 - 766MHz)", "start_freq": 742000, "stop_freq": 766000, "details": "Shure BLX Q25-Band (742 - 766MHz)", "band": "SUR_Q25" },
-        { "label": "R12-Band (794 - 806MHz)", "start_freq": 794000, "stop_freq": 806000, "details": "Shure BLX R12-Band (794 - 806MHz)", "band": "SUR_R12" },
-        { "label": "S8-Band  (823 - 832MHz)", "start_freq": 823000, "stop_freq": 832000, "details": "Shure BLX  S8-Band (823 - 832MHz)", "band": "SUR_S8"  },
-        { "label": "T11-Band (863 - 865MHz)", "start_freq": 863000, "stop_freq": 865000, "details": "Shure BLX T11-Band (863 - 865MHz)", "band": "SUR_T11" }
+        { "label": "H8-Band     (518 - 542MHz)", "start_freq": 518000, "stop_freq": 542000, "details": "Shure BLX H8-Band (518 - 542MHz)" , "band": "SUR_BLX_H8"  },
+        { "label": "H9-Band     (512 - 542MHz)", "start_freq": 512000, "stop_freq": 542000, "details": "Shure BLX H9-Band (512 - 542MHz)" , "band": "SUR_BLX_H9"  },
+        { "label": "H10-Band   (542 - 572MHz)" , "start_freq": 542000, "stop_freq": 572000, "details": "Shure BLX H10-Band (542 - 572MHz)", "band": "SUR_BLX_H10" },
+        { "label": "J10-Band    (584 - 608MHz)", "start_freq": 584000, "stop_freq": 608000, "details": "Shure BLX J10-Band (584 - 608MHz)", "band": "SUR_BLX_J10" },
+        { "label": "K12-Band    (614 - 638MHz)", "start_freq": 614000, "stop_freq": 638000, "details": "Shure BLX K12-Band (614 - 638MHz)", "band": "SUR_BLX_K12" },
+        { "label": "M15-Band   (662 - 686MHz)" , "start_freq": 662000, "stop_freq": 686000, "details": "Shure BLX M15-Band (662 - 686MHz)", "band": "SUR_BLX_M15" }
     ]},
     { "label":"FP", "submenu": [
-        { "label": "G4E-Band (470 - 494MHz)", "start_freq": 470000, "stop_freq": 494000, "details": "Shure SLX G4E-Band (470 - 494MHz)", "band": "SUR_G4E" },
-        { "label": "G5E-Band (494 - 518MHz)", "start_freq": 494000, "stop_freq": 518000, "details": "Shure SLX G5E-Band (494 - 518MHz)", "band": "SUR_G5E" },
-        { "label": "H5-Band  (518 - 542MHz)", "start_freq": 518000, "stop_freq": 542000, "details": "Shure SLX H5-Band  (518 - 542MHz)", "band": "SUR_H5"  },
-        { "label": "J3-Band  (572 - 596MHz)", "start_freq": 572000, "stop_freq": 596000, "details": "Shure SLX J3-Band  (572 - 596MHz)", "band": "SUR_J3"  },
-        { "label": "K3E-Band (606 - 630MHz)", "start_freq": 606000, "stop_freq": 630000, "details": "Shure SLX K3E-Band (606 - 630MHz)", "band": "SUR_K3E" },
-        { "label": "L4E-Band (638 - 662MHz)", "start_freq": 638000, "stop_freq": 662000, "details": "Shure SLX L4E-Band (638 - 662MHz)", "band": "SUR_L4E" },
-        { "label": "P4-Band  (702 - 726MHz)", "start_freq": 702000, "stop_freq": 726000, "details": "Shure SLX  P4-Band (702 - 726MHz)", "band": "SUR_P4"  },
-        { "label": "Q24-Band (736 - 754MHz)", "start_freq": 736000, "stop_freq": 754000, "details": "Shure SLX Q24-Band (736 - 754MHz)", "band": "SUR_Q24" },
-        { "label": "S6-Band  (838 - 865MHz)", "start_freq": 838000, "stop_freq": 865000, "details": "Shure SLX  S6-Band (838 - 865MHz)", "band": "SUR_S6"  }
+        { "label": "G4-Band      (470 - 494MHz)" , "start_freq": 470000, "stop_freq": 494000, "details": "Shure FP G4-Band (470 - 494MHz)" , "band": "SUR_FP_G4"  },
+        { "label": "G5-Band      (494 - 518MHz)" , "start_freq": 494000, "stop_freq": 518000, "details": "Shure FP G5-Band (494 - 518MHz)" , "band": "SUR_FP_G5"  },
+        { "label": "H5-Band      (518 - 542MHz)" , "start_freq": 518000, "stop_freq": 542000, "details": "Shure FP H5-Band (518 - 542MHz)" , "band": "SUR_FP_H5"  },
+        { "label": "J3-Band       (572 - 596MHz)", "start_freq": 572000, "stop_freq": 596000, "details": "Shure FP J3-Band (572 - 596MHz)" , "band": "SUR_FP_J3"  },
+        { "label": "JB-Band      (806 - 810MHz)" , "start_freq": 806000, "stop_freq": 810000, "details": "Shure FP JB-Band (806 - 810MHz)" , "band": "SUR_FP_JB"  },
+        { "label": "K3E-Band    (606 - 630MHz)"  , "start_freq": 606000, "stop_freq": 630000, "details": "Shure FP K3E-Band (606 - 630MHz)", "band": "SUR_FP_K3E" },
+        { "label": "L4-Band      (638 - 662MHz)" , "start_freq": 638000, "stop_freq": 662000, "details": "Shure FP L4-Band (638 - 662MHz)" , "band": "SUR_FP_L4"  },
+        { "label": "P4-Band      (702 - 726MHz)" , "start_freq": 702000, "stop_freq": 726000, "details": "Shure FP P4-Band (702 - 726MHz)" , "band": "SUR_FP_P4"  },
+        { "label": "Q24-Band    (736 - 754MHz)"  , "start_freq": 736000, "stop_freq": 754000, "details": "Shure FP Q24-Band (736 - 754MHz)", "band": "SUR_FP_Q24" },
+        { "label": "Q4-Band      (740 - 752MHz)" , "start_freq": 740000, "stop_freq": 752000, "details": "Shure FP Q4-Band (740 - 752MHz)" , "band": "SUR_FP_Q4"  },
+        { "label": "R5-Band      (800 - 820MHz)" , "start_freq": 800100, "stop_freq": 819900, "details": "Shure FP R5-Band (800 - 820MHz)" , "band": "SUR_FP_R5"  },
+        { "label": "R13-Band    (794 - 806MHz)"  , "start_freq": 794000, "stop_freq": 806000, "details": "Shure FP R13-Band (794 - 806MHz)", "band": "SUR_FP_R13" },
+        { "label": "R19-Band    (794 - 806MHz)"  , "start_freq": 794000, "stop_freq": 806000, "details": "Shure FP R19-Band (794 - 806MHz)", "band": "SUR_FP_R19" },
+        { "label": "S6-Band      (838 - 865MHz)" , "start_freq": 838000, "stop_freq": 865000, "details": "Shure FP S6-Band (838 - 865MHz)" , "band": "SUR_FP_S6"  },
+        { "label": "X4-Band      (925 - 932MHz)" , "start_freq": 925000, "stop_freq": 932000, "details": "Shure FP X4-Band (925 - 932MHz)" , "band": "SUR_FP_X4"  }
     ]},
-    { "label":"GLX-D", "submenu": [
-        { "label": "Z2-Band (2404 - 2478MHz)", "start_freq": 2404000, "stop_freq": 2478000, "details": "Shure GLX-D Z2-Band (2404 - 2478MHz)", "band": "SUR_Z2" }
+    { "label":"LX", "submenu": [
+        { "label": "LX-Band    (169 - 209MHz)", "start_freq": 169445, "stop_freq": 208200, "details": "Shure LX LX-Band (169 - 209MHz)" , "band": "SUR_LX_LX"  }
     ]},
-    { "label":"MICROFLEX WIRELESS", "submenu": [
-        { "label": "Z11-Band (1880 - 1900MHz)", "start_freq": 1880000, "stop_freq": 1900000, "details": "Shure MICROFLEX WIRELESS Z11-Band (1880 - 1900MHz)", "band": "SUR_Z11" }
+    { "label":"PG", "submenu": [
+        { "label": "H7-Band      (536 - 548MHz)" , "start_freq": 536000, "stop_freq": 548000, "details": "Shure PG H7-Band (536 - 548MHz)" , "band": "SUR_PG_H7" },
+        { "label": "JB-Band       (806 - 810MHz)", "start_freq": 806000, "stop_freq": 810000, "details": "Shure PG JB-Band (806 - 810MHz)" , "band": "SUR_PG_H6" },
+        { "label": "K7-Band       (590 - 602MHz)", "start_freq": 590000, "stop_freq": 602000, "details": "Shure PG K7-Band (590 - 602MHz)" , "band": "SUR_PG_K7" },
+        { "label": "M7-Band      (662 - 674MHz)" , "start_freq": 662000, "stop_freq": 674000, "details": "Shure PG M7-Band (662 - 674MHz)" , "band": "SUR_PG_M7" },
+        { "label": "M10-Band    (674 - 686MHz)"  , "start_freq": 674000, "stop_freq": 686000, "details": "Shure PG M10-Band (674 - 686MHz)", "band": "SUR_PG_M10"},
+        { "label": "P11-Band     (702 - 714MHz)" , "start_freq": 702000, "stop_freq": 714000, "details": "Shure PG P11-Band (702 - 714MHz)", "band": "SUR_PG_P11"},
+        { "label": "Q11-Band    (740 - 752MHz)"  , "start_freq": 740000, "stop_freq": 752000, "details": "Shure PG Q11-Band (740 - 752MHz)", "band": "SUR_PG_Q11"},
+        { "label": "R10-Band    (800 - 812MHz)"  , "start_freq": 800000, "stop_freq": 812000, "details": "Shure PG R10-Band (800 - 812MHz)", "band": "SUR_PG_R10"},
+        { "label": "R11-Band    (770 - 782MHz)"  , "start_freq": 770000, "stop_freq": 782000, "details": "Shure PG R11-Band (770 - 782MHz)", "band": "SUR_PG_R11"},
+        { "label": "R12-Band    (794 - 806MHz)"  , "start_freq": 794000, "stop_freq": 806000, "details": "Shure PG R12-Band (794 - 806MHz)", "band": "SUR_PG_R12"},
+        { "label": "T10-Band    (854 - 865MHz)"  , "start_freq": 854000, "stop_freq": 865000, "details": "Shure PG T10-Band (854 - 865MHz)", "band": "SUR_PG_T10"}
     ]},
     { "label":"PGX", "submenu": [
-        { "label": "H6-Band (524 - 542MHz)"  , "start_freq": 524000, "stop_freq": 542000, "details": "Shure PGX H6-Band (524 - 542MHz)", "band": "SUR_H6"},
-        { "label": "J6-Band (572 - 590MHz)"  , "start_freq": 572000, "stop_freq": 590000, "details": "Shure PGX J6-Band (572 - 590MHz)", "band": "SUR_J6"},
-        { "label": "L5-Band (644 - 662MHz)"  , "start_freq": 644000, "stop_freq": 662000, "details": "Shure PGX L5-Band (644 - 662MHz)", "band": "SUR_L5"}
+        { "label": "H6-Band    (524 - 542MHz)" , "start_freq": 524000, "stop_freq": 542000, "details": "Shure PGX H6-Band (524 - 542MHz)", "band": "SUR_PGX_H6"},
+        { "label": "J6-Band     (572 - 590MHz)", "start_freq": 572250, "stop_freq": 589875, "details": "Shure PGX J6-Band (572 - 590MHz)", "band": "SUR_PGX_J6"},
+        { "label": "JB-Band     (806 - 810MHz)", "start_freq": 806000, "stop_freq": 810000, "details": "Shure PGX JB-Band (806 - 810MHz)", "band": "SUR_PGX_JB"},
+        { "label": "L5-Band    (644 - 662MHz)" , "start_freq": 644000, "stop_freq": 662000, "details": "Shure PGX L5-Band (644 - 662MHz)", "band": "SUR_PGX_L5"},
+        { "label": "P6-Band    (702 - 719MHz)" , "start_freq": 702200, "stop_freq": 719000, "details": "Shure PGX P6-Band (702 - 719MHz)", "band": "SUR_PGX_P6"},
+        { "label": "Q8-Band    (740 - 752MHz)" , "start_freq": 740000, "stop_freq": 752000, "details": "Shure PGX Q8-Band (740 - 752MHz)", "band": "SUR_PGX_Q8"},
+        { "label": "R1-Band    (800 - 820MHz)" , "start_freq": 800000, "stop_freq": 820000, "details": "Shure PGX R1-Band (800 - 820MHz)", "band": "SUR_PGX_R1"},
+        { "label": "T1-Band    (846 - 865MHz)" , "start_freq": 846000, "stop_freq": 865000, "details": "Shure PGX T1-Band (846 - 865MHz)", "band": "SUR_PGX_T1"}
     ]},
     { "label":"PGX-D", "submenu": [
-        { "label": "X8-Band (903 - 928MHz)"  , "start_freq": 902750, "stop_freq": 927750, "details": "Shure PGX-D X8-Band (903 - 928MHz)", "band": "SUR_X8"}
+        { "label": "X8-Band         (902 - 928MHz)", "start_freq": 902000, "stop_freq": 928000, "details": "Shure PGX-D X8-Band (902 - 928MHz)"   , "band": "SUR_PGX-D_X8"   },
+        { "label": "X8A-Band       (915 - 928MHz)", "start_freq": 915000, "stop_freq": 928000, "details": "Shure PGX-D X8A-Band (915 - 928MHz)"  , "band": "SUR_PGX-D_X8A"  },
+        { "label": "X8B-Band-1    (902 - 908MHz)"  , "start_freq": 902000, "stop_freq": 907500, "details": "Shure PGX-D X8B-Band-1 (902 - 908MHz)", "band": "SUR_PGX-D_X8B-1"},
+        { "label": "X8B-Band-2    (915 - 928MHz)"  , "start_freq": 915000, "stop_freq": 928000, "details": "Shure PGX-D X8B-Band-1 (915 - 928MHz)", "band": "SUR_PGX-D_X8B-2"}
     ]},
-    { "label":"PSM 200", "submenu": [
-        { "label": "H2-Band  (518 - 554MHz)", "start_freq": 518000, "stop_freq": 554000, "details": "Shure PSM 200 H2-Band  (518 - 554MHz)", "band": "SUR_H2"  },
-        { "label": "K9E-Band (606 - 638MHz)", "start_freq": 606000, "stop_freq": 638000, "details": "Shure PSM 200 K9E-Band (606 - 638MHz)", "band": "SUR_K9E" },
-        { "label": "Q3-Band  (748 - 784MHz)", "start_freq": 748000, "stop_freq": 784000, "details": "Shure PSM 200  Q3-Band (748 - 784MHz)", "band": "SUR_Q3"  },
-        { "label": "R8-Band  (800 - 814MHz)", "start_freq": 800000, "stop_freq": 814000, "details": "Shure PSM 200  R8-Band (800 - 814MHz)", "band": "SUR_R8"  },
-        { "label": "S5-Band  (842 - 865MHz)", "start_freq": 842000, "stop_freq": 865000, "details": "Shure PSM 200  S5-Band (842 - 865MHz)", "band": "SUR_S5"  }
-    ]},
-    { "label":"PSM 300", "submenu": [
-        { "label": "H8E/H20-Band (518 - 542MHz)", "start_freq": 518000, "stop_freq": 542000, "details": "Shure PSM 300 H8E/H20-Band (518 - 542MHz)", "band": "SUR_H8E_H20" },
-        { "label": "K3E-Band (606 - 630MHz)", "start_freq": 606000, "stop_freq": 630000, "details": "Shure PSM 300 K3E-Band (606 - 630MHz)", "band": "SUR_K3E" },
-        { "label": "K12-Band (614 - 638MHz)", "start_freq": 614000, "stop_freq": 638000, "details": "Shure PSM 300 K12-Band (614 - 638MHz)", "band": "SUR_K12" },
-        { "label": "L19-Band (630 - 654MHz)", "start_freq": 630000, "stop_freq": 654000, "details": "Shure PSM 300 L19-Band (630 - 654MHz)", "band": "SUR_L19" },
-        { "label": "M16-Band (686 - 710MHz)", "start_freq": 686000, "stop_freq": 710000, "details": "Shure PSM 300 M16-Band (686 - 710MHz)", "band": "SUR_M16" },
-        { "label": "Q25-Band (742 - 766MHz)", "start_freq": 742000, "stop_freq": 766000, "details": "Shure PSM 300 Q25-Band (742 - 766MHz)", "band": "SUR_Q25" },
-        { "label": "R12-Band (794 - 806MHz)", "start_freq": 794000, "stop_freq": 806000, "details": "Shure PSM 300 R12-Band (794 - 806MHz)", "band": "SUR_R12" },
-        { "label": "S8-Band  (823 - 832MHz)", "start_freq": 823000, "stop_freq": 832000, "details": "Shure PSM 300  S8-Band (823 - 832MHz)", "band": "SUR_S8"  },
-        { "label": "T11-Band (863 - 865MHz)", "start_freq": 863000, "stop_freq": 865000, "details": "Shure PSM 300 T11-Band (863 - 865MHz)", "band": "SUR_T11" }
-    ]},
-    { "label":"PSM 400", "submenu": [
-        { "label": "HF-Band (722 - 746MHz)", "start_freq": 722000, "stop_freq": 746000, "details": "Shure PSM 400 HF-Band (722 - 746MHz)", "band": "SUR_HF" },
-        { "label": "X1-Band (944 - 952MHz)", "start_freq": 944000, "stop_freq": 952000, "details": "Shure PSM 400 X1-Band (944 - 952MHz)", "band": "SUR_X1" }
-    ]},
-    { "label":"PSM 600", "submenu": [
-        { "label": "HAHE-Band (626 - 657MHz)", "start_freq": 626000, "stop_freq": 657000, "details": "Shure PSM 600 HAHE-Band (626 - 657MHz)", "band": "SUR_HAHE" }
-    ]},
-    { "label":"PSM 700", "submenu": [
-        { "label": "H3-Band (524 - 554MHz)", "start_freq": 524000, "stop_freq": 554000, "details": "Shure PSM 700 H3-Band (524 - 554MHz)", "band": "SUR_H3" },
-        { "label": "L2-Band (632 - 662MHz)", "start_freq": 632000, "stop_freq": 662000, "details": "Shure PSM 700 L2-Band (632 - 662MHz)", "band": "SUR_L2" },
-        { "label": "HF-Band (722 - 746MHz)", "start_freq": 722000, "stop_freq": 746000, "details": "Shure PSM 700 HF-Band (722 - 746MHz)", "band": "SUR_HF" },
-        { "label": "MN-Band (800 - 830MHz)", "start_freq": 800000, "stop_freq": 830000, "details": "Shure PSM 700 MN-Band (800 - 830MHz)", "band": "SUR_MN" }
-    ]},
-    { "label":"PSM 900", "submenu": [
-        { "label": "G6E-Band (470 - 506MHz)", "start_freq": 470000, "stop_freq": 506000, "details": "Shure PSM 900 G6E-Band (470 - 506MHz)", "band": "SUR_G6E" },
-        { "label": "G7E-Band (506 - 542MHz)", "start_freq": 506000, "stop_freq": 542000, "details": "Shure PSM 900 G7E-Band (506 - 542MHz)", "band": "SUR_G7E" },
-        { "label": "K1E-Band (596 - 632MHz)", "start_freq": 596000, "stop_freq": 632000, "details": "Shure PSM 900 K1E-Band (596 - 632MHz)", "band": "SUR_K1E" },
-        { "label": "L6E-Band (656 - 692MHz)", "start_freq": 656000, "stop_freq": 692000, "details": "Shure PSM 900 L6E-Band (656 - 692MHz)", "band": "SUR_L6E" },
-        { "label": "P7-Band  (702 - 742MHz)", "start_freq": 702000, "stop_freq": 742000, "details": "Shure PSM 900  P7-Band (702 - 742MHz)", "band": "SUR_P7"  },
-        { "label": "Q15-Band (750 - 790MHz)", "start_freq": 750000, "stop_freq": 790000, "details": "Shure PSM 900 Q15-Band (750 - 790MHz)", "band": "SUR_Q15" },
-        { "label": "R22-Band (790 - 830MHz)", "start_freq": 790000, "stop_freq": 830000, "details": "Shure PSM 900 R22-Band (790 - 830MHz)", "band": "SUR_R22" },
-        { "label": "X1-Band  (944 - 952MHz)", "start_freq": 944000, "stop_freq": 952000, "details": "Shure PSM 900 X1-Band  (944 - 952MHz)", "band": "SUR_X1"  },
-        { "label": "X2-Band  (925 - 932MHz)", "start_freq": 925000, "stop_freq": 932000, "details": "Shure PSM 900 X2-Band  (925 - 932MHz)", "band": "SUR_X2"  }
-    ]},
-    { "label":"PSM 1000", "submenu": [
-        { "label": "G10E-Band (470 - 542MHz)", "start_freq": 470000, "stop_freq": 542000, "details": "Shure PSM 1000 G10E-Band (470 - 542MHz)", "band": "SUR_G10E" },
-        { "label": "H8Z-Band  (518 - 542MHz)", "start_freq": 518000, "stop_freq": 542000, "details": "Shure PSM 1000 G10E-Band (518 - 542MHz)", "band": "SUR_H8Z"  },
-        { "label": "J8E-Band  (554 - 626MHz)", "start_freq": 554000, "stop_freq": 626000, "details": "Shure PSM 1000 J8E-Band  (554 - 626MHz)", "band": "SUR_J8E"  },
-        { "label": "K10E-Band (596 - 668MHz)", "start_freq": 596000, "stop_freq": 668000, "details": "Shure PSM 1000 K10E-Band (596 - 668MHz)", "band": "SUR_K10E" },
-        { "label": "L8E-Band  (626 - 698MHz)", "start_freq": 626000, "stop_freq": 698000, "details": "Shure PSM 1000 L8E-Band  (626 - 698MHz)", "band": "SUR_L8E"  },
-        { "label": "L9E-Band  (670 - 742MHz)", "start_freq": 670000, "stop_freq": 742000, "details": "Shure PSM 1000 L9E-Band  (670 - 742MHz)", "band": "SUR_L9E"  },
-        { "label": "P8-Band   (710 - 790MHz)", "start_freq": 710000, "stop_freq": 790000, "details": "Shure PSM 1000  P8-Band  (710 - 790MHz)", "band": "SUR_P8"   },
-        { "label": "Q22E-Band (750 - 822MHz)", "start_freq": 750000, "stop_freq": 822000, "details": "Shure PSM 1000 Q22E-Band (750 - 822MHz)", "band": "SUR_Q22E" },
-        { "label": "X1-Band   (944 - 952MHz)", "start_freq": 944000, "stop_freq": 952000, "details": "Shure PSM 1000 Q22E-Band (944 - 952MHz)", "band": "SUR_X1"   },
-        { "label": "X2-Band   (925 - 932MHz)", "start_freq": 925000, "stop_freq": 932000, "details": "Shure PSM 1000 Q22E-Band (925 - 932MHz)", "band": "SUR_X2"   }
+    { "label":"PSM", "submenu": [
+        { "label":"PSM 200", "submenu": [
+            { "label": "PSM-200-Band    (518 - 554MHz)", "start_freq": 518750, "stop_freq": 553250, "details": "Shure PSM 200 Band (518 - 554MHz)", "band": "SUR_PSM-200_PSM200" }
+        ]},
+        { "label":"PSM 300", "submenu": [
+            { "label": "G20-Band    (488 - 512MHz)"  , "start_freq": 488000, "stop_freq": 512000, "details": "Shure PSM 300 G20-Band (488 - 512MHz)", "band": "SUR_PSM-300_G20" },
+            { "label": "H20-Band    (518 - 542MHz)"  , "start_freq": 518000, "stop_freq": 542000, "details": "Shure PSM 300 H20-Band (518 - 542MHz)", "band": "SUR_PSM-300_H20" },
+            { "label": "H8E-Band    (518 - 542MHz)"  , "start_freq": 518000, "stop_freq": 542000, "details": "Shure PSM 300 H8E-Band (518 - 542MHz)", "band": "SUR_PSM-300_H8E" },
+            { "label": "J10-Band     (548 - 608MHz)" , "start_freq": 584000, "stop_freq": 608000, "details": "Shure PSM 300 J10-Band (584 - 608MHz)", "band": "SUR_PSM-300_J10" },
+            { "label": "J13-Band     (566 - 590MHz)" , "start_freq": 566000, "stop_freq": 590000, "details": "Shure PSM 300 J13-Band (566 - 590MHz)", "band": "SUR_PSM-300_J13" },
+            { "label": "JB-Band       (806 - 810MHz)", "start_freq": 806000, "stop_freq": 810000, "details": "Shure PSM 300 JB-Band (806 - 810MHz)" , "band": "SUR_PSM-300_JB"  },
+            { "label": "K12-Band     (614 - 638MHz)" , "start_freq": 614000, "stop_freq": 638000, "details": "Shure PSM 300 K12-Band (614 - 638MHz)", "band": "SUR_PSM-300_K12" },
+            { "label": "K3E-Band     (606 - 630MHz)" , "start_freq": 606000, "stop_freq": 630000, "details": "Shure PSM 300 K3E-Band (606 - 630MHz)", "band": "SUR_PSM-300_K3E" },
+            { "label": "L18-Band     (630 - 654MHz)" , "start_freq": 630000, "stop_freq": 654000, "details": "Shure PSM 300 L18-Band (630 - 654MHz)", "band": "SUR_PSM-300_L18" },
+            { "label": "L19-Band     (630 - 654MHz)" , "start_freq": 630000, "stop_freq": 654000, "details": "Shure PSM 300 L19-Band (630 - 654MHz)", "band": "SUR_PSM-300_L19" },
+            { "label": "M16-Band    (686 - 710MHz)"  , "start_freq": 686000, "stop_freq": 710000, "details": "Shure PSM 300 M16-Band (686 - 710MHz)", "band": "SUR_PSM-300_M16" },
+            { "label": "M18-Band    (686 - 710MHz)"  , "start_freq": 686000, "stop_freq": 710000, "details": "Shure PSM 300 M18-Band (686 - 710MHz)", "band": "SUR_PSM-300_M18" },
+            { "label": "Q25-Band    (742 - 766MHz)"  , "start_freq": 742000, "stop_freq": 766000, "details": "Shure PSM 300 Q25-Band (742 - 766MHz)", "band": "SUR_PSM-300_Q25" },
+            { "label": "R12-Band    (794 - 806MHz)"  , "start_freq": 794000, "stop_freq": 806000, "details": "Shure PSM 300 R12-Band (794 - 806MHz)", "band": "SUR_PSM-300_R12" },
+            { "label": "S8-Band      (823 - 832MHz)" , "start_freq": 823000, "stop_freq": 832000, "details": "Shure PSM 300 S8-Band (823 - 832MHz)" , "band": "SUR_PSM-300_S8"  },
+            { "label": "T11-Band    (863 - 865MHz)"  , "start_freq": 863000, "stop_freq": 865000, "details": "Shure PSM 300 T11-Band (863 - 865MHz)", "band": "SUR_PSM-300_T11" },
+            { "label": "X7-Band      (925 - 938MHz)" , "start_freq": 925000, "stop_freq": 937500, "details": "Shure PSM 300 X7-Band (925 - 938MHz)" , "band": "SUR_PSM-300_X7"  }
+        ]},
+        { "label":"PSM 400", "submenu": [
+            { "label": "HF-Band    (722 - 746MHz)", "start_freq": 722325, "stop_freq": 745675, "details": "Shure PSM 400 HF-Band (722 - 746MHz)", "band": "SUR_PSM-400_HF" },
+            { "label": "X1-Band    (944 - 952MHz)", "start_freq": 944000, "stop_freq": 952000, "details": "Shure PSM 400 X1-Band (944 - 952MHz)", "band": "SUR_PSM-400_X1" }
+        ]},
+        { "label":"PSM 600", "submenu": [
+            { "label": "PSM-600-Band    (626 - 657MHz)", "start_freq": 626475, "stop_freq": 656500, "details": "Shure PSM 600 Band (626 - 657MHz)", "band": "SUR_PSM-600_PSM600" }
+        ]},
+        { "label":"PSM 700", "submenu": [
+            { "label": "H3-Band    (524 - 554MHz)", "start_freq": 524000, "stop_freq": 554000, "details": "Shure PSM 700 H3-Band (524 - 554MHz)", "band": "SUR_PSM-700_H3" },
+            { "label": "HF-Band    (722 - 746MHz)", "start_freq": 722325, "stop_freq": 745675, "details": "Shure PSM 700 HF-Band (722 - 746MHz)", "band": "SUR_PSM-700_HF" },
+            { "label": "L2-Band    (632 - 662MHz)", "start_freq": 632200, "stop_freq": 661800, "details": "Shure PSM 700 L2-Band (632 - 662MHz)", "band": "SUR_PSM-700_L2" }
+        ]},
+        { "label":"PSM 900", "submenu": [
+            { "label": "A24-Band    (779 - 806MHz)" , "start_freq": 779000, "stop_freq": 806000, "details": "Shure PSM 900 A24-Band (779 - 806MHz)", "band": "SUR_PSM-900_A24"},
+            { "label": "G6-Band      (470 - 506MHz)", "start_freq": 470000, "stop_freq": 506000, "details": "Shure PSM 900 G6-Band (470 - 506MHz)" , "band": "SUR_PSM-900_G6" },
+            { "label": "G7-Band      (506 - 542MHz)", "start_freq": 506000, "stop_freq": 542000, "details": "Shure PSM 900 G7-Band (506 - 542MHz)" , "band": "SUR_PSM-900_G7" },
+            { "label": "K1-Band      (596 - 632MHz)", "start_freq": 596000, "stop_freq": 632000, "details": "Shure PSM 900 K1-Band (596 - 632MHz)" , "band": "SUR_PSM-900_K1" },
+            { "label": "L6-Band      (656 - 692MHz)", "start_freq": 656000, "stop_freq": 692000, "details": "Shure PSM 900 L6-Band (656 - 692MHz)" , "band": "SUR_PSM-900_L6" },
+            { "label": "P7-Band      (702 - 742MHz)", "start_freq": 702000, "stop_freq": 742000, "details": "Shure PSM 900 P7-Band (702 - 742MHz)" , "band": "SUR_PSM-900_P7" },
+            { "label": "Q15-Band    (750 - 790MHz)" , "start_freq": 750000, "stop_freq": 790000, "details": "Shure PSM 900 Q15-Band (750 - 790MHz)", "band": "SUR_PSM-900_Q15"},
+            { "label": "Q20-Band    (750 - 787MHz)" , "start_freq": 750000, "stop_freq": 787000, "details": "Shure PSM 900 Q20-Band (750 - 787MHz)", "band": "SUR_PSM-900_Q20"},
+            { "label": "R20-Band    (794 - 806MHz)" , "start_freq": 794000, "stop_freq": 806000, "details": "Shure PSM 900 R20-Band (794 - 806MHz)", "band": "SUR_PSM-900_R20"},
+            { "label": "R21-Band    (794 - 806MHz)" , "start_freq": 794000, "stop_freq": 806000, "details": "Shure PSM 900 R21-Band (794 - 806MHz)", "band": "SUR_PSM-900_R21"},
+            { "label": "R22-Band    (790 - 830MHz)" , "start_freq": 790000, "stop_freq": 830000, "details": "Shure PSM 900 R22-Band (790 - 830MHz)", "band": "SUR_PSM-900_R22"},
+            { "label": "X1-Band      (944 - 952MHz)", "start_freq": 944000, "stop_freq": 952000, "details": "Shure PSM 900 X1-Band  (944 - 952MHz)", "band": "SUR_PSM-900_X1" },
+            { "label": "X2-Band      (925 - 932MHz)", "start_freq": 925000, "stop_freq": 932000, "details": "Shure PSM 900 X2-Band  (925 - 932MHz)", "band": "SUR_PSM-900_X2" },
+            { "label": "X7-Band      (925 - 938MHz)", "start_freq": 925000, "stop_freq": 937500, "details": "Shure PSM 900 X2-Band  (925 - 938MHz)", "band": "SUR_PSM-900_X7" }
+        ]},
+        { "label":"PSM 1000", "submenu": [
+            { "label": "A24-Band-1    (779 - 788MHz)"   , "start_freq": 779000, "stop_freq": 788000, "details": "Shure PSM 1000 A24-Band-1 (779 - 788MHz)", "band": "SUR_PSM-1000_A24-1"},
+            { "label": "A24-Band-2    (797 - 806MHz)"   , "start_freq": 797000, "stop_freq": 806000, "details": "Shure PSM 1000 A24-Band-2 (797 - 806MHz)", "band": "SUR_PSM-1000_A24-2"},
+            { "label": "G10-Band       (470 - 542MHz)"  , "start_freq": 470000, "stop_freq": 542000, "details": "Shure PSM 1000 G10E-Band (470 - 542MHz)" , "band": "SUR_PSM-1000_G10"  },
+            { "label": "G11-Band       (479 - 542MHz)"  , "start_freq": 479000, "stop_freq": 542000, "details": "Shure PSM 1000 G11-Band (479 - 542MHz)"  , "band": "SUR_PSM-1000_G11"  },
+            { "label": "H8Z-Band       (518 - 582MHz)"  , "start_freq": 518000, "stop_freq": 582000, "details": "Shure PSM 1000 H8Z-Band (518 - 582MHz)"  , "band": "SUR_PSM-1000_H8Z"  },
+            { "label": "J8-Band          (554 - 626MHz)", "start_freq": 554000, "stop_freq": 626000, "details": "Shure PSM 1000 J8-Band (554 - 626MHz)"   , "band": "SUR_PSM-1000_J8"   },
+            { "label": "K10E-Band     (596 - 668MHz)"   , "start_freq": 596000, "stop_freq": 668000, "details": "Shure PSM 1000 K10E-Band (596 - 668MHz)" , "band": "SUR_PSM-1000_K10E" },
+            { "label": "L8-Band         (626 - 698MHz)" , "start_freq": 626000, "stop_freq": 698000, "details": "Shure PSM 1000 L8-Band (626 - 698MHz)"   , "band": "SUR_PSM-1000_L8"   },
+            { "label": "L9E-Band       (670 - 742MHz)"  , "start_freq": 670000, "stop_freq": 742000, "details": "Shure PSM 1000 L9E-Band (670 - 742MHz)"  , "band": "SUR_PSM-1000_L9E"  },
+            { "label": "L11J-Band      (670 - 714MHz)"  , "start_freq": 670000, "stop_freq": 714000, "details": "Shure PSM 1000 L11J-Band (670 - 714MHz)" , "band": "SUR_PSM-1000_L11J" },
+            { "label": "P8-Band         (710 - 790MHz)" , "start_freq": 710000, "stop_freq": 790000, "details": "Shure PSM 1000 P8-Band (710 - 790MHz)"   , "band": "SUR_PSM-1000_P8"   },
+            { "label": "Q21-Band       (750 - 787MHz)"  , "start_freq": 750000, "stop_freq": 787000, "details": "Shure PSM 1000 Q21-Band (750 - 787MHz)"  , "band": "SUR_PSM-1000_Q21"  },
+            { "label": "Q22E-Band     (750 - 822MHz)"   , "start_freq": 750000, "stop_freq": 822000, "details": "Shure PSM 1000 Q22E-Band (750 - 822MHz)" , "band": "SUR_PSM-1000_Q22E" },
+            { "label": "R26-Band       (794 - 806MHz)"  , "start_freq": 794000, "stop_freq": 806000, "details": "Shure PSM 1000 R26-Band (794 - 806MHz)"  , "band": "SUR_PSM-1000_R26"  },
+            { "label": "R27-Band       (794 - 806MHz)"  , "start_freq": 794000, "stop_freq": 806000, "details": "Shure PSM 1000 R27-Band (794 - 806MHz)"  , "band": "SUR_PSM-1000_R27"  },
+            { "label": "X1-Band         (944 - 952MHz)" , "start_freq": 944000, "stop_freq": 952000, "details": "Shure PSM 1000 X1-Band (944 - 952MHz)"   , "band": "SUR_PSM-1000_X1"   }
+        ]}
     ]},
     { "label":"QLX-D", "submenu": [
-        { "label": "V51-Band (174 - 216MHz)", "start_freq": 174000, "stop_freq": 216000, "details": "Shure QLX-D G4E-Band (174 - 216MHz)", "band": "SUR_V51" },
-        { "label": "G51-Band (470 - 534MHz)", "start_freq": 470000, "stop_freq": 534000, "details": "Shure QLX-D G51-Band (470 - 534MHz)", "band": "SUR_G51" },
-        { "label": "H51-Band (534 - 598MHz)", "start_freq": 534000, "stop_freq": 598000, "details": "Shure QLX-D H51-Band (534 - 598MHz)", "band": "SUR_H51" },
-        { "label": "K51-Band (606 - 670MHz)", "start_freq": 606000, "stop_freq": 670000, "details": "Shure QLX-D K51-Band (606 - 670MHz)", "band": "SUR_K51" },
-        { "label": "L52-Band (632 - 694MHz)", "start_freq": 632000, "stop_freq": 694000, "details": "Shure QLX-D L52-Band (632 - 694MHz)", "band": "SUR_L52" },
-        { "label": "P51-Band (710 - 782MHz)", "start_freq": 710000, "stop_freq": 782000, "details": "Shure QLX-D P51-Band (710 - 782MHz)", "band": "SUR_P51" },
-        { "label": "Q51-Band (794 - 806MHz)", "start_freq": 794000, "stop_freq": 806000, "details": "Shure QLX-D Q51-Band (794 - 806MHz)", "band": "SUR_Q51" },
-        { "label": "S50-Band (823 - 865MHz)", "start_freq": 823000, "stop_freq": 865000, "details": "Shure QLX-D S50-Band (823 - 865MHz)", "band": "SUR_S50" },
-        { "label": "Z17-Band (1492 - 1525MHz)", "start_freq": 1492000, "stop_freq": 1525000, "details": "Shure QLX-D Z17-Band (1492 - 1525MHz)", "band": "SUR_Z17" },
-        { "label": "Z18-Band (1785 - 1805MHz)", "start_freq": 1785000, "stop_freq": 1805000, "details": "Shure QLX-D Z18-Band (1785 - 1805MHz)", "band": "SUR_Z18" }
+        { "label": "AB-Band      (770 - 810MHz)", "start_freq": 770000, "stop_freq": 810000, "details": "Shure QLX-D AB-Band (770 - 810MHz)" , "band": "SUR_QLX-D_AB"  },
+        { "label": "G50-Band    (470 - 534MHz)", "start_freq": 470000, "stop_freq": 534000, "details": "Shure QLX-D G50-Band (470 - 534MHz)", "band": "SUR_QLX-D_G50" },
+        { "label": "G51-Band    (470 - 534MHz)", "start_freq": 470000, "stop_freq": 534000, "details": "Shure QLX-D G51-Band (470 - 534MHz)", "band": "SUR_QLX-D_G51" },
+        { "label": "G52-Band    (470 - 534MHz)", "start_freq": 470000, "stop_freq": 534000, "details": "Shure QLX-D G52-Band (470 - 534MHz)", "band": "SUR_QLX-D_G52" },
+        { "label": "H50-Band    (534 - 598MHz)", "start_freq": 534000, "stop_freq": 598000, "details": "Shure QLX-D H50-Band (534 - 598MHz)", "band": "SUR_QLX-D_H50" },
+        { "label": "H51-Band    (534 - 598MHz)", "start_freq": 534000, "stop_freq": 598000, "details": "Shure QLX-D H51-Band (534 - 598MHz)", "band": "SUR_QLX-D_H51" },
+        { "label": "H52-Band    (534 - 565MHz)", "start_freq": 534000, "stop_freq": 565000, "details": "Shure QLX-D H52-Band (534 - 565MHz)", "band": "SUR_QLX-D_H52" },
+        { "label": "J50-Band    (572 - 636MHz)", "start_freq": 572000, "stop_freq": 636000, "details": "Shure QLX-D J50-Band (572 - 636MHz)", "band": "SUR_QLX-D_J50" },
+        { "label": "JA-Band      (770 - 806MHz)", "start_freq": 770250, "stop_freq": 805750, "details": "Shure QLX-D JA-Band (770 - 806MHz)" , "band": "SUR_QLX-D_JA"  },
+        { "label": "JB-Band      (806 - 810MHz)", "start_freq": 806000, "stop_freq": 810000, "details": "Shure QLX-D JB-Band (806 - 810MHz)" , "band": "SUR_QLX-D_JB"  },
+        { "label": "K51-Band    (606 - 670MHz)", "start_freq": 606000, "stop_freq": 670000, "details": "Shure QLX-D K51-Band (606 - 670MHz)", "band": "SUR_QLX-D_K51" },
+        { "label": "L50-Band    (632 - 696MHz)", "start_freq": 632000, "stop_freq": 696000, "details": "Shure QLX-D L50-Band (632 - 696MHz)", "band": "SUR_QLX-D_L50" },
+        { "label": "L51-Band    (632 - 696MHz)", "start_freq": 632000, "stop_freq": 696000, "details": "Shure QLX-D L51-Band (632 - 696MHz)", "band": "SUR_QLX-D_L51" },
+        { "label": "P51-Band    (710 - 782MHz)", "start_freq": 710000, "stop_freq": 782000, "details": "Shure QLX-D P51-Band (710 - 782MHz)", "band": "SUR_QLX-D_P51" },
+        { "label": "Q51-Band    (794 - 806MHz)", "start_freq": 794000, "stop_freq": 806000, "details": "Shure QLX-D Q51-Band (794 - 806MHz)", "band": "SUR_QLX-D_Q51" },
+        { "label": "R51-Band    (800 - 810MHz)", "start_freq": 800000, "stop_freq": 810000, "details": "Shure QLX-D R51-Band (800 - 810MHz)", "band": "SUR_QLX-D_R51" },
+        { "label": "X50-Band    (925 - 932MHz)", "start_freq": 925000, "stop_freq": 932000, "details": "Shure QLX-D X50-Band (925 - 932MHz)", "band": "SUR_QLX-D_X50" },
+        { "label": "X51-Band    (925 - 938MHz)", "start_freq": 925000, "stop_freq": 937500, "details": "Shure QLX-D X51-Band (925 - 938MHz)", "band": "SUR_QLX-D_X51" }
+    ]},
+    { "label":"SC Wireless", "submenu": [
+        { "label": "Base-Band       (176 - 211MHz)", "start_freq": 176200, "stop_freq": 210600, "details": "Shure SC Wireless Base-Band (176 - 211MHz)"  , "band": "SUR_SC_BASE"  },
+        { "label": "Travel-Band    (169 - 172MHz)"  , "start_freq": 169445, "stop_freq": 171905, "details": "Shure SC Wireless Travel-Band (169 - 172MHz)", "band": "SUR_SC_TRAVEL"}
     ]},
     { "label":"SLX", "submenu": [
-        { "label": "G4E-Band (470 - 494MHz)", "start_freq": 470000, "stop_freq": 494000, "details": "Shure SLX G4E-Band (470 - 494MHz)", "band": "SUR_G4E" },
-        { "label": "G5E-Band (494 - 518MHz)", "start_freq": 494000, "stop_freq": 518000, "details": "Shure SLX G5E-Band (494 - 518MHz)", "band": "SUR_G5E" },
-        { "label": "H5-Band  (518 - 542MHz)", "start_freq": 518000, "stop_freq": 542000, "details": "Shure SLX H5-Band  (518 - 542MHz)", "band": "SUR_H5"  },
-        { "label": "J3-Band  (572 - 596MHz)", "start_freq": 572000, "stop_freq": 596000, "details": "Shure SLX J3-Band  (572 - 596MHz)", "band": "SUR_J3"  },
-        { "label": "K3E-Band (606 - 630MHz)", "start_freq": 606000, "stop_freq": 630000, "details": "Shure SLX K3E-Band (606 - 630MHz)", "band": "SUR_K3E" },
-        { "label": "L4E-Band (638 - 662MHz)", "start_freq": 638000, "stop_freq": 662000, "details": "Shure SLX L4E-Band (638 - 662MHz)", "band": "SUR_L4E" },
-        { "label": "P4-Band  (702 - 726MHz)", "start_freq": 702000, "stop_freq": 726000, "details": "Shure SLX  P4-Band (702 - 726MHz)", "band": "SUR_P4"  },
-        { "label": "Q24-Band (736 - 754MHz)", "start_freq": 736000, "stop_freq": 754000, "details": "Shure SLX Q24-Band (736 - 754MHz)", "band": "SUR_Q24" },
-        { "label": "R5-Band  (800 - 820MHz)", "start_freq": 800000, "stop_freq": 820000, "details": "Shure SLX  R5-Band (800 - 820MHz)", "band": "SUR_R5"  },
-        { "label": "S10-Band (823 - 832MHz)", "start_freq": 823000, "stop_freq": 832000, "details": "Shure SLX S10-Band (823 - 832MHz)", "band": "SUR_S10" },
-        { "label": "S6-Band  (838 - 865MHz)", "start_freq": 838000, "stop_freq": 865000, "details": "Shure SLX  S6-Band (838 - 865MHz)", "band": "SUR_S6"  }
+        { "label": "G4-Band    (470 - 494MHz)" , "start_freq": 470000, "stop_freq": 494000, "details": "Shure SLX G4-Band (470 - 494MHz)", "band": "SUR_SLX_G4"},
+        { "label": "G5-Band    (494 - 518MHz)" , "start_freq": 494000, "stop_freq": 518000, "details": "Shure SLX G5-Band (494 - 518MHz)", "band": "SUR_SLX_G5"},
+        { "label": "H5-Band    (518 - 542MHz)" , "start_freq": 518000, "stop_freq": 542000, "details": "Shure SLX H5-Band (518 - 542MHz)", "band": "SUR_SLX_H5"},
+        { "label": "J3-Band     (572 - 596MHz)", "start_freq": 572000, "stop_freq": 596000, "details": "Shure SLX J3-Band (572 - 596MHz)", "band": "SUR_SLX_J3"},
+        { "label": "JB-Band     (572 - 596MHz)", "start_freq": 572000, "stop_freq": 596000, "details": "Shure SLX JB-Band (572 - 596MHz)", "band": "SUR_SLX_JB"},
+        { "label": "L4-Band    (638 - 662MHz)" , "start_freq": 638000, "stop_freq": 662000, "details": "Shure SLX L4-Band (638 - 662MHz)", "band": "SUR_SLX_L4"},
+        { "label": "P4-Band    (702 - 726MHz)" , "start_freq": 702000, "stop_freq": 726000, "details": "Shure SLX P4-Band (702 - 726MHz)", "band": "SUR_SLX_P4"},
+        { "label": "Q4-Band    (736 - 754MHz)" , "start_freq": 736000, "stop_freq": 754000, "details": "Shure SLX Q4-Band (736 - 754MHz)", "band": "SUR_SLX_Q4"},
+        { "label": "R5-Band    (800 - 820MHz)" , "start_freq": 800100, "stop_freq": 819900, "details": "Shure SLX R5-Band (800 - 820MHz)", "band": "SUR_SLX_R5"},
+        { "label": "S6-Band    (838 - 865MHz)" , "start_freq": 838000, "stop_freq": 865000, "details": "Shure SLX S6-Band (838 - 865MHz)", "band": "SUR_SLX_S6"}
+    ]},
+    { "label":"Twin Wireless", "submenu": [
+       { "label": "Twin-Wireless-Band    (169 - 209MHz)"  , "start_freq": 169445, "stop_freq": 208200, "details": "Shure Twin Wireless Band (169 - 209MHz)", "band": "SUR_TWIN_NONE"}
     ]},
     { "label":"UC", "submenu": [
-        { "label": "UA-Band (782 - 806MHz)" , "start_freq": 782000, "stop_freq": 806000, "details": "Shure UC UA-Band (782 - 806MHz)", "band": "SUR_UA"},
-        { "label": "UB-Band (692 - 716MHz)" , "start_freq": 692000, "stop_freq": 716000, "details": "Shure UC UB-Band (692 - 716MHz)", "band": "SUR_UB"}
+        { "label": "UA-Band    (782 - 806MHz)" , "start_freq": 782000, "stop_freq": 806000, "details": "Shure UC UA-Band (782 - 806MHz)", "band": "SUR_UC_UA"},
+        { "label": "UB-Band    (692 - 716MHz)" , "start_freq": 692000, "stop_freq": 716000, "details": "Shure UC UB-Band (692 - 716MHz)", "band": "SUR_UC_UB"}
     ]},
     { "label":"UHF", "submenu": [
-        { "label": "J4-Band (554 - 584MHz)" , "start_freq": 554000, "stop_freq": 584000, "details": "Shure UHF J4-Band (554 - 584MHz)", "band": "SUR_J4"},
-        { "label": "M4-Band (662 - 692MHz)" , "start_freq": 662000, "stop_freq": 692000, "details": "Shure UHF M4-Band (662 - 692MHz)", "band": "SUR_M4"},
-        { "label": "UA-Band (782 - 806MHz)" , "start_freq": 782000, "stop_freq": 806000, "details": "Shure UHF UA-Band (782 - 806MHz)", "band": "SUR_UA"},
-        { "label": "UB-Band (692 - 716MHz)" , "start_freq": 692000, "stop_freq": 716000, "details": "Shure UHF UB-Band (692 - 716MHz)", "band": "SUR_UB"}
+        { "label": "J4-Band      (554 - 584MHz)", "start_freq": 554000, "stop_freq": 584000, "details": "Shure UHF J4-Band (554 - 584MHz)", "band": "SUR_UHF_J3"},
+        { "label": "M4-Band    (662 - 692MHz)"  , "start_freq": 662000, "stop_freq": 692000, "details": "Shure UHF J3-Band (662 - 692MHz)", "band": "SUR_UHF_J3"},
+        { "label": "UA-Band    (782 - 806MHz)"  , "start_freq": 782000, "stop_freq": 806000, "details": "Shure UHF UA-Band (782 - 806MHz)", "band": "SUR_UHF_UA"},
+        { "label": "UB-Band    (692 - 716MHz)"  , "start_freq": 692000, "stop_freq": 716000, "details": "Shure UHF UB-Band (692 - 716MHz)", "band": "SUR_UHF_UB"}
     ]},
     { "label":"UHF-R", "submenu": [
-        { "label": "A24-Band (779 - 806MHz)" , "start_freq": 779000, "stop_freq": 806000, "details": "Shure UHF-R A24-Band (554 - 584MHz)", "band": "SUR_A24"},
-        { "label": "G1-Band  (470 - 530MHz)" , "start_freq": 470000, "stop_freq": 530000, "details": "Shure UHF-R G1-Band (470 - 530MHz)" , "band": "SUR_G1" },
-        { "label": "H4-Band  (518 - 578MHz)" , "start_freq": 518000, "stop_freq": 578000, "details": "Shure UHF-R H4-Band (518 - 578MHz)" , "band": "SUR_H4" },
-        { "label": "J5-Band  (578 - 638MHz)" , "start_freq": 578000, "stop_freq": 638000, "details": "Shure UHF-R J5-Band (578 - 638MHz)" , "band": "SUR_J5" },
-        { "label": "K4E-Band (606 - 666MHz)" , "start_freq": 606000, "stop_freq": 666000, "details": "Shure UHF-R K4E-Band (606 - 666MHz)", "band": "SUR_K4E"},
-        { "label": "L3-Band  (638 - 698MHz)" , "start_freq": 638000, "stop_freq": 698000, "details": "Shure UHF-R L3-Band (638 - 698MHz)" , "band": "SUR_L3" },
-        { "label": "MA-Band  (782 - 810MHz)" , "start_freq": 782000, "stop_freq": 810000, "details": "Shure UHF-R MA-Band (782 - 810MHz)" , "band": "SUR_MA" },
-        { "label": "Q5-Band  (740 - 814MHz)" , "start_freq": 740000, "stop_freq": 814000, "details": "Shure UHF-R Q5-Band (740 - 814MHz)" , "band": "SUR_Q5" },
-        { "label": "Q9-Band  (740 - 806MHz)" , "start_freq": 740000, "stop_freq": 806000, "details": "Shure UHF-R Q9-Band (740 - 806MHz)" , "band": "SUR_Q9" },
-        { "label": "R9-Band  (790 - 865MHz)" , "start_freq": 790000, "stop_freq": 865000, "details": "Shure UHF-R R9-Band (790 - 865MHz)" , "band": "SUR_R9" },
-        { "label": "X1-Band  (944 - 952MHz)" , "start_freq": 944000, "stop_freq": 952000, "details": "Shure UHF-R X1-Band (944 - 952MHz)" , "band": "SUR_X1" }
-    ]},
-    { "label":"ULX", "submenu": [
-        { "label": "G3-Band (470 - 506MHz)", "start_freq": 470000, "stop_freq": 506000, "details": "Shure ULX G3-Band (470 - 506MHz)", "band": "SUR_G3" },
-        { "label": "J1-Band (554 - 590MHz)", "start_freq": 554000, "stop_freq": 590000, "details": "Shure ULX J1-Band (554 - 599MHz)", "band": "SUR_J1" },
-        { "label": "M1-Band (662 - 698MHz)", "start_freq": 662000, "stop_freq": 698000, "details": "Shure ULX M1-Band (662 - 698MHz)", "band": "SUR_M1" }
+        { "label": "A24-Band-1    (779 - 787MHz)"   , "start_freq": 779000, "stop_freq": 787000, "details": "Shure UHF-R A24-Band-1 (779 - 787MHz)", "band": "SUR_UHF-R_A24-1"},
+        { "label": "A24-Band-2    (797 - 806MHz)"   , "start_freq": 797000, "stop_freq": 806000, "details": "Shure UHF-R A24-Band-2 (797 - 806MHz)", "band": "SUR_UHF-R_A24-2"},
+        { "label": "G1-Band         (470 - 530MHz)" , "start_freq": 470000, "stop_freq": 530000, "details": "Shure UHF-R G1-Band (470 - 530MHz)"   , "band": "SUR_UHF-R_G1"   },
+        { "label": "H4-Band         (518 - 578MHz)" , "start_freq": 518000, "stop_freq": 578000, "details": "Shure UHF-R H4-Band (518 - 578MHz)"   , "band": "SUR_UHF-R_H4"   },
+        { "label": "J5-Band-1       (578 - 608MHz)" , "start_freq": 578000, "stop_freq": 607975, "details": "Shure UHF-R J5-Band-1 (578 - 608MHz)" , "band": "SUR_UHF-R_J5-1" },
+        { "label": "J5-Band-2       (614 - 638MHz)" , "start_freq": 614025, "stop_freq": 638000, "details": "Shure UHF-R J5-Band-1 (614 - 638MHz)" , "band": "SUR_UHF-R_J5-2" },
+        { "label": "JBX-Band        (806 - 810MHz)" , "start_freq": 806125, "stop_freq": 809750, "details": "Shure UHF-R JBX-Band (806 - 810MHz)"  , "band": "SUR_UHF-R_JBX"  },
+        { "label": "L3-Band          (638 - 698MHz)", "start_freq": 638000, "stop_freq": 698000, "details": "Shure UHF-R L3-Band (638 - 698MHz)"   , "band": "SUR_UHF-R_L3"   },
+        { "label": "Q5-Band         (740 - 814MHz)" , "start_freq": 740000, "stop_freq": 814000, "details": "Shure UHF-R Q5-Band (740 - 814MHz)"   , "band": "SUR_UHF-R_Q5"   },
+        { "label": "Q6-Band         (740 - 752MHz)" , "start_freq": 740125, "stop_freq": 751875, "details": "Shure UHF-R Q5-Band (740 - 752MHz)"   , "band": "SUR_UHF-R_Q6"   },
+        { "label": "Q9-Band         (740 - 806MHz)" , "start_freq": 740000, "stop_freq": 805975, "details": "Shure UHF-R Q9-Band (740 - 806MHz)"   , "band": "SUR_UHF-R_Q9"   },
+        { "label": "Q10-Band       (740 - 798MHz)"  , "start_freq": 740000, "stop_freq": 797900, "details": "Shure UHF-R Q10-Band (740 - 798MHz)"  , "band": "SUR_UHF-R_Q10"  },
+        { "label": "R9-Band          (790 - 865MHz)", "start_freq": 790000, "stop_freq": 865000, "details": "Shure UHF-R R9-Band (790 - 865MHz)"   , "band": "SUR_UHF-R_R9"   },
+        { "label": "R16-Band        (794 - 806MHz)" , "start_freq": 794000, "stop_freq": 806000, "details": "Shure UHF-R R16-Band (794 - 806MHz)"  , "band": "SUR_UHF-R_R16"  },
+        { "label": "R18-Band        (794 - 806MHz)" , "start_freq": 790000, "stop_freq": 806000, "details": "Shure UHF-R R18-Band (794 - 806MHz)"  , "band": "SUR_UHF-R_R18"  },
+        { "label": "X1-Band          (944 - 952MHz)", "start_freq": 944000, "stop_freq": 952000, "details": "Shure UHF-R X1-Band (944 - 952MHz)"   , "band": "SUR_UHF-R_X1"   }
+     ]},
+     { "label":"ULX", "submenu": [
+        { "label": "G3-Band     (470 - 506MHz)" , "start_freq": 470000, "stop_freq": 506000, "details": "Shure ULX G3-Band (470 - 506MHz)", "band": "SUR_ULX_G3" },
+        { "label": "J1-Band      (554 - 590MHz)", "start_freq": 554000, "stop_freq": 590000, "details": "Shure ULX J1-Band (554 - 590MHz)", "band": "SUR_ULX_J1" },
+        { "label": "M1-Band    (662 - 698MHz)"  , "start_freq": 662000, "stop_freq": 698000, "details": "Shure ULX M1-Band (662 - 698MHz)", "band": "SUR_ULX_M1" }
     ]},
     { "label":"ULX-D", "submenu": [
-        { "label": "V51-Band (174 - 216MHz)", "start_freq": 174000, "stop_freq": 216000, "details": "Shure ULX-D G4E-Band (174 - 216MHz)", "band": "SUR_V51" },
-        { "label": "G51-Band (470 - 534MHz)", "start_freq": 470000, "stop_freq": 534000, "details": "Shure ULX-D G51-Band (470 - 534MHz)", "band": "SUR_G51" },
-        { "label": "H51-Band (534 - 598MHz)", "start_freq": 534000, "stop_freq": 598000, "details": "Shure ULX-D H51-Band (534 - 598MHz)", "band": "SUR_H51" },
-        { "label": "J50-Band (572 - 636MHz)", "start_freq": 572000, "stop_freq": 636000, "details": "Shure ULX-D J50-Band (572 - 636MHz)", "band": "SUR_J50" },
-        { "label": "K51-Band (606 - 670MHz)", "start_freq": 606000, "stop_freq": 670000, "details": "Shure ULX-D K51-Band (606 - 670MHz)", "band": "SUR_K51" },
-        { "label": "L50-Band (632 - 696MHz)", "start_freq": 632000, "stop_freq": 696000, "details": "Shure ULX-D L50-Band (632 - 696MHz)", "band": "SUR_L50" },
-        { "label": "P51-Band (710 - 782MHz)", "start_freq": 710000, "stop_freq": 782000, "details": "Shure ULX-D P51-Band (710 - 782MHz)", "band": "SUR_P51" },
-        { "label": "Q51-Band (794 - 806MHz)", "start_freq": 794000, "stop_freq": 806000, "details": "Shure ULX-D Q51-Band (794 - 806MHz)", "band": "SUR_Q51" },
-        { "label": "R51-Band (800 - 810MHz)", "start_freq": 800000, "stop_freq": 810000, "details": "Shure ULX-D R51-Band (800 - 810MHz)", "band": "SUR_R51" },
-        { "label": "X50-Band (925 - 932MHz)", "start_freq": 925000, "stop_freq": 932000, "details": "Shure ULX-D X50-Band (925 - 932MHz)", "band": "SUR_X50" },
-        { "label": "Z17-Band (1492 - 1525MHz)", "start_freq": 1492000, "stop_freq": 1525000, "details": "Shure ULX-D Z17-Band (1492 - 1525MHz)", "band": "SUR_Z17" },
-        { "label": "Z18-Band (1785 - 1805MHz)", "start_freq": 1785000, "stop_freq": 1805000, "details": "Shure ULX-D Z18-Band (1785 - 1805MHz)", "band": "SUR_Z18" }
+        { "label": "AB-Band       (770 - 810MHz)" , "start_freq": 770000 , "stop_freq": 810000 , "details": "Shure ULX-D AB-Band (770 - 810MHz)"   , "band": "SUR_ULX-D_AB"  },
+        { "label": "G50-Band     (470 - 534MHz)"  , "start_freq": 470000 , "stop_freq": 534000 , "details": "Shure ULX-D G50-Band (470 - 534MHz)"  , "band": "SUR_ULX-D_G50" },
+        { "label": "H50-Band     (534 - 598MHz)"  , "start_freq": 534000 , "stop_freq": 598000 , "details": "Shure ULX-D H50-Band (534 - 598MHz)"  , "band": "SUR_ULX-D_H50" },
+        { "label": "J51-Band      (572 - 636MHz)" , "start_freq": 572000 , "stop_freq": 636000 , "details": "Shure ULX-D J51-Band (572 - 636MHz)"  , "band": "SUR_ULX-D_J51" },
+        { "label": "JA-Band       (770 - 806MHz)" , "start_freq": 770000 , "stop_freq": 806000 , "details": "Shure ULX-D JA-Band (770 - 806MHz)"   , "band": "SUR_ULX-D_JA"  },
+        { "label": "JB-Band       (806 - 810MHz)" , "start_freq": 806000 , "stop_freq": 810000 , "details": "Shure ULX-D JB-Band (806 - 810MHz)"   , "band": "SUR_ULX-D_JB"  },
+        { "label": "L53-Band     (632 - 714MHz)"  , "start_freq": 632000 , "stop_freq": 714000 , "details": "Shure ULX-D L53-Band (632 - 714MHz)"  , "band": "SUR_ULX-D_L53" },
+        { "label": "V50-Band     (174 - 216MHz)"  , "start_freq": 174000 , "stop_freq": 216000 , "details": "Shure ULX-D V50-Band (174 - 216MHz)"  , "band": "SUR_ULX-D_V50" },
+        { "label": "V51-Band     (174 - 216MHz)"  , "start_freq": 174000 , "stop_freq": 216000 , "details": "Shure ULX-D V51-Band (174 - 216MHz)"  , "band": "SUR_ULX-D_V51" },
+        { "label": "Z16-Band     (1240 - 1260MHz)", "start_freq": 1240000, "stop_freq": 1260000, "details": "Shure ULX-D Z16-Band (1240 - 1260MHz)", "band": "SUR_ULX-D_Z16" }
+    ]},
+    { "label":"UP", "submenu": [
+        { "label": "UB-Band    (692 - 716MHz)" , "start_freq": 692000, "stop_freq": 716000, "details": "Shure UC UB-Band (692 - 716MHz)", "band": "SUR_UC_UB"}
+    ]},
+    { "label":"UT", "submenu": [
+        { "label": "UT Wireless Band-1    (581 - 625MHz)", "start_freq": 581200, "stop_freq": 624300, "details": "Shure UT Wireless Band-1 (581 - 625MHz)", "band": "SUR_UT_UT-1"},
+        { "label": "UT Wireless Band-2    (740 - 752MHz)", "start_freq": 740375, "stop_freq": 751875, "details": "Shure UT Wireless Band-2 (740 - 752MHz)", "band": "SUR_UT_UT-2"},
+        { "label": "UT Wireless Band-3    (774 - 782MHz)", "start_freq": 774400, "stop_freq": 781775, "details": "Shure UT Wireless Band-3 (774 - 782MHz)", "band": "SUR_UT_UT-3"}
+    ]},
+    { "label":"GLX-D", "submenu": [
+        { "label": "Z2-Band    (2404 - 2478MHz)", "start_freq": 2404000, "stop_freq": 2478000, "details": "Shure GLX-D Z2-Band (2404 - 2478MHz)", "band": "SUR_GLX-D_Z2" }
     ]}
 ]}
