@@ -2,6 +2,7 @@
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true; // Disable security warning on the console
 
 var SerialPort = require ( 'serialport' );
+const fs       = require ('fs');
 
 const FREQ_VENDOR_BANDS   = require ( 'require-all' )(__dirname +'/frequency_data/bands'  );
 const FREQ_VENDOR_PRESETS = require ( 'require-all' )(__dirname +'/frequency_data/presets');
@@ -27,7 +28,12 @@ let mainWindow;
 let helpWindow;
 let aboutWindow;
 
-let country = configStore.get('country');
+let country_code = configStore.get('country_code');
+
+if ( !country_code ) {
+    console.log ( "No country setting saved! Using default: 'DE'");
+    country_code = "DE";
+}
 
 function createWindow () {
     mainWindow = new BrowserWindow({width: 1200, height: 700});
@@ -168,18 +174,13 @@ function createWindow () {
 
     menuJSON.push ({ label: 'Country', submenu: [] });
 
-    if ( !country ) {
-        console.log ( "No country setting saved! Using default: 'DE'");
-        country = "DE";
-    }
-
     COUNTRIES.forEach ( ( c ) => {
         menuJSON[MENU_COUNTRY].submenu.push (
             {
                 'label' : c.label,
                 'code'  : c.code,
                 'type'  : 'radio' ,
-                'checked': country===c.code?true:false,
+                'checked': country_code===c.code?true:false,
                 click () { wc.send ( 'SET_COUNTRY', { country_code : c.code, country_label : c.label } ); }
             }
         );

@@ -110,7 +110,7 @@
     { "start": 832000 , "stop": 842000 , "info": "LTE-20 800 Up O2"    },
     { "start": 842000 , "stop": 852000 , "info": "LTE-20 800 Up D2"    },
     { "start": 852000 , "stop": 862000 , "info": "LTE-20 800 Up D1"    },
-    { "start": 863000 , "stop": 870000 , "info": "LPD/SRD Radio"       },
+    { "start": 865000 , "stop": 870000 , "info": "LPD/SRD Radio"       },
     { "start": 870000 , "stop": 873000 , "info": "Military"            },
     { "start": 873000 , "stop": 880000 , "info": "GSM-R 900 Up D.Bahn" },
     { "start": 880000 , "stop": 890000 , "info": "GSM 900 Up O2"       },
