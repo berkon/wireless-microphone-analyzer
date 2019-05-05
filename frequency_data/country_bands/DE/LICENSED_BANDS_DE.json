@@ -1,0 +1,7 @@
+{ "label":"DE - Licensed bands", "submenu": [
+    { "label": "Licensed Band 1 (470 - 608MHz)"  , "start_freq": 470000 , "stop_freq": 608000 , "details": "Licensed Band 1 (470 - 608MHz)"   },
+    { "label": "Licensed Band 2 (614 - 703MHz)"  , "start_freq": 614000 , "stop_freq": 703000 , "details": "Licensed Band 2 (614 - 703MHz)"   },
+    { "label": "Licensed Band 3 (733 - 823MHz)"  , "start_freq": 733000 , "stop_freq": 823000 , "details": "Licensed Band 3 (733 - 823MHz)"   },
+    { "label": "Licensed Band 4 (1350 - 1400MHz)", "start_freq": 1350000, "stop_freq": 1400000, "details": "Licensed Band 4 (1350 - 1400MHz)" },
+    { "label": "Licensed Band 5 (1452 - 1525MHz)", "start_freq": 1452000, "stop_freq": 1525000, "details": "Licensed Band 5 (1452 - 1525MHz)" }
+]}

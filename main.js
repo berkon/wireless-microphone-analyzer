@@ -4,7 +4,7 @@ process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true; // Disable security warni
 var SerialPort = require ( 'serialport' );
 const fs       = require ('fs');
 
-const FREQ_VENDOR_BANDS   = require ( 'require-all' )(__dirname +'/frequency_data/bands'  );
+const FREQ_VENDOR_BANDS   = require ( 'require-all' )(__dirname +'/frequency_data/vendor_bands'  );
 const FREQ_VENDOR_PRESETS = require ( 'require-all' )(__dirname +'/frequency_data/presets');
 const COUNTRIES           = require ( './country_codes');
 
@@ -130,6 +130,17 @@ function createWindow () {
         else
             addMenuEntryOrSubmenu ( value.label, value, menuJSON[MENU_BAND].submenu );
     });
+
+    if ( country_code && fs.existsSync ( __dirname + '/frequency_data/country_bands/' + country_code ) ) {
+        const COUNTRY_BANDS = require ( 'require-all' )(__dirname +'/frequency_data/country_bands/' + country_code );
+        menuJSON[MENU_BAND].submenu.push ({ type:'separator' });
+
+        Object.entries ( COUNTRY_BANDS ).forEach ( countryBandData => {
+            let key   = countryBandData[0];
+            let value = countryBandData[1];
+            addMenuEntryOrSubmenu ( value.label, value.hasOwnProperty('submenu')?value.submenu:value, menuJSON[MENU_BAND].submenu );
+        });
+    }
 
     menuJSON.push ({ label: 'Chan. Presets', submenu: [] });
 

@@ -1,6 +1,7 @@
 'use strict'
 
-const { ipcRenderer } = require ( 'electron'    );
+const { ipcRenderer } = require ('electron');
+const { app } = require ('electron').remote;
 const ConfigStore     = require ( 'configstore' );
 const SerialPort      = require ( 'serialport'  );
 const Chart           = require ( 'chart.js'    );
@@ -926,9 +927,7 @@ ipcRenderer.on ( 'SET_COUNTRY', (event, message) => {
             message: 'Country not available!',
             detail:  'No frequency related information available for ' + message.country_label +' (' + message.country_code + ')' + '! Falling back to Germany (DE)'
         }
-        dialog.showMessageBox ( dialogOptions, (i) => {
-        //    console.log("Button " + i + " was pressed!")
-        });
+        dialog.showMessageBox ( dialogOptions, (i) => {});
         console.log ( "File with forbidden ranges not found for country code: '" + message.country_code +"' => Falling back to: 'DE'");
     } else {
         COUNTRY_CODE = message.country_code;
@@ -938,6 +937,18 @@ ipcRenderer.on ( 'SET_COUNTRY', (event, message) => {
     configStore.set ( 'country_code', COUNTRY_CODE );
     configStore.set ( 'country_name', COUNTRY_NAME );
     FREQ_FORBIDDEN = require ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + COUNTRY_CODE + '.json');
+
+    dialog.showMessageBox ({
+        type: 'question',
+        buttons: ['Cancel', 'Restart'],
+        message: 'Restart required!',
+        detail:  'Please restart the app, for the new country settings to become active. Otherwise menues won\'t be updated!'
+    }, (i) => {
+        if ( i === 1 ) {
+            app.relaunch();
+            app.exit(0);
+        }
+    });
 
     if ( fs.existsSync ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json' ) )
         FREQ_GRIDS = require ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json');
