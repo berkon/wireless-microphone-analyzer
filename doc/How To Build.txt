@@ -1,14 +1,32 @@
-After cloning the repo run the following commands:
+1. Clone the repo
 
-- npm install
-- npm run dist       (Creates the installer in ./dist directory)
+2. IMPORTANT! Adding "electron-rebuild" as explained below, is NOT required when using 
+   "electron-builder". If "electron-builder" is installed in devDependencies it is only
+   required to add this line:
+        
+        "postinstall": "electron-builder install-app-deps",
+
+   to the "scripts" section. Then if "npm start" or "npm run dist" is executed,
+   electron-builder will make sure that the native binaries are rebuilt if required.
+   This is just an explanation on how to do it without electron-builder. This page
+   explains how to install/rebuild for Electron https://serialport.io/docs/en/guide-installation
+
+    - npm install --save-dev electron-rebuild (if module is not in package.json already)
+
+    - add "install" line below to package.json (if not done already)
+
+        "scripts": {
+            "start": "electron .",
+            "install": "electron-rebuild"
+        }
+
+3. npm install
+
+4. npm run dist       (Creates the installer in ./dist directory)
 
 OR
 
-- npm start          (to just start the app)
-
-
-The module electron-rebuild is not required when using electron-builder
+4. npm start          (to just start the app)
 
 
 This link shows which Electron version contains which NodeJS and which Chromium version:
