@@ -14,6 +14,8 @@ const electronLocalshortcut          = require ( 'electron-localshortcut' );
 const { productName, name, author, version } = require ( './package.json'         );
 const { dialog }                     = require ( 'electron'               );
 
+app.commandLine.appendSwitch('disable-gpu');
+
 const ConfigStore = require ( 'configstore' );
 const configStore = new ConfigStore ( name );
 
