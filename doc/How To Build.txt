@@ -22,11 +22,17 @@
 
 3. npm install
 
-4. npm run dist       (Creates the installer in ./dist directory)
+4a. Increase version number in package.json
+4b. Increase version number in about.html
+4c. Update CHANGELOG.txt
+
+5. Update SHA256.txt file
+
+5. npm run dist       (Creates the installer in ./dist directory)
 
 OR
 
-4. npm start          (to just start the app)
+5. npm start          (to just start the app)
 
 
 This link shows which Electron version contains which NodeJS and which Chromium version:

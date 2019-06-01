@@ -1,3 +1,12 @@
+V1.6.0
+    FEATURES
+        - Added Shure Axient-D channel presets
+        - Added Shure PGX L5 channel preset
+        - Updated Shure bands
+        - Updated Sony bands
+    FIXES
+        - Now reading correct country code at startup
+
 V1.5.0
     FEATURES
         - Remember visibility settings for overlay graphs after restart
