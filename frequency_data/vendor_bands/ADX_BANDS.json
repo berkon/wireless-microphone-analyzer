@@ -1,5 +1,16 @@
 { "label":"Audix", "submenu": [
-    { "label": "A-Band (566 - 590MHz)", "start_freq": 566000, "stop_freq": 590000, "details": "Audix A-Band (566 - 590MHz)", "band": "ADX_A_NONE" },    
-    { "label": "B-Band (614 - 638MHz)", "start_freq": 614000, "stop_freq": 638000, "details": "Audix B-Band (470 - 538MHz)", "band": "ADX_B_NONE" },
-    { "label": "C-Band (638 - 662MHz)", "start_freq": 638000, "stop_freq": 662000, "details": "Audix C-Band (638 - 662MHz)", "band": "ADX_C_NONE" }
+    { "label":"RAD 360", "submenu": [
+        { "label": "A-Band (566 - 590MHz)", "start_freq": 566000, "stop_freq": 590000, "details": "Audix RAD 360 A-Band (566 - 590MHz)", "band": "ADX_A_NONE_RAD-360" },    
+        { "label": "B-Band (614 - 638MHz)", "start_freq": 614000, "stop_freq": 638000, "details": "Audix RAD 360 B-Band (470 - 538MHz)", "band": "ADX_B_NONE_RAD-360" },
+        { "label": "C-Band (638 - 662MHz)", "start_freq": 638000, "stop_freq": 662000, "details": "Audix RAD 360 C-Band (638 - 662MHz)", "band": "ADX_C_NONE_RAD-360" }
+    ]},
+    { "label":"R41/R42", "submenu": [
+        { "label": "A-Band (522 - 554MHz)", "start_freq": 522000, "stop_freq": 554000, "details": "Audix R41/R42 A-Band (522 - 554MHz)", "band": "ADX_A_NONE_RAD-R41-R42" },
+        { "label": "B-Band (554 - 586MHz)", "start_freq": 554000, "stop_freq": 586000, "details": "Audix R41/R42 B-Band (554 - 586MHz)", "band": "ADX_B_NONE_RAD-R41-R42" }
+    ]},
+    { "label":"R61/R62", "submenu": [
+        { "label": "A+B-Band (522 - 586MHz)", "start_freq": 522000, "stop_freq": 586000, "details": "Audix A+B-Band (522 - 586MHz)", "band": "ADX_AB_RAD-R61-R62"      },
+        { "label": "823 - 832MHz"           , "start_freq": 823000, "stop_freq": 832000, "details": "Audix R61/R62 (823 - 832MHz)" , "band": "ADX_823-832_RAD-R61-R62" },
+        { "label": "863 - 865MHz"           , "start_freq": 863000, "stop_freq": 865000, "details": "Audix R61/R62 (863 - 865MHz)" , "band": "ADX_863-865_RAD-R61-R62" }
+    ]}
 ]}
