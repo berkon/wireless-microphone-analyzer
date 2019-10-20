@@ -1,7 +1,7 @@
 {
   "name": "wireless-microphone-analyzer",
   "productName": "Wireless Microphone Analyzer",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "license": "CC0-1.0",
   "description": "Uses the RF-Explorer (a spectrum analyzer hardware) to check for free/congested wireless microphone frequencies",
   "author": "Bernd Konnerth <bernd@konnerth.de>",

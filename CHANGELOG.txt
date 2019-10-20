@@ -1,3 +1,9 @@
+V1.6.1
+    FEATURES
+        - Added Audix bands R41/R42 and R61/R62
+    FIXES
+        - Fixed black drop down menus on Ubuntu 18
+
 V1.6.0
     FEATURES
         - Added Shure Axient-D channel presets
