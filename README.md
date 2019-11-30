@@ -32,11 +32,10 @@ The following mouse/keyboard commands zoom/move the frequency range:
 ### Installation
 
 #### Windows
-Download and install the **.exe** installer.
+Download and install the **.exe** installer. The required drivers for Windows can be found here: https://j3.rf-explorer.com/43-rfe/how-to
 
 #### Mac
-Download and install the **.dmg** package. Also make sure to download and install the necessary USB-Serial driver according to this guide:
-https://j3.rf-explorer.com/43-rfe/how-to/205-h2-macosx-drivers
+Download and install the **.dmg** package. Also make sure to download and install the necessary USB-Serial driver according to this guide: https://j3.rf-explorer.com/43-rfe/how-to/205-h2-macosx-drivers
 
 #### Linux
 For all common Linux distribuitions the **.AppImage** can be used without any installation (like a portable applications on Windows).
@@ -54,3 +53,5 @@ In order to run the tool as non-root, you have to add your username to the "dial
     sudo gpasswd --add <your_username> dialout
     
 IMPORTANT: After adding your username to the group you have to logout/login (or reboot)!
+
+For linux normally no special driver is required, as the corresponding driver is already included in most Linux distribuitions. In case the driver is missing in your installation, you can download it from here: https://j3.rf-explorer.com/43-rfe/how-to
