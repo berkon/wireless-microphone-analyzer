@@ -1,0 +1,12 @@
+[
+    { "start": 452500 , "stop": 457500 , "info": "LTE-31 450 Down"     },
+    { "start": 462500 , "stop": 467500 , "info": "LTE-31 450 Up"       },
+    { "start": 791000 , "stop": 821000 , "info": "LTE-20 800 Down"     },
+    { "start": 832000 , "stop": 862000 , "info": "LTE-20 800 Up"       },
+    { "start": 864000 , "stop": 868200 , "info": "Unknown"             },
+    { "start": 876000 , "stop": 880000 , "info": "GSM-R"               },
+    { "start": 880000 , "stop": 915000 , "info": "LTE-8 900 Up"        },
+    { "start": 880000 , "stop": 915000 , "info": "LTE-8 900 Up"        },
+    { "start": 921000 , "stop": 925000 , "info": "GSM-R"               },
+    { "start": 925000 , "stop": 960000 , "info": "LTE-8 900 Down"      }
+]
