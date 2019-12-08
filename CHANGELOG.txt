@@ -1,3 +1,7 @@
+V1.6.2
+    FEATURES
+        - Added Russian TV channels and forbidden ranges
+
 V1.6.1
     FEATURES
         - Added Audix bands R41/R42 and R61/R62
