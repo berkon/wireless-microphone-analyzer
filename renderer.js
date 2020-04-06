@@ -1008,7 +1008,7 @@ function checkSpanExceeded ( start_f, stop_f ) {
 document.addEventListener ( "wheel", function ( e ) {
     let start_f = 0, stop_f = 0;
     let delta_freq_10percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 10 ); // 10% of freq range
-    let delta_freq_30percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 30 ); // 30% of freq range
+    let delta_freq_25percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 25 ); // 25% of freq range
     let delta_freq_50percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 50 ); // 50% of freq range
 
     if ( e.deltaY > 0 ) { // Zoom out
@@ -1026,8 +1026,8 @@ document.addEventListener ( "wheel", function ( e ) {
             start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
             stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
         } else if ( e.shiftKey && !e.ctrlKey ) {
-            start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_30percent;
-            stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_30percent;
+            start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_25percent;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_25percent;
         }
         
         if ( stop_f - start_f < SWEEP_POINTS )
@@ -1057,7 +1057,7 @@ document.addEventListener ( "wheel", function ( e ) {
 document.addEventListener ( "keydown", function ( e ) {
     let start_f = 0, stop_f = 0;
     let delta_freq_10percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 10 ); // 10% of freq range
-    let delta_freq_30percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 30 ); // 30% of freq range
+    let delta_freq_25percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 25 ); // 25% of freq range
     let delta_freq_50percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 50 ); // 50% of freq range
 
     switch ( e.keyCode ) {
@@ -1104,12 +1104,12 @@ document.addEventListener ( "keydown", function ( e ) {
             break;
 
         case 38: // Zoom in
-            if ( !e.shiftKey ) { // Zoom in by removing 10% of span on both sides ( = 20% ) if SHIFT not pressed
+            if ( !e.shiftKey ) { // Zoom in by removing 10% of span on both sides ( = 20% )
                 start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
                 stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
-            } else { // Zoom in by removing 30% of span on both sides ( = 60% ) if SHIFT is pressed
-                start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_30percent;
-                stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_30percent;
+            } else { // Zoom in by removing 25% of span on both sides ( = 50% )
+                start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_25percent;
+                stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_25percent;
             }
             
             if ( stop_f - start_f < SWEEP_POINTS )
@@ -1119,12 +1119,12 @@ document.addEventListener ( "keydown", function ( e ) {
             break;
 
         case 40: // Zoom out
-            if ( !e.shiftKey ) { // Zoom out by adding 10% of span on both sides ( = 20% ) if SHIFT not pressed
+            if ( !e.shiftKey ) { // Zoom out by adding 10% of span on both sides ( = 20% )
                 start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_10percent;
                 stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
-            } else { // Zoom out by adding 30% of span on both sides ( = 60% ) if SHIFT is pressed
-                start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_30percent;
-                stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_30percent;
+            } else { // Zoom out by adding 50% of span on both sides ( = 100% )
+                start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_50percent;
+                stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_50percent;
             }
 
             [ start_f, stop_f ] = checkSpanExceeded ( start_f, stop_f );

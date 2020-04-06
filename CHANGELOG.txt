@@ -1,3 +1,8 @@
+V1.7.0
+    FEATURES
+        - Fast scrolling/zooming with SHIFT now possible with mouse as well
+        - Corrected wrong zoom percentage values
+
 V1.6.2
     FEATURES
         - Added Russian TV channels and forbidden ranges
