@@ -8,6 +8,14 @@
 
    to the "scripts" section. Then if "npm start" or "npm run dist" is executed,
    electron-builder will make sure that the native binaries are rebuilt if required.
+
+   In case there are no pre-build binaries available, the binaries might have to be built
+   locally. Therefore the visual studio runtime VS 2015 is required. Please install it as follows:
+
+        npm install --global --production windows-build-tools --vs2015 
+
+   This page might help (https://spin.atomicobject.com/2019/03/27/node-gyp-windows/)
+    
    This is just an explanation on how to do it without electron-builder. This page
    explains how to install/rebuild for Electron https://serialport.io/docs/en/guide-installation
 
