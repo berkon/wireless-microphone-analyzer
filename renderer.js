@@ -650,7 +650,7 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq ) {
     port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
     
     responeCheckTimer = setTimeout ( function () {
-        console.error ("No Response!");
+        console.error ("No Response from device!");
         responeCheckTimer = undefined;
     }, SERIAL_RESPONSE_TIMEOUT );
 }
@@ -1008,24 +1008,46 @@ function checkSpanExceeded ( start_f, stop_f ) {
 document.addEventListener ( "wheel", function ( e ) {
     let start_f = 0, stop_f = 0;
     let delta_freq_10percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 10 ); // 10% of freq range
+    let delta_freq_30percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 30 ); // 30% of freq range
+    let delta_freq_50percent = Math.floor ( ( ( Math.floor(STOP_FREQ/1000) - Math.floor(START_FREQ/1000) ) / 100 ) * 50 ); // 50% of freq range
 
     if ( e.deltaY > 0 ) { // Zoom out
-        start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_10percent;
-        stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
+        if ( !e.shiftKey && !e.ctrlKey ) {
+            start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_10percent;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
+        } else if ( e.shiftKey && !e.ctrlKey ) {
+            start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_50percent;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_50percent;
+        }
 
         [ start_f, stop_f ] = checkSpanExceeded ( start_f, stop_f );
     } else if ( e.deltaY < 0 ) { // Zoom in
-        start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
-        stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
+        if ( !e.shiftKey && !e.ctrlKey ) {
+            start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
+        } else if ( e.shiftKey && !e.ctrlKey ) {
+            start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_30percent;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_30percent;
+        }
         
         if ( stop_f - start_f < SWEEP_POINTS )
             return;
     } else if ( e.deltaX < 0 ) { // Move left
-        start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_10percent;
-        stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
+        if ( !e.shiftKey && !e.ctrlKey ) {
+            start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_10percent;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_10percent;
+        } else if ( e.shiftKey && !e.ctrlKey ) {
+            start_f = Math.floor ( START_FREQ/1000 ) - delta_freq_50percent;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) - delta_freq_50percent;
+        }
     } else if ( e.deltaX > 0 ) { // Move right
-        start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
-        stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
+        if ( !e.shiftKey && !e.ctrlKey ) {
+            start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_10percent;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_10percent;
+        } else if ( e.shiftKey && !e.ctrlKey ) {
+            start_f = Math.floor ( START_FREQ/1000 ) + delta_freq_50percent;
+            stop_f  = Math.floor ( STOP_FREQ /1000 ) + delta_freq_50percent;
+        }
     }
 
     BAND_DETAILS = "";
