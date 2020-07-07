@@ -14,7 +14,7 @@
     "analyzer"
   ],
   "devDependencies": {
-    "electron": "^4.0.0",
+    "electron": "^7.2.4",
     "electron-builder": "^20.38.5"
   },
   "dependencies": {
