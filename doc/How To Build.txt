@@ -12,7 +12,7 @@
    In case there are no pre-build binaries available, the binaries might have to be built
    locally. Therefore the visual studio runtime VS 2015 is required. Please install it as follows:
 
-        npm install --global --production windows-build-tools --vs2015 
+        npm install --global --production windows-build-tools --vs2017 
 
    This page might help (https://spin.atomicobject.com/2019/03/27/node-gyp-windows/)
     

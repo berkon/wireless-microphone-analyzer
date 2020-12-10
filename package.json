@@ -14,15 +14,15 @@
     "analyzer"
   ],
   "devDependencies": {
-    "electron": "^4.0.0",
-    "electron-builder": "^20.38.5"
+    "electron": "11.0.4",
+    "electron-builder": "22.9.1"
   },
   "dependencies": {
     "chart.js": "^2.7.2",
     "configstore": "^4.0.0",
     "electron-localshortcut": "^3.1.0",
     "require-all": "^3.0.0",
-    "serialport": "^7.0.2",
+    "serialport": "9.0.3",
     "vis": "^4.21.0"
   },
   "scripts": {
@@ -32,7 +32,7 @@
     "start_linux": "node_modules/electron/dist/electron .",
     "install_start": "npm install && node_modules\\electron\\dist\\electron.exe .",
     "pack": "build --dir",
-    "dist": "build"
+    "dist": "electron-builder"
   },
   "build": {
     "appId": "wireless-microphone-analyzer",

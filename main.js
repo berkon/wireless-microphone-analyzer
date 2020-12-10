@@ -16,6 +16,11 @@ const { dialog }                     = require ( 'electron'               );
 
 app.commandLine.appendSwitch('disable-gpu');
 
+// See the following discussions for next setting
+// https://stackoverflow.com/questions/60106922/electron-non-context-aware-native-module-in-renderer
+//https://github.com/electron/electron/issues/18397#issuecomment-583221969
+app.allowRendererProcessReuse = false
+
 const ConfigStore = require ( 'configstore' );
 const configStore = new ConfigStore ( name );
 
@@ -38,7 +43,14 @@ if ( !country_code ) {
 }
 
 function createWindow () {
-    mainWindow = new BrowserWindow({width: 1200, height: 700});
+    mainWindow = new BrowserWindow ({
+        width: 1200,
+        height: 700,
+        webPreferences: {
+            nodeIntegration: true,
+            enableRemoteModule: true
+        }
+    });
     mainWindow.loadFile('index.html');
     let wc = mainWindow.webContents;
     //wc.openDevTools();
@@ -222,7 +234,7 @@ function createWindow () {
         }
         
         ports.forEach ( ( port ) => {
-            portNameArr.push ( port.comName );
+            portNameArr.push ( port.path );
         });
 
         menuJSON[MENU_PORT].submenu[0] = { label: 'Auto', type: 'radio', click () { wc.send ( 'SET_PORT',  portNameArr ); } }
