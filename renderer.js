@@ -21,7 +21,7 @@ var MIN_DBM    = -110;
 var MAX_SPAN   = undefined;
 var CONGESTION_LEVEL_DBM = -85;
 
-var SWEEP_POINTS = 112;
+var SWEEP_POINTS = -1;
 var SERIAL_RESPONSE_TIMEOUT = 1500;
 var VENDOR_ID  = 'NON';
 
@@ -614,17 +614,11 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq ) {
     if ( start_freq < MIN_FREQ ) {
         stop_freq += MIN_FREQ - start_freq; // stay at current position
         start_freq = MIN_FREQ; // don't move start_freq to frequencies lower than allowed
-
-        if ( stop_freq - start_freq < SWEEP_POINTS)
-            stop_freq = start_freq + SWEEP_POINTS;
     }
 
     if ( stop_freq > MAX_FREQ ) {
         start_freq -= stop_freq - MAX_FREQ; // don't move to higher frequencies than allowed
         stop_freq   = MAX_FREQ; // stay at current position
-
-        if ( stop_freq - start_freq < SWEEP_POINTS)
-            start_freq = stop_freq - SWEEP_POINTS;
     }
 
     let start_freq_str = start_freq.toString();
@@ -679,7 +673,7 @@ var rec_buf = []; // Buffer for continuosly receiving data
 var rec_buf_str = []; // rec_buf converted to string so that we can check for commands
 var msg_buf = []; // Once a message is complete, it will be placed in this buffer
 var msg_id_array = [
-    '$Sp',    // '$S' = sweep data, 'p' = ASCII code 112 ( 112 sweep points will be received)
+    '$S',     // '$S' = sweep data, 'p' = ASCII code 112 ( 112 sweep points will be received) 'à' = ASCII code 224 ( 224 sweep points will be received)
     '#C2-F:'  // '#C2-F:' = config data from device
 ];
 var msgStart = -1;
@@ -709,7 +703,9 @@ function setCallbacks () {
         if ( msgStart === -1 ) // Message found?
             return;
 
-        if ( msgId === '$Sp' ) {
+        if ( msgId === '$S' ) {
+//            SWEEP_POINTS = rec_buf_str.charCodeAt ( msgStart + msgId.length ) // right after the message ID there is a byte which contains the number of sweep points
+
             // If this is the first answer ever which we recieve from the device, this means that the serial port ist
             // valid and working. So stop the port check timer and initialize the Chart ...
             if ( !received_first_answer ) {
@@ -721,7 +717,7 @@ function setCallbacks () {
                 InitChart ();
             }
 
-            var dataStart = msgStart + msgId.length;
+            var dataStart = msgStart + msgId.length + 1; // +1 to exclude the byte following the message ID which contains the number of sweep points
             var val_changed = false;
 
             msg_buf = rec_buf.slice ( dataStart + rec_buf_sweep_poi, dataStart + SWEEP_POINTS );
@@ -790,6 +786,7 @@ function setCallbacks () {
 
                 START_FREQ = parseInt ( res_arr[0] ) * 1000; // Start frquency
                 FREQ_STEP  = parseInt ( res_arr[1] );        // Frequency step
+                SWEEP_POINTS = parseInt ( res_arr[4] );      // Number of sweep points
                 STOP_FREQ  = ( FREQ_STEP * (SWEEP_POINTS-1) ) + START_FREQ;
 
                 MIN_FREQ   = parseInt ( res_arr[7] ); // Minimum frequency
