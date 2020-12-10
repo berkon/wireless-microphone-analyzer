@@ -549,8 +549,10 @@ function openPort () {
 
             console.log ( "Trying port " + ports[i].path + " ...");
             port = new SerialPort ( ports[i].path, { baudRate : 500000 }, function ( err ) {
-                if ( err ) // Most likely the reason for the error is that the RF Explorer is not connected to this port. So we don't print an error message here.
-                    return;
+                if ( err ) {
+                    console.log ( err )
+                    return
+                }
 
                 setCallbacks();
                 sendAnalyzer_SetConfig ( start_f, stop_f );
