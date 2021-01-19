@@ -1,3 +1,10 @@
+V1.7.1
+    FEATURES
+        - On Windows the EXE now is a portable app and is no longer installing
+
+    FIXES
+        - Fixed broken CSV export for Wireless Workbench
+
 V1.7.0
     FEATURES
         - Fast scrolling/zooming with SHIFT now possible with mouse as well

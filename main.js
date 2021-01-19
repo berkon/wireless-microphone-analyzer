@@ -75,12 +75,13 @@ function createWindow () {
     var toolsMenuJSON = { label: 'Tools', submenu: [
         { label: 'Export', submenu: [
             { label: "Shure WW6 and IAS (CSV Format)", click () {
-                dialog.showSaveDialog({
+                dialog.showSaveDialog ({
                     title: "Export for Shure WW6 and IAS (CSV Format)",
                     filters: [ {name: "CSV", extensions: ["csv"]} ]
-                },
-                ( filename ) => { wc.send ( 'EXPORT_WW6_IAS_CSV', { filename : filename }); })
-            }}
+                }).then ( (res) => {
+                    wc.send ( 'EXPORT_WW6_IAS_CSV', { filename : res.filePath })
+                })  }
+            }
         ]},
         { label: 'Reset Peak             R', click () {
             wc.send ('RESET_PEAK', {});
