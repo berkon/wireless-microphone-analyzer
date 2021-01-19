@@ -4,3 +4,9 @@ dist/
 node_modules/
 
 npm-debug\.log
+
+*.pdf
+
+*.xlsx
+
+TODO.txt

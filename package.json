@@ -37,7 +37,7 @@
   "build": {
     "appId": "wireless-microphone-analyzer",
     "win": {
-      "target": "nsis",
+      "target": "portable",
       "icon": "build/microphone-wave.ico"
     },
     "linux": {
