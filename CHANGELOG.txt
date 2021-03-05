@@ -1,6 +1,9 @@
 V1.7.2
     FEATURES
         - Added Australian TV channels and forbidden ranges
+    FIXES
+        - Fixed broken restart handling and broken handling of dialog boxes in general
+        - Moved back from portable to NSIS installer. Otherwise restart is not working
 
 V1.7.1
     FEATURES
