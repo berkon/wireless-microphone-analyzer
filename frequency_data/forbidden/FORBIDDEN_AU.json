@@ -1,0 +1,9 @@
+[
+    { "start": 15000  , "stop": 174000  , "info": "Forbidden" },
+    { "start": 230000 , "stop": 520000  , "info": "Forbidden" },
+    { "start": 694000 , "stop": 915000  , "info": "Forbidden" },
+    { "start": 928000 , "stop": 1785000 , "info": "Forbidden" },
+    { "start": 1800000, "stop": 1880000 , "info": "Forbidden" },
+    { "start": 1900000, "stop": 2400000 , "info": "Forbidden" },
+    { "start": 2438500, "stop": 2700000 , "info": "Forbidden" }
+]

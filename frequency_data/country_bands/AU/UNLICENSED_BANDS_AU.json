@@ -1,0 +1,5 @@
+{ "label":"AU - Unlicensed bands", "submenu": [
+    { "label": "ISM Band          (915 - 928MHz)"    , "start_freq": 915000 , "stop_freq": 928000 , "details": "ISM Band (915 - 928MHz)"       },
+    { "label": "DECT                (1880 - 1900MHz)", "start_freq": 1880000, "stop_freq": 1900000, "details": "DECT (1880 - 1900MHz)"         },
+    { "label": "WLAN              (2400 - 2439MHz)"  , "start_freq": 2400000, "stop_freq": 2438500, "details": "WLAN (2400 - 2439MHz)"         }
+]}
