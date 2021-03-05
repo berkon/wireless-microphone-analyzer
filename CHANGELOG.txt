@@ -1,3 +1,7 @@
+V1.7.2
+    FEATURES
+        - Added Australian TV channels and forbidden ranges
+
 V1.7.1
     FEATURES
         - On Windows the EXE now is a portable app and no longer an installer
