@@ -538,15 +538,38 @@ function openPort () {
     let start_f = Math.floor ( START_FREQ / 1000 );
     let stop_f  = Math.floor ( STOP_FREQ  / 1000 );
 
-    if( !PORT_MENU_SELECTION || PORT_MENU_SELECTION === 'AUTO' ) { // Automatic port selection
+    if ( !PORT_MENU_SELECTION || PORT_MENU_SELECTION === 'AUTO' ) { // Automatic port selection
+        function showHwError ( msg ) {
+            if ( !msg )
+                msg = ""
+            else
+                msg += '\n\n'
+
+            const dialogOptions = {
+                type: 'error',
+                buttons: ['OK'],
+                message: 'Hardware error!',
+                detail:  msg + '- Make sure that the device is connected\n- Select the corresponding serial port (or leave default: \'Auto\')\n- If it still doesn\'t work please restart the app or press <CTRL><R>!'}
+            dialog.showMessageBoxSync ( dialogOptions )
+
+            if ( msg )
+                console.log ( msg )
+            else
+                console.log ( "Unable to find RF Explorer!" )
+        }
+        
         SerialPort.list().then ( (ports, err) => {
             if ( err ) {
-                console.log ( err );
-                return;
+                showHwError ( err )
+                return
+            }
+
+            if ( !ports.length ) {
+                showHwError ( "Unable to find serial ports!" )
+                return
             }
 
             let i = 0;
-
             console.log ( "Trying port " + ports[i].path + " ...");
             port = new SerialPort ( ports[i].path, { baudRate : 500000 }, function ( err ) {
                 if ( err ) {
@@ -554,39 +577,31 @@ function openPort () {
                     return
                 }
 
-                setCallbacks();
-                sendAnalyzer_SetConfig ( start_f, stop_f );
+                setCallbacks()
+                sendAnalyzer_SetConfig ( start_f, stop_f )
             });
 
-            i++;
+            i++
 
             autoPortCheckTimer = setInterval ( () => {
-                if ( i === ports.length ) {
-                    clearInterval ( autoPortCheckTimer );
-                    const dialogOptions = {
-                        type: 'error',
-                        buttons: ['OK'],
-                        message: 'Unable to find RF Explorer hardware!',
-                        detail:  '- Make sure that the device is connected\n- Select the corresponding serial port (or leave default: \'Auto\')\n- If it still doesn\'t work please restart the app or press <CTRL><R>!'}
-                    dialog.showMessageBox ( dialogOptions, (i) => {
-                    //    console.log("Button " + i + " was pressed!")
-                    });
-                    console.log ( "Unable to find RF Explorer!");
-                    return;
+                if ( !ports || i === ports.length ) {
+                    clearInterval ( autoPortCheckTimer )
+                    showHwError()
+                    return
                 }
                 
                 console.log ( "Trying port " + ports[i].path + " ...");
                 port = new SerialPort ( ports[i].path, { baudRate : 500000 }, function ( err ) {
                     if ( err ) // Most likely the reason for the error is that the RF Explorer is not connected to this port. So we don't print an error message here.
-                        return;
+                        return
 
-                    setCallbacks();
-                    sendAnalyzer_SetConfig ( start_f, stop_f );
-                });
+                    setCallbacks()
+                    sendAnalyzer_SetConfig ( start_f, stop_f )
+                })
 
-                i++;
-            }, SERIAL_RESPONSE_TIMEOUT);
-        });
+                i++
+            }, SERIAL_RESPONSE_TIMEOUT)
+        })
     } else  {
         port = new SerialPort ( PORT_MENU_SELECTION, { baudRate : 500000 }, function ( err ) {
             if ( err ) {
@@ -809,9 +824,7 @@ function setCallbacks () {
                         buttons: ['OK'],
                         message: 'Invalid frequency range!',
                         detail:  'The currently selected frequency range is not valid for the selected antenna module! Make sure to select a valid frequency range!'}
-                    dialog.showMessageBox ( dialogOptions, (i) => {
-                    //    console.log("Button " + i + " was pressed!")
-                    });
+                    dialog.showMessageBoxSync ( dialogOptions )
                 }
 
                 let band_details = "";
@@ -909,10 +922,8 @@ ipcRenderer.on ( 'SET_COUNTRY', (event, message) => {
             message: 'Empty or invalid country code!',
             detail:  'country_code.json might be corrupted!'
         }
-        dialog.showMessageBox ( dialogOptions, (i) => {
-        //    console.log("Button " + i + " was pressed!")
-        });
-        console.log ( "Empty or invalid country code!" );
+        dialog.showMessageBoxSync ( dialogOptions )
+        console.log ( "Empty or invalid country code!" )
         return;
     }
 
@@ -926,7 +937,7 @@ ipcRenderer.on ( 'SET_COUNTRY', (event, message) => {
             message: 'Country not available!',
             detail:  'No frequency related information available for ' + message.country_label +' (' + message.country_code + ')' + '! Falling back to Germany (DE)'
         }
-        dialog.showMessageBox ( dialogOptions, (i) => {});
+        dialog.showMessageBoxSync ( dialogOptions )
         console.log ( "File with forbidden ranges not found for country code: '" + message.country_code +"' => Falling back to: 'DE'");
     } else {
         COUNTRY_CODE = message.country_code;
@@ -937,17 +948,9 @@ ipcRenderer.on ( 'SET_COUNTRY', (event, message) => {
     configStore.set ( 'country_name', COUNTRY_NAME );
     FREQ_FORBIDDEN = require ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + COUNTRY_CODE + '.json');
 
-    dialog.showMessageBox ({
-        type: 'question',
-        buttons: ['Cancel', 'Restart'],
-        message: 'Restart required!',
-        detail:  'Please restart the app, for the new country settings to become active. Otherwise menues won\'t be updated!'
-    }, (i) => {
-        if ( i === 1 ) {
-            app.relaunch();
-            app.exit(0);
-        }
-    });
+    // Restart app
+    app.relaunch ()
+    app.exit ( 0)
 
     if ( fs.existsSync ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json' ) )
         FREQ_GRIDS = require ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json');
