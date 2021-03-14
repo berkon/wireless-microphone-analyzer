@@ -31,6 +31,15 @@ let MENU_PORT     = 3;
 let MENU_TOOLS    = 4;
 let MENU_HELP     = 5;
 
+if ( process.platform === 'darwin') {
+    MENU_BAND     = 1;
+    MENU_CHANNELS = 2;
+    MENU_COUNTRY  = 3;
+    MENU_PORT     = 4;
+    MENU_TOOLS    = 5;
+    MENU_HELP     = 6;
+}
+
 let mainWindow;
 let helpWindow;
 let aboutWindow;
@@ -128,6 +137,10 @@ function createWindow () {
     }
 
     var menuJSON = [];
+
+    if ( process.platform === 'darwin' )
+        menuJSON.push ({ label: 'App Menu', submenu: [{ role: 'quit'}] })
+    
     menuJSON.push ({ label: 'Band', submenu: [] });
 
     Object.entries ( FREQ_VENDOR_BANDS ).forEach ( vendorBandData => {
