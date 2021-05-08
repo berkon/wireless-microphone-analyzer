@@ -1,1 +1,6 @@
-PNG was converted to ICO via this Website: https://convertico.com/
+PNG was converted to ICO via this Website:
+https://convertico.com/
+But it looks like this site is not online anymore (18.03.2021)
+
+Alternatively it can be done via Gimp:
+https://computerhalbwissen.de/konvertieren-eines-bildes-zu-einem-icon-mit-gimp/
