@@ -21,7 +21,7 @@ var MIN_DBM    = -110;
 var MAX_SPAN   = undefined;
 var CONGESTION_LEVEL_DBM = -85;
 
-var SWEEP_POINTS = -1;
+var SWEEP_POINTS = 112;
 var SERIAL_RESPONSE_TIMEOUT = 1500;
 var VENDOR_ID  = 'NON';
 
