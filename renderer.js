@@ -4,36 +4,35 @@ const { ipcRenderer } = require ('electron');
 const { app }         = require ('electron').remote;
 const ConfigStore     = require ( 'configstore' );
 const SerialPort      = require ( 'serialport'  );
+const Delimiter        = require ( '@serialport/parser-delimiter')
 const Chart           = require ( 'chart.js'    );
 const FREQ_VENDOR_PRESETS = require ( 'require-all' )(__dirname +'/frequency_data/presets'  );
 const Pkg             = require ('./package.json');
 const { dialog }      = require ('electron'     ).remote;
 const fs              = require ('fs');
 
-const configStore = new ConfigStore ( Pkg.name );
+const configStore = new ConfigStore ( Pkg.name )
+const SAVED_DATA_VERSION = 1
 
-const SAVED_DATA_VERSION = 1;
+var   MAX_FREQ   = 2700000 // 2700000 kHz (2.7 GHz)
+var   MIN_FREQ   = 15000   //   15000 kHz ( 15 MHz)
+const MAX_DBM    = -20
+const MIN_DBM    = -110
+const CONGESTION_LEVEL_DBM = -85
+const SERIAL_RESPONSE_TIMEOUT = 1500
 
-var MAX_FREQ   = 2700000; // 2700000 kHz (2.7 GHz)
-var MIN_FREQ   =   15000; //   15000 kHz ( 15 MHz)
-var MAX_DBM    = -20;
-var MIN_DBM    = -110;
-var MAX_SPAN   = undefined;
-var CONGESTION_LEVEL_DBM = -85;
+const LINE_LIVE          = 0
+const LINE_RECOMMENDED   = 1
+const LINE_FORBIDDEN     = 2
+const LINE_CONGESTED     = 3
+const LINE_CONGEST_TRESH = 4
+const LINE_GRIDS         = 5
+const LINE_FORBIDDEN_MARKERS = 6
 
-var SWEEP_POINTS = -1;
-var SERIAL_RESPONSE_TIMEOUT = 1500;
-var VENDOR_ID  = 'NON';
-
-var LINE_LIVE        = 0;
-var LINE_RECOMMENDED = 1;
-var LINE_FORBIDDEN   = 2;
-var LINE_CONGESTED   = 3;
-var LINE_CONGEST_TRESH = 4;
-var LINE_GRIDS       = 5;
-var LINE_FORBIDDEN_MARKERS = 6;
-
-var PORT_MENU_SELECTION = undefined;
+var MAX_SPAN     = undefined
+var SWEEP_POINTS = undefined
+var PORT_MENU_SELECTION = undefined
+var VENDOR_ID    = 'NON'
 
 const chartColors = {
 	RED    : 'rgb(255, 99 , 132)',
@@ -45,35 +44,33 @@ const chartColors = {
 	GREY   : 'rgb(201, 203, 207)'
 };
 
-let RECOMMENDED_CHANNELS_COLOR = chartColors.GREEN;
-let FORBIDDEN_COLOR            = chartColors.RED;
-let SCAN_COLOR                 = chartColors.PURPLE;
-let CONGESTED_COLOR            = chartColors.ORANGE;
-let CHAN_GRID_COLOR            = chartColors.GREY;
+const RECOMMENDED_CHANNELS_COLOR = chartColors.GREEN
+const FORBIDDEN_COLOR            = chartColors.RED
+const SCAN_COLOR                 = chartColors.PURPLE
+const CONGESTED_COLOR            = chartColors.ORANGE
+const CHAN_GRID_COLOR            = chartColors.GREY
 
-let SENNHEISER_CHANNEL_WIDTH   = 96000; // +/-48kHz Spitzenhub
+const SENNHEISER_CHANNEL_WIDTH   = 96000 // +/-48kHz Spitzenhub
 
-var port = undefined;
-var autoPortCheckTimer = undefined;
-var responeCheckTimer  = undefined;
+var port = undefined
+var autoPortCheckTimer  = undefined
+var responseCheckTimer  = undefined
 
-let saved_data_version = configStore.get('saved_data_version');
+let saved_data_version = configStore.get('saved_data_version')
 
 // Saved data version handling
 if ( !saved_data_version ) {
-    configStore.set ( 'saved_data_version', SAVED_DATA_VERSION );
-    saved_data_version = SAVED_DATA_VERSION;
+    configStore.set ( 'saved_data_version', SAVED_DATA_VERSION )
+    saved_data_version = SAVED_DATA_VERSION
 } else {
     switch ( saved_data_version ) {
         case 1: // Nothing to do
             break;
 
         default:
-            console.log ( "Unkonw version of saved data!");
+            console.log ( "Unknown version of saved data!" )
     }
 }
-
-
 
 let chPreset_Vendor = configStore.get('chPreset.vendor');
 let chPreset_Band   = configStore.get('chPreset.band'  );
@@ -98,7 +95,7 @@ if ( VIS_FORBIDDEN  === undefined ) VIS_FORBIDDEN  = true;
 if ( VIS_CONGEST    === undefined ) VIS_CONGEST    = true;
 if ( VIS_TV_CHAN    === undefined ) VIS_TV_CHAN    = true;
 
-let received_first_answer = false;
+let received_config_data = false;
 
 if ( !COUNTRY_CODE || !fs.existsSync ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + COUNTRY_CODE + '.json' ) ) {
     COUNTRY_CODE = 'DE';
@@ -617,16 +614,8 @@ function openPort () {
 
 // Configure analyzer device
 function sendAnalyzer_SetConfig ( start_freq, stop_freq ) {
-    if ( responeCheckTimer ) // Exit immediately in case another command is running
-        return;
-
-    rec_buf = []; // Buffer for continuosly receiving data
-    rec_buf_str = []; // rec_buf converted to string so that we can check for commands
-    msg_buf = []; // Once a message is complete, it will be placed in this buffer
-    msgStart = -1;
-    msgEnd   = -1;
-    msgId    = -1;
-    rec_buf_sweep_poi = 0;
+    if ( responseCheckTimer ) // Exit immediately in case another command is running
+        return
 
     if ( start_freq < MIN_FREQ ) {
         stop_freq += MIN_FREQ - start_freq; // stay at current position
@@ -651,18 +640,21 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq ) {
 //    var config_buf = Buffer.from ( '#0Cp0', 'ascii' ); // Second character will be replaced in next line by a binary lenght value
 //    config_buf.writeUInt8 ( 0x05, 1 );
 //    port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
-
     let config_buf = Buffer.from ( '#0C2-F:'+start_freq_str+','+stop_freq_str+',-0'+Math.abs(MAX_DBM).toString()+','+MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
 
     START_FREQ = start_freq * 1000;
     STOP_FREQ  = stop_freq  * 1000;
     config_buf.writeUInt8 ( 0x20, 1 );
 
-    port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
-    
-    responeCheckTimer = setTimeout ( function () {
+    let res = port.write ( config_buf, 'ascii', function(err) {
+        if ( err )
+            console.log ( 'Error on write: ', err.message )
+            return
+        })
+
+    responseCheckTimer = setTimeout ( function () {
         console.error ("No Response from device!");
-        responeCheckTimer = undefined;
+        responseCheckTimer = undefined;
     }, SERIAL_RESPONSE_TIMEOUT );
 }
 
@@ -686,180 +678,126 @@ function checkCongestion ( pos, val ) {
 /***********************************/
 /*    Receive data from device     */
 /***********************************/
-var rec_buf = []; // Buffer for continuosly receiving data
-var rec_buf_str = []; // rec_buf converted to string so that we can check for commands
-var msg_buf = []; // Once a message is complete, it will be placed in this buffer
 var msg_id_array = [
-    '$S',     // '$S' = sweep data, 'p' = ASCII code 112 ( 112 sweep points will be received) 'à' = ASCII code 224 ( 224 sweep points will be received)
-    '#C2-F:'  // '#C2-F:' = config data from device
-];
-var msgStart = -1;
-var msgEnd   = -1;
-var msgId    = -1; // Command prefix of the message (see msg_id_array[])
-var rec_buf_sweep_poi = 0;
+    '#C2-F:',  // '#C2-F:' = config data from device
+    '$S'       // '$S' = sweep data, 'p' = ASCII code 112 ( 112 sweep points will be received) 'à' = ASCII code 224 ( 224 sweep points will be received)
+]
 
 function setCallbacks () {
-    port.on ( 'data', function ( data ) {
-        Array.prototype.push.apply ( rec_buf, data ); //Add new data to receive buffer
-        rec_buf_str = String.fromCharCode.apply ( null, rec_buf ); // Convert to characters
+    const parser = port.pipe(new Delimiter({ delimiter: '\r\n' }))
 
-        if ( msgStart === -1 ) { // Look for message start
-            msgEnd = -1;
-            msgId  = -1;
+    parser.on ( 'data', (res) => {
+        let buf = String.fromCharCode.apply ( null, res )
 
-            for ( var msg_id of msg_id_array ) {
-                let tmpMsgStart = rec_buf_str.indexOf ( msg_id );
-
-                if ( tmpMsgStart !== -1 && (msgStart === -1 || tmpMsgStart < msgStart) ) {
-                    msgStart = tmpMsgStart;
-                    msgId    = msg_id;
-                }
+        for ( var id of msg_id_array ) {
+            if ( buf.indexOf ( id ) !== -1 ) {
+                handleMessage ({
+                    id,
+                    dataLength: parseInt ( buf[id.length] ),
+                    data: buf.substring ( id.length + 1 ) // +1 to exclude the byte following the message ID which contains the number of sweep points
+                })
             }
-        }
+        }            
+    })
+}
 
-        if ( msgStart === -1 ) // Message found?
-            return;
+function handleMessage ( msg ) {
+    switch ( msg.id ) {
+        case '#C2-F:': // Received config data from device
+            console.log ( "Received config data:  ID:", msg.id, "DATA LENGTH:", msg.dataLength, "DATA:", msg.data )
+            received_config_data = true
 
-        if ( msgId === '$S' ) {
-//            SWEEP_POINTS = rec_buf_str.charCodeAt ( msgStart + msgId.length ) // right after the message ID there is a byte which contains the number of sweep points
+            clearTimeout  ( responseCheckTimer )
+            clearInterval ( autoPortCheckTimer )
+            responseCheckTimer = undefined
+            autoPortCheckTimer = undefined
 
-            // If this is the first answer ever which we recieve from the device, this means that the serial port ist
-            // valid and working. So stop the port check timer and initialize the Chart ...
-            if ( !received_first_answer ) {
-                received_first_answer = true;
-                clearInterval ( autoPortCheckTimer );
-                clearTimeout  ( responeCheckTimer  );
-                responeCheckTimer = undefined;
-                console.log ( "RF Explorer found!" );
-                InitChart ();
+            let res_arr = msg.data.split ( "," )
+
+            START_FREQ   = parseInt ( res_arr[0] ) * 1000 // Start frquency
+            FREQ_STEP    = parseInt ( res_arr[1] )        // Frequency step
+            SWEEP_POINTS = parseInt ( res_arr[4] )        // Number of sweep points
+            STOP_FREQ    = ( FREQ_STEP * (SWEEP_POINTS-1) ) + START_FREQ
+
+            MIN_FREQ   = parseInt ( res_arr[7] ) // Minimum frequency
+            MAX_FREQ   = parseInt ( res_arr[8] ) // Maximum frequency
+            MAX_SPAN   = parseInt ( res_arr[9] ) // Maximum span
+
+            configStore.set ( 'start_freq', START_FREQ )
+            configStore.set ( 'stop_freq' , STOP_FREQ  )
+            configStore.set ( 'freq_step' , FREQ_STEP  )
+
+            let start_f = Math.floor ( START_FREQ / 1000 )
+            let stop_f  = Math.ceil  ( STOP_FREQ  / 1000 )
+            let span_f  = Math.ceil  ( stop_f - start_f  )
+
+            if ( start_f < MIN_FREQ || stop_f > MAX_FREQ ) {
+                const dialogOptions = {
+                    type:    'error',
+                    buttons: ['OK'],
+                    message: 'Invalid frequency range!',
+                    detail:  'The currently selected frequency range is not valid for the selected antenna module! Make sure to select a valid frequency range!'}
+                dialog.showMessageBoxSync ( dialogOptions )
             }
 
-            var dataStart = msgStart + msgId.length + 1; // +1 to exclude the byte following the message ID which contains the number of sweep points
-            var val_changed = false;
+            let band_details = ""
 
-            msg_buf = rec_buf.slice ( dataStart + rec_buf_sweep_poi, dataStart + SWEEP_POINTS );
+            if ( !BAND_DETAILS )
+                band_details = "    |    Band: <NO BAND SELECTED>"
+            else 
+                band_details = "    |    Band: " + BAND_DETAILS + ""
+            
+            let country_information = ""
 
-            for ( let i = 0 ; i < msg_buf.length ; i++ ) {
-                msg_buf[i] = -( msg_buf[i] / 2 );
-                
-                if ( msg_buf[i] < MIN_DBM)
-                    msg_buf[i] = MIN_DBM;
+            if ( !COUNTRY_CODE || !COUNTRY_NAME)
+                country_information = "    |    Country: Germany (DE)"
+            else
+                country_information = "    |    Country: " + COUNTRY_NAME + " (" + COUNTRY_CODE + ")"
 
-                if ( msg_buf[i] > myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] || myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] === undefined ) {
-                    myChart.data.datasets[LINE_LIVE].data[rec_buf_sweep_poi] = msg_buf[i];
-                    val_changed = true;
+            let label = formatFrequencyString("Range: " + start_f.toString()) + " - " + formatFrequencyString(stop_f.toString()) + " MHz    |    Span: " + formatFrequencyString(span_f.toString()) + "MHz" + country_information + band_details
 
-                    let congestedChannel = checkCongestion ( rec_buf_sweep_poi, msg_buf[i] );
+            myChart.options.scales.xAxes[0].scaleLabel.labelString = label
+            configStore.set ( 'band_label' , label )
 
-                    if ( congestedChannel ) {
-                        for ( let i = congestedChannel[0] ; i <= congestedChannel[1] ; i++ ) {
-                            myChart.data.datasets[LINE_RECOMMENDED].data[i] = undefined;
-                            myChart.data.datasets[LINE_CONGESTED  ].data[i] = MAX_DBM;
+            InitChart ()
+            break
+
+        case '$S':
+            if ( received_config_data ) {
+                var val_changed = false
+                let msgData = msg.data
+
+                for ( let i = 0 ; i < msgData.length ; i++ ) {
+                    let value = -( msgData[i].charCodeAt(0) / 2 )
+
+                    if ( value < MIN_DBM)
+                        value = MIN_DBM
+
+                    if ( value > myChart.data.datasets[LINE_LIVE].data[i] || myChart.data.datasets[LINE_LIVE].data[i] === undefined ) {
+                        myChart.data.datasets[LINE_LIVE].data[i] = value
+                        val_changed = true
+
+                        let congestedChannel = checkCongestion ( i, value )
+
+                        if ( congestedChannel ) {
+                            for ( let i = congestedChannel[0] ; i <= congestedChannel[1] ; i++ ) {
+                                myChart.data.datasets[LINE_RECOMMENDED].data[i] = undefined
+                                myChart.data.datasets[LINE_CONGESTED  ].data[i] = MAX_DBM
+                            }
                         }
                     }
                 }
 
-                rec_buf_sweep_poi++;
+                if ( val_changed )
+                    myChart.update()
             }
+            break
 
-            if ( val_changed )
-                myChart.update();
-
-            if ( rec_buf_sweep_poi === SWEEP_POINTS ) { // Not waiting to get CR LF here since logic would be more complicated. Instead CR LF will automatically be skipped anyway when searching for next message!
-                rec_buf = rec_buf.slice ( dataStart + SWEEP_POINTS ); // Remove message from rec_buf including CR LF at end of line
-                rec_buf_sweep_poi = 0;
-                msgStart = -1;            
-                msgId    = -1;
-            }
-
-            return;
-        } else {
-            msgEnd = rec_buf_str.indexOf ( '\r\n', msgStart + msgId.length );
-
-            if ( msgEnd !== -1 ) {
-                msg_buf = rec_buf.slice ( msgStart + msgId.length, msgEnd );
-                rec_buf = rec_buf.slice ( msgEnd + 2 ); // Remove oldest message from rec_buf including CR LF at end of line
-    //console.log ( "ID: "+msgId+" LEN: "+msg_buf.length+"   " + String.fromCharCode.apply ( null, msg_buf) );
-    //console.log ( "REMOVE START: 0 END: " + msgEnd );
-            } else
-                return;
-        }
-
-        switch ( msgId ) {
-            case '#C2-F:': // Received config data from device
-                clearTimeout ( responeCheckTimer );
-                responeCheckTimer = undefined;
-
-                // If this is the first answer ever which we recieve from the device, this means that the serial port ist
-                // valid and working. So stop the port check timer and initialize the Chart ...
-                if ( !received_first_answer ) {
-                    received_first_answer = true;
-                    clearInterval ( autoPortCheckTimer );
-                    console.log ( "RF Explorer found!" );
-                }
-
-                let msg_buf_str = String.fromCharCode.apply ( null, msg_buf ); // Convert to characters
-                let res_arr = msg_buf_str.split ( "," );
-
-                START_FREQ = parseInt ( res_arr[0] ) * 1000; // Start frquency
-                FREQ_STEP  = parseInt ( res_arr[1] );        // Frequency step
-                SWEEP_POINTS = parseInt ( res_arr[4] );      // Number of sweep points
-                STOP_FREQ  = ( FREQ_STEP * (SWEEP_POINTS-1) ) + START_FREQ;
-
-                MIN_FREQ   = parseInt ( res_arr[7] ); // Minimum frequency
-                MAX_FREQ   = parseInt ( res_arr[8] ); // Maximum frequency
-                MAX_SPAN   = parseInt ( res_arr[9] ); // Maximum span
-
-                configStore.set ( 'start_freq', START_FREQ );
-                configStore.set ( 'stop_freq' , STOP_FREQ  );
-                configStore.set ( 'freq_step' , FREQ_STEP  );
-
-                let start_f = Math.floor ( START_FREQ / 1000 );
-                let stop_f  = Math.ceil  ( STOP_FREQ  / 1000 );
-                let span_f  = Math.ceil  ( stop_f - start_f  );
-
-                if ( start_f < MIN_FREQ || stop_f > MAX_FREQ ) {
-                    const dialogOptions = {
-                        type: 'error',
-                        buttons: ['OK'],
-                        message: 'Invalid frequency range!',
-                        detail:  'The currently selected frequency range is not valid for the selected antenna module! Make sure to select a valid frequency range!'}
-                    dialog.showMessageBoxSync ( dialogOptions )
-                }
-
-                let band_details = "";
-
-                if ( !BAND_DETAILS )
-                    band_details = "    |    Band: <NO BAND SELECTED>";
-                else 
-                    band_details = "    |    Band: " + BAND_DETAILS + "";
-                
-                let country_information = "";
-
-                if ( !COUNTRY_CODE || !COUNTRY_NAME)
-                    country_information = "    |    Country: Germany (DE)";
-                else
-                    country_information = "    |    Country: " + COUNTRY_NAME + " (" + COUNTRY_CODE + ")";
-
-                let label = formatFrequencyString("Range: " + start_f.toString()) + " - " + formatFrequencyString(stop_f.toString()) + " MHz    |    Span: " + formatFrequencyString(span_f.toString()) + "MHz" + country_information + band_details;
-
-                myChart.options.scales.xAxes[0].scaleLabel.labelString = label;
-                configStore.set ( 'band_label' , label );
-
-                InitChart ();
-                break;
-
-            default:
-                console.log ( "Unknown command!");
-        }
-
-        msgStart = -1;            
-        msgEnd   = -1;
-        msgId    = -1;
-    });
+        default:
+    }
 }
 
-openPort();
+openPort()
 
 ipcRenderer.on ( 'CHANGE_BAND', (event, message) => {
     LAST_START_FREQ = message.start_freq * 1000;
