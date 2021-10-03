@@ -15,6 +15,7 @@ const { productName, name, author, version } = require ( './package.json'       
 const { dialog }                     = require ( 'electron'               );
 
 app.commandLine.appendSwitch('disable-gpu');
+require('@electron/remote/main').initialize()
 
 // See the following discussions for next setting
 // https://stackoverflow.com/questions/60106922/electron-non-context-aware-native-module-in-renderer
@@ -57,11 +58,13 @@ function createWindow () {
         height: 700,
         webPreferences: {
             nodeIntegration: true,
-            enableRemoteModule: true
+            enableRemoteModule: true,
+            contextIsolation: false
         }
     });
     mainWindow.loadFile('index.html');
     let wc = mainWindow.webContents;
+    require("@electron/remote/main").enable(wc)
     //wc.openDevTools();
     
     electronLocalshortcut.register ( mainWindow, 'Alt+CommandOrControl+Shift+I', () => {

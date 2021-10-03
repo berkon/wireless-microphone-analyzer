@@ -14,10 +14,11 @@
     "analyzer"
   ],
   "devDependencies": {
-    "electron": "11.0.4",
+    "electron": "^13.5.1",
     "electron-builder": "22.9.1"
   },
   "dependencies": {
+    "@electron/remote": "^2.0.1",
     "chart.js": "^2.7.2",
     "configstore": "^4.0.0",
     "electron-localshortcut": "^3.1.0",

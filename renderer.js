@@ -1,7 +1,7 @@
 'use strict'
 
 const { ipcRenderer } = require ('electron');
-const { app }         = require ('electron').remote;
+const { app }         = require ( '@electron/remote' )
 const ConfigStore     = require ( 'configstore' );
 const SerialPort      = require ( 'serialport'  );
 const Delimiter        = require ( '@serialport/parser-delimiter')
