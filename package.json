@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@electron/remote": "^2.0.1",
-    "chart.js": "^2.7.2",
+    "chart.js": "^2.9.4",
     "configstore": "^4.0.0",
     "electron-localshortcut": "^3.1.0",
     "require-all": "^3.0.0",
