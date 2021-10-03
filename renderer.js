@@ -546,7 +546,7 @@ function openPort () {
                 type: 'error',
                 buttons: ['OK'],
                 message: 'Hardware error!',
-                detail:  msg + '- Make sure that the device is connected\n- Select the corresponding serial port (or leave default: \'Auto\')\n- If it still doesn\'t work please restart the app or press <CTRL><R>!'}
+                detail:  msg + '- Make sure that the device is connected\n- Select the corresponding serial port (or leave default: \'Auto\')\n- If it still doesn\'t work please disconnect/power off the device, stop this tool, leave the device unpowered for approx 10s, then start the device and wait until its "pre-calibration" phase is over and it shows a graph on the display. Now start the software again!'}
             dialog.showMessageBoxSync ( dialogOptions )
 
             if ( msg )
@@ -562,7 +562,7 @@ function openPort () {
             }
 
             if ( !ports.length ) {
-                showHwError ( "Unable to find serial ports!" )
+                showHwError ( "Unable to find device!" )
                 return
             }
 
