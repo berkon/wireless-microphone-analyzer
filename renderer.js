@@ -646,11 +646,14 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq ) {
     STOP_FREQ  = stop_freq  * 1000;
     config_buf.writeUInt8 ( 0x20, 1 );
 
-    let res = port.write ( config_buf, 'ascii', function(err) {
-        if ( err )
-            console.log ( 'Error on write: ', err.message )
-            return
+    let config_buf2 = Buffer.from ( '#0C0' )  // Workaround for issue with MX Linux (app only works once, then RF explorer must be restarted)
+    config_buf2.writeUInt8 ( 0x4, 1 ) // Workaround for issue with MX Linux (app only works once, then RF explorer must be restarted)
+    port.write ( config_buf2, 'ascii', function(err) { // Workaround for issue with MX Linux (app only works once, then RF explorer must be restarted)
+        port.write ( config_buf, 'ascii', function(err) {
+            if ( err )
+                console.log ( 'Error on write: ', err.message )
         })
+    })
 
     responseCheckTimer = setTimeout ( function () {
         console.error ("No Response from device!");
