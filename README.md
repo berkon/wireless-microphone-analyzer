@@ -37,6 +37,8 @@ Download and install the **.exe** installer. The required drivers for Windows ca
 #### Mac
 Download and install the **.dmg** package. Also make sure to download and install the necessary USB-Serial driver according to this guide: https://j3.rf-explorer.com/43-rfe/how-to/205-h2-macosx-drivers
 
+IMPORTANT: For Catalina (MacOS 10.15) and later, make sure to download the latest USB-Serial driver! Older versions cannot be installed anymore due to Apple's security restrictions!
+
 #### Linux
 For all common Linux distribuitions the **.AppImage** can be used without any installation (like a portable applications on Windows).
 
