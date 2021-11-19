@@ -1,5 +1,7 @@
 'use strict'
 
+// API information taken from : https://github.com/RFExplorer/RFExplorer-for-.NET/wiki/RF-Explorer-UART-API-interface-specification
+
 const { ipcRenderer } = require ('electron');
 const { app }         = require ( '@electron/remote' )
 const ConfigStore     = require ( 'configstore' );
