@@ -3,14 +3,13 @@
 // API information taken from : https://github.com/RFExplorer/RFExplorer-for-.NET/wiki/RF-Explorer-UART-API-interface-specification
 
 const { ipcRenderer } = require ('electron');
-const { app }         = require ( '@electron/remote' )
+const { app, dialog } = require ( '@electron/remote' )
 const ConfigStore     = require ( 'configstore' );
 const SerialPort      = require ( 'serialport'  );
 const Delimiter        = require ( '@serialport/parser-delimiter')
 const Chart           = require ( 'chart.js'    );
 const FREQ_VENDOR_PRESETS = require ( 'require-all' )(__dirname +'/frequency_data/presets'  );
 const Pkg             = require ('./package.json');
-const { dialog }      = require ('electron'     ).remote;
 const fs              = require ('fs');
 
 const configStore = new ConfigStore ( Pkg.name )

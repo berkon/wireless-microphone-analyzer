@@ -1,0 +1,5 @@
+{ "label":"innopow", "submenu": [
+    { "label":"80 Channel Dual UHF", "submenu": [
+        { "label": "535 - 575MHz" , "start_freq": 535300, "stop_freq": 574800, "details": "(488 - 506MHz)" , "band": "INO_1_NONE" }
+    ]}
+]}
