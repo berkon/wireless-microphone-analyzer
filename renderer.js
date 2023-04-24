@@ -5,8 +5,8 @@
 const { ipcRenderer } = require ('electron');
 const { app, dialog } = require ( '@electron/remote' )
 const ConfigStore     = require ( 'configstore' );
-const SerialPort      = require ( 'serialport'  );
-const Delimiter        = require ( '@serialport/parser-delimiter')
+const { SerialPort }  = require ( 'serialport'  );
+const { DelimiterParser }   = require ( '@serialport/parser-delimiter')
 const Chart           = require ( 'chart.js'    );
 const FREQ_VENDOR_PRESETS = require ( 'require-all' )(__dirname +'/frequency_data/presets'  );
 const Pkg             = require ('./package.json');
@@ -569,7 +569,7 @@ function openPort () {
 
             let i = 0;
             console.log ( "Trying port " + ports[i].path + " ...");
-            port = new SerialPort ( ports[i].path, { baudRate : 500000 }, function ( err ) {
+            port = new SerialPort ({ path: ports[i].path, baudRate : 500000 }, function ( err ) {
                 if ( err ) {
                     console.log ( err )
                     return
@@ -589,7 +589,7 @@ function openPort () {
                 }
                 
                 console.log ( "Trying port " + ports[i].path + " ...");
-                port = new SerialPort ( ports[i].path, { baudRate : 500000 }, function ( err ) {
+                port = new SerialPort ({ path: ports[i].path, baudRate : 500000 }, function ( err ) {
                     if ( err ) // Most likely the reason for the error is that the RF Explorer is not connected to this port. So we don't print an error message here.
                         return
 
@@ -601,7 +601,7 @@ function openPort () {
             }, SERIAL_RESPONSE_TIMEOUT)
         })
     } else  {
-        port = new SerialPort ( PORT_MENU_SELECTION, { baudRate : 500000 }, function ( err ) {
+        port = new SerialPort ({ path: PORT_MENU_SELECTION, baudRate : 500000 }, function ( err ) {
             if ( err ) {
                 console.log ( 'Error: ', err.message );
                 return;
@@ -688,7 +688,7 @@ var msg_id_array = [
 ]
 
 function setCallbacks () {
-    const parser = port.pipe(new Delimiter({ delimiter: '\r\n' }))
+    const parser = port.pipe(new DelimiterParser({ delimiter: '\r\n' }))
 
     parser.on ( 'data', (res) => {
         let buf = String.fromCharCode.apply ( null, res )

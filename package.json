@@ -1,7 +1,7 @@
 {
   "name": "wireless-microphone-analyzer",
   "productName": "Wireless Microphone Analyzer",
-  "version": "1.7.6",
+  "version": "1.8.0",
   "license": "CC0-1.0",
   "description": "Uses the RF-Explorer (a spectrum analyzer hardware) to check for free/congested wireless microphone frequencies",
   "author": "Bernd Konnerth <bernd@konnerth.de>",
@@ -14,17 +14,17 @@
     "analyzer"
   ],
   "devDependencies": {
-    "electron": "^13.5.1",
-    "electron-builder": "22.9.1"
+    "electron": "^24.1.2",
+    "electron-builder": "23.6.0"
   },
   "dependencies": {
     "@electron/remote": "^2.0.1",
     "chart.js": "^2.7.2",
     "configstore": "^4.0.0",
     "electron-localshortcut": "^3.1.0",
-    "node-abi": "^3.2.0",
+    "node-abi": "^3.40.0",
     "require-all": "^3.0.0",
-    "serialport": "9.0.3",
+    "serialport": "10.5.0",
     "vis": "^4.21.0"
   },
   "scripts": {

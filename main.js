@@ -1,8 +1,8 @@
 'use strict'
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true; // Disable security warning on the console
 
-var SerialPort = require ( 'serialport' );
-const fs       = require ('fs');
+var { SerialPort } = require ( 'serialport' );
+const fs           = require ('fs');
 
 const FREQ_VENDOR_BANDS   = require ( 'require-all' )(__dirname +'/frequency_data/vendor_bands'  );
 const FREQ_VENDOR_PRESETS = require ( 'require-all' )(__dirname +'/frequency_data/presets');

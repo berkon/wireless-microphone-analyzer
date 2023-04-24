@@ -1,3 +1,7 @@
+V1.8.0
+    FIXES
+        - Fix for issue #29: Java Script Error
+
 V1.7.6
     FEATURES
         - Added forbidden frequency ranges for Turkey
