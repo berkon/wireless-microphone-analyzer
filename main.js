@@ -101,6 +101,7 @@ function createWindow () {
     ]};
     var helpMenuJSON = { label: 'Help', submenu: [
         { label: "Documentation", click () { openHelpWindow() ; } },
+        { label: "Developer tools", click () { wc.openDevTools(); } },
         { label: "About"        , click () { openAboutWindow(); } }
     ]};
 
