@@ -718,8 +718,8 @@ function setCallbacks () {
             if ( buf.indexOf ( id ) !== -1 ) {
                 handleMessage ({
                     id,
-                    dataLength: parseInt ( buf[id.length] ),
-                    data: buf.substring ( id.length + 1 ) // +1 to exclude the byte following the message ID which contains the number of sweep points
+                    dataLength: parseInt ( id === '$S' ? buf[id.length]  : (buf.length - id.length) ),
+                    data: buf.substring  ( id === '$S' ? (id.length + 1) : id.length ) // +1 to exclude the byte following the message ID which contains the number of sweep points
                 })
             }
         }            
