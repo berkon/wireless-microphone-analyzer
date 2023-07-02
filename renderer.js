@@ -90,6 +90,14 @@ var VIS_MANUF_CHAN  = configStore.get('graphVisibility.recommended');
 var VIS_FORBIDDEN   = configStore.get('graphVisibility.forbidden'  );
 var VIS_CONGEST     = configStore.get('graphVisibility.congested'  );
 var VIS_TV_CHAN     = configStore.get('graphVisibility.grids'      );
+var LINUX_MX_WORKAROUND = configStore.get('linux_mx_workaround_enabled' );
+
+if ( !LINUX_MX_WORKAROUND ) {
+    configStore.set('linux_mx_workaround_enabled', false )
+    LINUX_MX_WORKAROUND = false
+}
+console.log ( (LINUX_MX_WORKAROUND ? "Enabling" : "Disabling") + " Linux MX workaround")
+ipcRenderer.send ('LINUX_MX_WORKAROUND', { checked : LINUX_MX_WORKAROUND });
 
 if ( VIS_MANUF_CHAN === undefined ) VIS_MANUF_CHAN = true;
 if ( VIS_FORBIDDEN  === undefined ) VIS_FORBIDDEN  = true;
@@ -647,14 +655,27 @@ function sendAnalyzer_SetConfig ( start_freq, stop_freq ) {
     STOP_FREQ  = stop_freq  * 1000;
     config_buf.writeUInt8 ( 0x20, 1 );
 
-    let config_buf2 = Buffer.from ( '#0C0' )  // Workaround for issue with MX Linux (app only works once, then RF explorer must be restarted)
-    config_buf2.writeUInt8 ( 0x4, 1 ) // Workaround for issue with MX Linux (app only works once, then RF explorer must be restarted)
-    port.write ( config_buf2, 'ascii', function(err) { // Workaround for issue with MX Linux (app only works once, then RF explorer must be restarted)
-        port.write ( config_buf, 'ascii', function(err) {
-            if ( err )
-                console.log ( 'Error on write: ', err.message )
+    if ( LINUX_MX_WORKAROUND ) {
+        let config_buf2 = Buffer.from ( '#0C0' )  // Workaround for issue with MX Linux (app only works once, then RF explorer must be restarted)
+        config_buf2.writeUInt8 ( 0x4, 1 ) // Workaround for issue with MX Linux (app only works once, then RF explorer must be restarted)
+        port.write ( config_buf2, 'ascii', function(err) { // Workaround for issue with MX Linux (app only works once, then RF explorer must be restarted)
+            if ( err ) {
+                console.error ( err.message )
+            }
+
+            port.write ( config_buf, 'ascii', function(err) {
+                if ( err ) {
+                    console.error ( err.message )
+                }
+            })
         })
-    })
+    } else {
+        port.write ( config_buf, 'ascii', function(err) {
+            if ( err ) {
+                console.error ( err.message )
+            }
+        })
+    }
 
     responseCheckTimer = setTimeout ( function () {
         console.error ("No Response from device!");
@@ -934,6 +955,18 @@ ipcRenderer.on ( 'RESET_PEAK', (event, message) => {
         myChart.data.datasets[LINE_LIVE].data[i] = undefined;
 
     myChart.update();
+});
+
+ipcRenderer.on ( 'LINUX_MX_WORKAROUND', (event, message) => {
+    if ( message.enabled ) {
+        console.log("Enabled workaround for MX Linux")
+        configStore.set( 'linux_mx_workaround_enabled', true)
+        LINUX_MX_WORKAROUND = true
+    } else {
+        console.log("Disabled workaround for MX Linux")
+        configStore.set( 'linux_mx_workaround_enabled', false)
+        LINUX_MX_WORKAROUND = false
+    }
 });
 
 function checkSpanExceeded ( start_f, stop_f ) {

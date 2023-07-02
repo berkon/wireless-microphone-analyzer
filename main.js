@@ -95,6 +95,17 @@ function createWindow () {
                 })  }
             }
         ]},
+        { label : 'Linux MX Workaround',
+            type  : 'checkbox',
+            click (ev) {
+                if ( ev.checked ) {
+                    wc.send ( 'LINUX_MX_WORKAROUND', { enabled : true })
+                    dialog.showMessageBox ({ type: 'info', title: "Information", message: "This enables a workaround which prevents the app from hanging on certain Linux MX systems. Enabling it, will make it work on Linux MX, but also slow down zooming and moving throug the spectrum." })
+                } else {
+                    wc.send ( 'LINUX_MX_WORKAROUND', { enabled : false })
+                }
+            }
+        },
         { label: 'Reset Peak             R', click () {
             wc.send ('RESET_PEAK', {});
         }}
@@ -236,6 +247,12 @@ function createWindow () {
                 Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) );
             }
         });
+    });
+
+    ipcMain.on ( "LINUX_MX_WORKAROUND", (event, message) => {
+        let elem = menuJSON[MENU_TOOLS].submenu.find((elem)=> elem.label === 'Linux MX Workaround')
+        elem.checked = message.checked;
+        Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) )
     });
 
     menuJSON.push ( portMenuJSON  );
