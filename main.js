@@ -95,14 +95,14 @@ function createWindow () {
                 })  }
             }
         ]},
-        { label : 'Linux MX Workaround',
+        { label : 'MX Linux Workaround',
             type  : 'checkbox',
             click (ev) {
                 if ( ev.checked ) {
-                    wc.send ( 'LINUX_MX_WORKAROUND', { enabled : true })
-                    dialog.showMessageBox ({ type: 'info', title: "Information", message: "This enables a workaround which prevents the app from hanging on certain Linux MX systems. Enabling it, will make it work on Linux MX, but also slow down zooming and moving throug the spectrum." })
+                    wc.send ( 'MX_LINUX_WORKAROUND', { enabled : true })
+                    dialog.showMessageBox ({ type: 'info', title: "Information", message: "This enables a workaround which prevents the app from hanging on certain MX Linux systems. Enabling it, will make it work on MX Linux, but also slow down zooming and moving throug the spectrum." })
                 } else {
-                    wc.send ( 'LINUX_MX_WORKAROUND', { enabled : false })
+                    wc.send ( 'MX_LINUX_WORKAROUND', { enabled : false })
                 }
             }
         },
@@ -249,8 +249,8 @@ function createWindow () {
         });
     });
 
-    ipcMain.on ( "LINUX_MX_WORKAROUND", (event, message) => {
-        let elem = menuJSON[MENU_TOOLS].submenu.find((elem)=> elem.label === 'Linux MX Workaround')
+    ipcMain.on ( "MX_LINUX_WORKAROUND", (event, message) => {
+        let elem = menuJSON[MENU_TOOLS].submenu.find((elem)=> elem.label === 'MX Linux Workaround')
         elem.checked = message.checked;
         Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) )
     });
