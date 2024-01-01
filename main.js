@@ -56,6 +56,23 @@ if ( !country_code ) {
     country_code = "DE";
 }
 
+const gotLock = app.requestSingleInstanceLock()
+    
+if ( !gotLock ) {
+    app.quit()
+} else { // This applies to the first instance of the applicatoin which has got the lock
+    app.on ( 'second-instance', (event, commandLine, workingDirectory ) => {
+        // Someone tried to run a second instance, we should focus our window.
+        if ( mainWindow ) {
+            if ( mainWindow.isMinimized() ) {
+                mainWindow.restore()
+            }
+
+            mainWindow.focus()
+        }
+    })
+}
+
 function createWindow () {
     mainWindow = new BrowserWindow ({
         width: 1200,
