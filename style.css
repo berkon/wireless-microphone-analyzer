@@ -16,3 +16,24 @@
 .swal2-select {
     border-radius: 4px!important;
 }
+
+#donate-button {
+    font-size: 12px;
+    margin-left: auto;
+    background: rgb(150, 79, 216);
+    border-radius: 3px;
+    padding: 3px 5px;
+    cursor: pointer;
+    font-family: Arial;
+    line-height: 18px;
+    color: white;
+    transform: rotate(270deg);
+    display: inline-block;
+    top: 65px;
+    left: -34px;
+    position: absolute;
+ }
+
+#donate-button:hover {
+    background: #a86ddf;
+}

@@ -1,7 +1,7 @@
 'use strict'
 
 const { ipcRenderer } = require ('electron');
-const { app }         = require ( '@electron/remote' )
+const { app, BrowserWindow } = require ( '@electron/remote' )
 const ConfigStore     = require ( 'configstore' );
 const { SerialPort }  = require ( 'serialport'  );
 const Chart           = require ( 'chart.js'    );
@@ -64,6 +64,22 @@ let saved_data_version = configStore.get('saved_data_version')
 let portDetectionIndex = 0
 var data$ = new Subject();
 let dataSubscription = null
+
+document.getElementById('donate-button').addEventListener ('click', () => openDonateWindow() )
+
+function openDonateWindow () {
+    let win = new BrowserWindow ({
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        },
+        width: 650,
+        height: 650
+    })
+    win.setMenuBarVisibility ( false )
+    win.loadURL("file://" + __dirname + "/donate.html")
+//win.webContents.openDevTools()
+}
 
 // Saved data version handling
 if ( !saved_data_version ) {
