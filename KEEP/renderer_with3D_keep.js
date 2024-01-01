@@ -3,8 +3,8 @@
 var vis = require ('vis');
 var Chart = require('chart.js');
 
-var START_FREQ = 821000;
-var STOP_FREQ  = 866000;
+var global.START_FREQ = 821000;
+var global.STOP_FREQ  = 866000;
 var MAX_DBM    = -20;
 var MIN_DBM    = -110;
 
@@ -80,9 +80,9 @@ var myChart = new Chart(ctx, {
     }
 });
 
-var freq_step  = Math.round ( (STOP_FREQ - START_FREQ) / 112 );
+var freq_step  = Math.round ( (global.STOP_FREQ - global.START_FREQ) / 112 );
 
-for ( var freq = START_FREQ; freq < STOP_FREQ ; freq += freq_step  ) {
+for ( var freq = global.START_FREQ; freq < global.STOP_FREQ ; freq += freq_step  ) {
     let freq_str = freq.toString();
     let str_len = freq_str.length;
 
@@ -104,8 +104,8 @@ for ( let i = 0 ; i < 112 ; i++ ) {
 
 // Blocked frequencies
 for ( var b of blocked ) {
-    let left_data_point  = Math.round ( (b[0] - START_FREQ) / freq_step );
-    let right_data_point = Math.round ( (b[1] - START_FREQ) / freq_step );
+    let left_data_point  = Math.round ( (b[0] - global.START_FREQ) / freq_step );
+    let right_data_point = Math.round ( (b[1] - global.START_FREQ) / freq_step );
 
     if ( left_data_point < 0 )
         left_data_point = 0;
@@ -128,9 +128,9 @@ for ( var b of blocked ) {
 // Sennheiser frequencies
 for ( var s of sennheiser_e ) {
     let left_freq_edge  = s - 200; // Subtract 200kHz
-    let left_data_point = Math.round ( (left_freq_edge - START_FREQ) / freq_step );
+    let left_data_point = Math.round ( (left_freq_edge - global.START_FREQ) / freq_step );
     let right_freq_edge = s + 200; // Add 200kHz
-    let right_data_point = Math.round ( (right_freq_edge - START_FREQ) / freq_step );
+    let right_data_point = Math.round ( (right_freq_edge - global.START_FREQ) / freq_step );
 
     if ( left_data_point < 0 )
         left_data_point = 0;

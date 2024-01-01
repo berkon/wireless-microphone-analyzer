@@ -11,7 +11,7 @@ const COUNTRIES           = require ( './country_codes');
 const {ipcMain}                      = require ( 'electron'               );
 const {app, BrowserWindow, Menu}     = require ( 'electron'               );
 const electronLocalshortcut          = require ( 'electron-localshortcut' );
-const { productName, name, author, version } = require ( './package.json'         );
+const { productName, name, author, version } = require ( './package.json' );
 const { dialog }                     = require ( 'electron'               );
 
 app.commandLine.appendSwitch('disable-gpu');
@@ -29,21 +29,25 @@ let MENU_BAND     = 0;
 let MENU_CHANNELS = 1;
 let MENU_COUNTRY  = 2;
 let MENU_PORT     = 3;
-let MENU_TOOLS    = 4;
-let MENU_HELP     = 5;
+let MENU_SCAN_DEVICE = 4;
+let MENU_TOOLS    = 5;
+let MENU_HELP     = 6;
 
 if ( process.platform === 'darwin') {
     MENU_BAND     = 1;
     MENU_CHANNELS = 2;
     MENU_COUNTRY  = 3;
     MENU_PORT     = 4;
-    MENU_TOOLS    = 5;
-    MENU_HELP     = 6;
+    MENU_SCAN_DEVICE = 5;
+    MENU_TOOLS    = 6;
+    MENU_HELP     = 7;
 }
 
 let mainWindow;
 let helpWindow;
 let aboutWindow;
+
+let globalPorts = []
 
 let country_code = configStore.get('country_code');
 
@@ -65,9 +69,9 @@ function createWindow () {
     mainWindow.loadFile('index.html');
     let wc = mainWindow.webContents;
     require("@electron/remote/main").enable(wc)
-    //wc.openDevTools();
+//wc.openDevTools();
     
-    electronLocalshortcut.register ( mainWindow, 'Alt+CommandOrControl+Shift+I', () => {
+    electronLocalshortcut.register ( mainWindow, 'F12', () => {
         mainWindow.toggleDevTools();
     });
 
@@ -84,6 +88,23 @@ function createWindow () {
         ]}, */
         
     var portMenuJSON = { label: 'Port', submenu: [] };
+
+    var scanDeviceMenuJSON = { label: 'Device', submenu: [{
+        label : 'RF Explorer',
+        code  : 'RF_EXPLORER',
+        type  : 'radio',
+        click () { wc.send ( 'SET_SCAN_DEVICE', { scanDevice : 'RF_EXPLORER' } ); }
+    }, {
+        label : 'Tiny SA',
+        code  : 'TINY_SA',
+        type  : 'radio',
+        click () { wc.send ( 'SET_SCAN_DEVICE', { scanDevice : 'TINY_SA' } ); }
+    }, {
+        label : 'Settings',
+        code  : 'DEVICE_SETTINGS',
+        click () { wc.send ( 'DEVICE_SETTINGS', {} ); }
+    }]};
+
     var toolsMenuJSON = { label: 'Tools', submenu: [
         { label: 'Export', submenu: [
             { label: "Shure WW6 and IAS (CSV Format)", click () {
@@ -98,18 +119,17 @@ function createWindow () {
         { label : 'MX Linux Workaround',
             type  : 'checkbox',
             click (ev) {
-                if ( ev.checked ) {
-                    wc.send ( 'MX_LINUX_WORKAROUND', { enabled : true })
-                    dialog.showMessageBox ({ type: 'info', title: "Information", message: "This enables a workaround which prevents the app from hanging on certain MX Linux systems. Enabling it, will make it work on MX Linux, but also slow down zooming and moving throug the spectrum." })
-                } else {
-                    wc.send ( 'MX_LINUX_WORKAROUND', { enabled : false })
-                }
+                wc.send ( 'MX_LINUX_WORKAROUND', { enabled : ev.checked ? true : false })
             }
         },
         { label: 'Reset Peak             R', click () {
             wc.send ('RESET_PEAK', {});
+        }},
+        { label: 'Reset Settings', click () {
+            wc.send ('RESET_SETTINGS', {});
         }}
     ]};
+
     var helpMenuJSON = { label: 'Help', submenu: [
         { label: "Documentation", click () { openHelpWindow() ; } },
         { label: "Developer tools", click () { wc.openDevTools(); } },
@@ -228,64 +248,104 @@ function createWindow () {
 
     menuJSON.push ({ label: 'Country', submenu: [] });
 
-    COUNTRIES.forEach ( ( c ) => {
-        menuJSON[MENU_COUNTRY].submenu.push (
-            {
-                'label' : c.label,
-                'code'  : c.code,
-                'type'  : 'radio' ,
-                'checked': country_code===c.code?true:false,
-                click () { wc.send ( 'SET_COUNTRY', { country_code : c.code, country_label : c.label } ); }
-            }
-        );
+    COUNTRIES.forEach ( c => {
+        if ( fs.existsSync ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + c.code + '.json' ) ) {
+            menuJSON[MENU_COUNTRY].submenu.push (
+                {
+                    'label' : c.label,
+                    'code'  : c.code,
+                    'type'  : 'radio' ,
+                    'checked': country_code===c.code?true:false,
+                    click () { wc.send ( 'SET_COUNTRY', { country_code : c.code, country_label : c.label } ); }
+                }
+            );
+        }
     });
 
-    ipcMain.on ( "SET_COUNTRY", (event, message) => {
+    ipcMain.on ( "SET_COUNTRY", (event, data) => {
         menuJSON[MENU_COUNTRY].submenu.forEach ( function ( elem ) {
-            if ( elem.code === message.country_code ) {
+            if ( elem.code === data.country_code ) {
                 elem.checked = true;
+
+                // Need to rebuild menu to reflect attribute (in this case the 'checked' attribute)
                 Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) );
             }
         });
     });
 
-    ipcMain.on ( "MX_LINUX_WORKAROUND", (event, message) => {
+    ipcMain.on ( "MX_LINUX_WORKAROUND", (event, data) => {
         let elem = menuJSON[MENU_TOOLS].submenu.find((elem)=> elem.label === 'MX Linux Workaround')
-        elem.checked = message.checked;
+        elem.checked = data.checked;
+        // Need to rebuild menu to reflect attribute (in this case the 'checked' attribute)
         Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) )
     });
 
     menuJSON.push ( portMenuJSON  );
+    menuJSON.push ( scanDeviceMenuJSON );
     menuJSON.push ( toolsMenuJSON );
     menuJSON.push ( helpMenuJSON  );
 
-    // Add serial ports to the menu
-    SerialPort.list().then ( (ports, err) => {
-        let portNameArr = [];
+    ipcMain.on ( "SET_SCAN_DEVICE", (event, data) => {
+        switch ( data.scanDevice ) {
+            case 'RF_EXPLORER':
+                menuJSON[MENU_SCAN_DEVICE].submenu[0].checked = true
+                menuJSON[MENU_SCAN_DEVICE].submenu[1].checked = false
+                break
 
-        if ( err ) {
-            console.log ( err );
-            return;
+            case 'TINY_SA':
+                menuJSON[MENU_SCAN_DEVICE].submenu[0].checked = false
+                menuJSON[MENU_SCAN_DEVICE].submenu[1].checked = true
+                break
         }
-        
-        ports.forEach ( ( port ) => {
-            portNameArr.push ( port.path );
+
+        // Need to rebuild menu to reflect attribute (in this case the 'checked' attribute)
+        Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) )
+    })
+
+    let createPortMenu = selectedPort => {
+        let portPathArr = [];
+        menuJSON[MENU_PORT].submenu = []
+
+        globalPorts.forEach ( ( port ) => {
+            portPathArr.push ( port.path );
         });
 
-        menuJSON[MENU_PORT].submenu[0] = { label: 'Auto', type: 'radio', click () { wc.send ( 'SET_PORT',  portNameArr ); } }
+        menuJSON[MENU_PORT].submenu[0] = {
+            label: 'Auto',
+            type: 'radio',
+            checked: (selectedPort === undefined || selectedPort === 'AUTO') ? true : false,
+            click () { wc.send ( 'SET_PORT',  portPathArr ); }
+        }
 
-        portNameArr.forEach ( ( port ) => {
+        portPathArr.forEach ( port => {
             menuJSON[MENU_PORT].submenu.push (
                 {
                     'label' : port,
-                    'type'  : 'radio' ,
+                    'type'  : 'radio',
+                    'checked': selectedPort === port ? true : false,
                     click () { wc.send ( 'SET_PORT', { port : port } ); }
                 }
             );
         });
 
+        // Need to rebuild menu to reflect attribute (in this case the 'checked' attribute)
         Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) );
-    });
+    }
+
+    ipcMain.on ( "SET_PORT", (event, data) => {
+        createPortMenu ( data.portPath )
+    })
+
+    // Add serial ports to the menu
+    SerialPort.list().then ( (ports, err) => {
+        if ( err ) {
+            console.log ( err );
+            return;
+        }
+
+        globalPorts = ports
+        createPortMenu ( err )
+    })
 
     function openHelpWindow () {
         helpWindow = new BrowserWindow({width: 800, height: 600});
