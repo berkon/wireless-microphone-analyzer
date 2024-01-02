@@ -37,3 +37,7 @@
 #donate-button:hover {
     background: #a86ddf;
 }
+
+.dark-mode {
+    background-color: black;
+}

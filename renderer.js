@@ -37,22 +37,6 @@ global.SWEEP_POINTS = 100 // default value
 var COM_PORT = undefined
 var VENDOR_ID    = 'NON'
 
-const chartColors = {
-	RED    : 'rgb(255, 99 , 132)',
-	ORANGE : 'rgb(255, 159, 64 )',
-	YELLOW : 'rgb(255, 205, 86 )',
-	GREEN  : 'rgb(75 , 222, 192)',
-	BLUE   : 'rgb(54 , 162, 235)',
-	PURPLE : 'rgb(153, 102, 255)',
-	GREY   : 'rgb(201, 203, 207)'
-};
-
-const RECOMMENDED_CHANNELS_COLOR = chartColors.GREEN
-const FORBIDDEN_COLOR            = chartColors.RED
-const SCAN_COLOR                 = chartColors.PURPLE
-const CONGESTED_COLOR            = chartColors.ORANGE
-const CHAN_GRID_COLOR            = chartColors.GREY
-
 const SENNHEISER_CHANNEL_WIDTH   = 96000 // +/-48kHz Spitzenhub
 
 let isExecuting = false
@@ -117,6 +101,35 @@ global.MX_LINUX_WORKAROUND = configStore.get('mx_linux_workaround_enabled' );
 var SCAN_DEVICE     = configStore.get('scan_device' );
 var COM_PORT        = configStore.get('com_port');
 var SWEEP_POINTS    = configStore.get('sweep_points');
+let DARK_MODE       = configStore.get('dark_mode');
+
+let chartColors = {}
+
+if (DARK_MODE) {
+    document.getElementsByTagName('body')[0].setAttribute('class', 'dark-mode')
+
+    chartColors = {
+        RED    : 'rgb(255, 0  , 0  )',
+        AMBER  : 'rgb(130, 130, 0  )',
+        GREEN  : 'rgb(75 , 222, 192)',
+        PURPLE : 'rgb(153, 102, 255)',
+        GREY   : 'rgb(201, 203, 207)'
+    }
+} else {
+    chartColors = {
+        RED    : 'rgb(255, 99 ,132 )',
+        AMBER  : 'rgb(255, 159, 64  )',
+        GREEN  : 'rgb(75 , 222, 192)',
+        PURPLE : 'rgb(153, 102, 255)',
+        GREY   : 'rgb(201, 203, 207)'
+    }
+}
+
+const RECOMMENDED_CHANNELS_COLOR = chartColors.GREEN
+const FORBIDDEN_COLOR            = chartColors.RED
+const SCAN_COLOR                 = chartColors.PURPLE
+const CONGESTED_COLOR            = chartColors.AMBER
+const CHAN_GRID_COLOR            = chartColors.GREY
 
 if ( !global.MX_LINUX_WORKAROUND ) {
     configStore.set('mx_linux_workaround_enabled', false )
@@ -125,6 +138,14 @@ if ( !global.MX_LINUX_WORKAROUND ) {
 
 console.log ( "MX Linux workaround is " + (global.MX_LINUX_WORKAROUND ? "enabled" : "disabled"))
 ipcRenderer.send ('MX_LINUX_WORKAROUND', { checked : global.MX_LINUX_WORKAROUND });
+
+if ( !DARK_MODE) {
+    configStore.set('dark_mode', false )
+    DARK_MODE = false
+}
+
+console.log ( "Dark mode is " + (DARK_MODE ? "enabled" : "disabled"))
+ipcRenderer.send ('DARK_MODE', { checked : DARK_MODE });
 
 var ctx = document.getElementById("graph2d").getContext('2d');
 var myChart = null
@@ -166,7 +187,7 @@ let initChart = () => {
                 {
                     type: "line",
                     label: 'Live Scan (Peak Hold)',
-                    backgroundColor: Chart.helpers.color(SCAN_COLOR).alpha(0.2).rgbString(),
+                    backgroundColor: Chart.helpers.color(SCAN_COLOR).alpha(0.5).rgbString(),
                     borderColor: SCAN_COLOR,
                     pointBackgroundColor: SCAN_COLOR,
                     borderWidth: 2,
@@ -187,7 +208,7 @@ let initChart = () => {
                 },{
                     type: "line",
                     label: 'Forbidden Ranges',
-                    backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.2).rgbString(),
+                    backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.5).rgbString(),
                     borderColor: FORBIDDEN_COLOR,
                     borderWidth: 0.01, // 0 is not working!
                     pointRadius: 0,
@@ -198,7 +219,7 @@ let initChart = () => {
                 },{
                     type: "line",
                     label: 'Congested / Forbidden Channels',
-                    backgroundColor: Chart.helpers.color(CONGESTED_COLOR).alpha(0.5).rgbString(),
+                    backgroundColor: Chart.helpers.color(CONGESTED_COLOR).alpha(0.7).rgbString(),
                     borderColor: CONGESTED_COLOR,
                     borderWidth: 0.01, // 0 is not working!
                     pointRadius: 0,
@@ -652,14 +673,14 @@ let tryPort = (index) => {
                             restartApp()
                         }
                     })
-
+// TODO: Show popup to restart the app in case of: "Error: Opening COM4: File not found"
                     console.error ( err )
                     reject ( 'ERR_PORT_ACCESS_DENIED' )
                     return
                 }
 
                 console.error ( err )
-                reject ( `ERR_PORT_GENERIC_${err.toString()}` )
+                reject ( err )
                 return
             }
 
@@ -1307,6 +1328,23 @@ ipcRenderer.on ( 'MX_LINUX_WORKAROUND', (event, message) => {
         global.MX_LINUX_WORKAROUND = false
     }
 });
+
+ipcRenderer.on ( 'DARK_MODE', (event, message) => {
+    console.error(message)
+        if ( message.enabled ) {
+            console.log("Enabled dark mode")
+            configStore.set('dark_mode', true)
+        } else {
+            console.log("Disabled dark mode")
+            configStore.set('dark_mode', false)
+        }
+
+        showPopup('warning', 'Restart', 'App must be restarted for changes to take effect', ['Ok', 'Cancel']).then (result => {
+            if ( result.isConfirmed ) {
+                restartApp()
+            }
+        })
+})
 
 ipcRenderer.on ( 'SET_SCAN_DEVICE', async (event, message) => {
     console.log ( `User selected device '${message.scanDevice}'` )

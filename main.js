@@ -144,7 +144,13 @@ function createWindow () {
         }},
         { label: 'Reset Settings', click () {
             wc.send ('RESET_SETTINGS', {});
-        }}
+        }},
+        { label: 'Dark mode',
+            type: 'checkbox',
+            click (ev) {
+                wc.send ( 'DARK_MODE', { enabled : ev.checked ? true : false })
+            }
+        }
     ]};
 
     var helpMenuJSON = { label: 'Help', submenu: [
@@ -296,6 +302,13 @@ function createWindow () {
         // Need to rebuild menu to reflect attribute (in this case the 'checked' attribute)
         Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) )
     });
+
+    ipcMain.on ( "DARK_MODE", (event, data) => {
+        let elem = menuJSON[MENU_TOOLS].submenu.find((elem)=> elem.label === 'Dark mode')
+        elem.checked = data.checked;
+        // Need to rebuild menu to reflect attribute (in this case the 'checked' attribute)
+        Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) )
+    })
 
     menuJSON.push ( portMenuJSON  );
     menuJSON.push ( scanDeviceMenuJSON );
