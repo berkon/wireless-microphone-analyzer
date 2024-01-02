@@ -1498,13 +1498,46 @@ document.addEventListener ( "wheel", async e => {
             return;
         }
     } else if ( e.deltaX < 0 ) { // Move left
-        if ( !e.shiftKey && !e.ctrlKey ) {
+        if ( e.ctrlKey && !e.shiftKey ) { // Toggle vendor specific channel presets/banks down
+            if ( chPreset_Preset > 1 ) {
+                chPreset_Preset--;
+                console.log (`Toggle vendor specific channel presets/banks down. Now is: ${chPreset_Preset}`)
+
+                if ( FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series] && chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset)
+                    setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+                myChart.update();
+            } else {
+                console.error(`Unable to toggle vendor specific channel presets/banks down! Already on preset ${chPreset_Preset}!`)
+            }
+            isExecuting = false
+            return;
+        } else if ( !e.shiftKey && !e.ctrlKey ) {
             move(-10); // Move frequency band to LEFT by 10% of span
         } else if ( e.shiftKey && !e.ctrlKey ) {
             move(-50); // Move frequency band to LEFT by 50% of span
         }
     } else if ( e.deltaX > 0 ) { // Move right
-        if ( !e.shiftKey && !e.ctrlKey ) {
+        if ( e.ctrlKey && !e.shiftKey ) { // Toggle vendor specific channel presets/banks up
+            if ( chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset && FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series] ) {
+                if ( chPreset_Preset <  FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length ) {
+                    chPreset_Preset++;
+                    console.log (`Toggle vendor specific channel presets/banks up. Now is: ${chPreset_Preset}`)
+                    setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+                    myChart.update();
+                } else {
+                    console.error(`Unable to toggle vendor specific channel presets/banks up! Only ${FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length} presets available!`)
+                }
+            } else {
+                console.error("Unable to toggle vendor specific channel presets/banks up!")
+                console.error(`chPreset_Vendor: ${chPreset_Vendor}`)
+                console.error(`chPreset_Band: ${chPreset_Band}`)
+                console.error(`chPreset_Series: ${chPreset_Series}`)
+                console.error(`chPreset_Preset: ${chPreset_Preset}`)
+                console.error(`FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series]: ${FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series]}`)
+            }
+            isExecuting = false
+            return;
+        } else if ( !e.shiftKey && !e.ctrlKey ) {
             move(10); // Move frequency band to RIGHT by 10% of span
         } else if ( e.shiftKey && !e.ctrlKey ) {
             move(50); // Move frequency band to RIGHT by 50% of span
