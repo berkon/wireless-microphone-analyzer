@@ -103,26 +103,16 @@ var COM_PORT        = configStore.get('com_port');
 var SWEEP_POINTS    = configStore.get('sweep_points');
 let DARK_MODE       = configStore.get('dark_mode');
 
-let chartColors = {}
+const chartColors = {
+    RED    : 'rgb(255, 99 ,132 )',
+    AMBER  : 'rgb(255, 159, 64  )',
+    GREEN  : 'rgb(75 , 222, 192)',
+    PURPLE : 'rgb(153, 102, 255)',
+    GREY   : 'rgb(201, 203, 207)'
+}
 
 if (DARK_MODE) {
     document.getElementsByTagName('body')[0].setAttribute('class', 'dark-mode')
-
-    chartColors = {
-        RED    : 'rgb(255, 0  , 0  )',
-        AMBER  : 'rgb(130, 130, 0  )',
-        GREEN  : 'rgb(75 , 222, 192)',
-        PURPLE : 'rgb(153, 102, 255)',
-        GREY   : 'rgb(201, 203, 207)'
-    }
-} else {
-    chartColors = {
-        RED    : 'rgb(255, 99 ,132 )',
-        AMBER  : 'rgb(255, 159, 64  )',
-        GREEN  : 'rgb(75 , 222, 192)',
-        PURPLE : 'rgb(153, 102, 255)',
-        GREY   : 'rgb(201, 203, 207)'
-    }
 }
 
 const RECOMMENDED_CHANNELS_COLOR = chartColors.GREEN
@@ -435,28 +425,6 @@ function legendClick ( e, legendItem ) {
 
     ci.update();
 }
-
-/*
-Chart.pluginService.register({
-    afterUpdate: function(chart) {
-        chart.config.data.datasets.forEach ( (dataset) => {
-            var offset = -4;
-
-            if ( !dataset._meta[0].data[0])
-                return;
-            
-    //        console.log(dataset._meta[0].data[0]._model);
-
-            for ( var i = 0 ; i < dataset._meta[0].data.length; i++ ) {
-                let model = dataset._meta[0].data[i]._model;
-                model.x += offset;
-                model.controlPointNextX += offset;
-                model.controlPointPreviousX += offset;
-            }
-        });
-    }
-});
-*/
 
 function setForbidden () {
     for ( var f of FREQ_FORBIDDEN ) {
