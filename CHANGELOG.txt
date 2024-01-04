@@ -1,3 +1,15 @@
+V2.0.0
+## New Features
+* Added Support for TinySA and TinySA Ultra hardware
+* Added menu option to reset settings (in case the app hangs)
+* Added dark mode
+* Vendor presets can now also be toggled by <CTRL> + mouse wheel tilt
+* Added donate button :-)
+##FIXES
+* Now only showing countries which have frequency data available
+* Improved device detection
+* Improved information in notification popups
+
 V1.8.0
     FIXES
         - Fix for issue #29: Java Script Error
