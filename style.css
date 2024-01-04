@@ -1,0 +1,43 @@
+.sweetalert2-title {
+    font-size: 18px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.sweetalert2-validation-message {
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.sweetalert2-container {
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.swal2-select {
+    border-radius: 4px!important;
+}
+
+#donate-button {
+    font-size: 12px;
+    margin-left: auto;
+    background: rgb(150, 79, 216);
+    border-radius: 3px;
+    padding: 3px 5px;
+    cursor: pointer;
+    font-family: Arial;
+    line-height: 18px;
+    color: white;
+    transform: rotate(270deg);
+    display: inline-block;
+    top: 65px;
+    left: -34px;
+    position: absolute;
+ }
+
+#donate-button:hover {
+    background: #a86ddf;
+}
+
+.dark-mode {
+    background-color: black;
+}
