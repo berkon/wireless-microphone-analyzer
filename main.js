@@ -93,7 +93,8 @@ function createWindow () {
     });
 
     electronLocalshortcut.register ( mainWindow, 'CommandOrControl+R', () => {
-        mainWindow.reload();
+        app.relaunch ()
+        app.exit (0)
     });
 
     mainWindow.setTitle ( productName + " V" + version );

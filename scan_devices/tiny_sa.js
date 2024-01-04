@@ -15,10 +15,12 @@ class TinySA {
 
     static MIN_FREQ_BASIC = 0
     static MAX_FREQ_BASIC = 960000000
-    static MAX_SPAN_BASIC = 959900000
+    static MIN_SPAN_BASIC = 1 // couldn't find any specification if and what the minimum span is
+    static MAX_SPAN_BASIC = 959900000 // couldn't find any specification if and what the maximum span is
     static MIN_FREQ_ULTRA = 0
     static MAX_FREQ_ULTRA = 6000000000
-    static MAX_SPAN_ULTRA = 5999900000
+    static MIN_SPAN_ULTRA = 1 // couldn't find any specification if and what the minimum span is
+    static MAX_SPAN_ULTRA = 5999900000 // couldn't find any specification if and what the maximum span is
 
     static BAUD_RATE = 115200; // For TinySA the connection baudrate doesn't seem to matter
     static deviceCommands = {
@@ -123,7 +125,10 @@ class TinySA {
     }
 
     async getConfiguration () {
-        await this.sendPromise (`Probing for '${TinySA.NAME}' hardware ...`, TinySA.deviceCommands.GET_VERSION, null )
+        const deviceInfo = await this.sendPromise (`Probing for '${TinySA.NAME}' hardware ...`, TinySA.deviceCommands.GET_VERSION, null )
+        if ( deviceInfo[0].type === 'ERROR_RECEIVED_TRASH') {
+            return
+        }
         const freqConfig = await this.sendPromise (`Obtain current frequency settings ...`, TinySA.deviceCommands.GET_FREQ_CONFIG, null )
 
         if ( freqConfig[0].status === 'VALID' ) {
@@ -230,7 +235,9 @@ class TinySA {
                         // echo (as it should be) consider it to be trash data.
                         if (!(line === this.lastCmdLineSent && index === 0)) {
                             console.log ( `Ignoring trash data from device buffer`)
-                            return
+                            returnData.push ({
+                                type: 'ERROR_RECEIVED_TRASH'
+                            })
                         }
                     }
                 }

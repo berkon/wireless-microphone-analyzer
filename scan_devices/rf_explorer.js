@@ -6,6 +6,7 @@ class RFExplorer {
     static NAME     = 'RF Explorer';
     static HW_TYPE   = 'RF_EXPLORER';
     static BAUD_RATE = 500000;
+    static MIN_SPAN = 112000
     static deviceCommands = {
         GET_CONFIG: '#0C0', // Get current configuration
         SET_CONFIG: '#0C2-F:'
@@ -23,7 +24,6 @@ class RFExplorer {
     SERIAL_RESPONSE_TIMEOUT = 1500
 
     port                 = undefined;
-    responseCheckTimer   = undefined;
     received_config_data = false;
 
     constructor (port) {
@@ -43,10 +43,6 @@ class RFExplorer {
     }
 
     async setConfiguration ( startFreq, stopFreq, sweepPoints ) {
-        if ( this.responseCheckTimer ) { // Exit in case another command is running
-            return
-        }
-
         const startFreqStr = Math.floor(startFreq/1000).toString().padStart(7, '0')
         const stopFreqStr  = Math.floor(stopFreq/1000).toString().padStart(7, '0')
 
@@ -71,11 +67,6 @@ class RFExplorer {
         } else {
             await this.port.writePromise ( sendBuf, 'ascii' )
         }
-
-        this.responseCheckTimer = setTimeout ( function () {
-            console.error ("No Response from scan device!");
-            this.responseCheckTimer = undefined;
-        }, this.SERIAL_RESPONSE_TIMEOUT );
     }
 
     setHandler (data$) {
@@ -105,8 +96,6 @@ class RFExplorer {
 
                     switch ( deviceEvent ) {
                         case this.constructor.deviceEvents.CONFIG_DATA: // Received config data from scan device
-                            clearTimeout ( this.responseCheckTimer )
-                            this.responseCheckTimer = undefined
                             this.received_config_data = true
                             console.log ( "Received config data:  ID:", deviceEvent, "DATA LENGTH:", dataLength, "DATA:", data )
 

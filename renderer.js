@@ -9,7 +9,7 @@ const Swal            = require ( 'sweetalert2' );
 const FREQ_VENDOR_PRESETS = require ( 'require-all' )(__dirname +'/frequency_data/presets' );
 const Pkg             = require ('./package.json');
 const fs              = require ('fs');
-var { take, filter, Subject, firstValueFrom } = require('rxjs');
+var { Subject, firstValueFrom } = require('rxjs');
 const configStore     = new ConfigStore ( Pkg.name )
 
 const RFExplorer = require('./scan_devices/rf_explorer.js');
@@ -32,6 +32,7 @@ const LINE_FORBIDDEN_MARKERS = 6
 
 var MIN_FREQ     = undefined
 var MAX_FREQ     = undefined
+var MIN_SPAN     = undefined
 var MAX_SPAN     = undefined
 global.SWEEP_POINTS = 100 // default value
 var COM_PORT = undefined
@@ -48,6 +49,8 @@ let saved_data_version = configStore.get('saved_data_version')
 let portDetectionIndex = 0
 var data$ = new Subject();
 let dataSubscription = null
+let popupCategory = ''
+let responseCheckTimer  = null
 
 document.getElementById('donate-button').addEventListener ('click', () => openDonateWindow() )
 
@@ -145,7 +148,8 @@ if ( VIS_FORBIDDEN  === undefined ) VIS_FORBIDDEN  = true;
 if ( VIS_CONGEST    === undefined ) VIS_CONGEST    = true;
 if ( VIS_TV_CHAN    === undefined ) VIS_TV_CHAN    = true;
 
-let showPopup = async ( type, title, html, buttonsArr = [] ) => {
+let showPopup = async ( type, category, title, html, buttonsArr = [] ) => {
+    popupCategory = category
     let swalConfig = {
         title,
         html,
@@ -270,7 +274,7 @@ let initChart = () => {
                 xAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: BAND_LABEL?BAND_LABEL:'MHz'
+                        labelString: BAND_LABEL?BAND_LABEL:'Hz'
                     },
                     barPercentage: 0.2,
                     gridLines : {
@@ -488,7 +492,7 @@ function setChannelGrids () {
         if ( f.start * 1000 >= global.START_FREQ )
             myChart.config.options.scales.xAxes[3].labels[left_data_point] = '|';
 
-        myChart.config.options.scales.xAxes[3].labels[Math.floor((left_data_point+right_data_point)/2)] = f.label;
+        myChart.config.options.scales.xAxes[3].labels[Math.round((left_data_point+right_data_point)/2)] = f.label;
 
         if ( !even ) { // Only draw even (gray) fields. Otherwise overlapping occours. For odd (white fields we simply do nothing)
             even = !even;
@@ -584,7 +588,8 @@ function alignToBoundary ( point ) {
 }
 
 function formatFrequencyString ( freq ) { // as Hz
-    return (freq / 1000000).toFixed(6)
+    let arr = freq.toString().split ( /(?=(?:...)*$)/ )
+    return arr.join('.')
 }
 
 function updateChart () {
@@ -633,10 +638,12 @@ let tryPort = (index) => {
                 if ( err.toString().indexOf('Access denied') !== -1 ) {
                     showPopup (
                         'error',
+                        'POPUP_CAT_CONNECTION_ISSUE',
                         "Access denied!",
                         `Got 'Access denied' on serial port! The application must be restarted!`,
                         ['Restart']
                     ).then ( result => {
+                        popupCategory = ''
                         if ( result.isConfirmed ) {
                             restartApp()
                         }
@@ -699,6 +706,7 @@ const portOpenCb = () => {
                             global.SWEEP_POINTS = data[0].values.SWEEP_POINTS
                             MIN_FREQ = data[0].values.MIN_FREQ
                             MAX_FREQ = data[0].values.MAX_FREQ
+                            MIN_SPAN = RFExplorer.MIN_SPAN
                             MAX_SPAN = data[0].values.MAX_SPAN
 
                             configStore.set ( 'start_freq', global.START_FREQ )
@@ -740,7 +748,7 @@ const portOpenCb = () => {
 
                             const sweep_points = "    |    Sweep points: " + global.SWEEP_POINTS
 
-                            let label = "Range: " + formatFrequencyString(global.START_FREQ) + " - " + formatFrequencyString(global.STOP_FREQ) + " MHz    |    Span: " + formatFrequencyString(global.STOP_FREQ - global.START_FREQ) + " MHz" + country_information + band_details +  sweep_points
+                            let label = "Range: " + formatFrequencyString(global.START_FREQ) + " - " + formatFrequencyString(global.STOP_FREQ) + " Hz    |    Span: " + formatFrequencyString(global.STOP_FREQ - global.START_FREQ) + " Hz" + country_information + band_details +  sweep_points
 
                             myChart.options.scales.xAxes[0].scaleLabel.labelString = label
                             configStore.set ( 'band_label' , label )
@@ -780,7 +788,7 @@ const portOpenCb = () => {
 
                 console.log ( "Starting response check timer ..." )
 
-                let responseCheckTimer = setTimeout ( () => {
+                responseCheckTimer = setTimeout ( () => {
                     console.error ( `No or invalid response from ${RFExplorer.NAME}!`)
 
                     // If serial port was connected successfully but to a different device type
@@ -796,27 +804,24 @@ const portOpenCb = () => {
                             console.log ( `Now trying port with index ${portDetectionIndex}`)
                             connectPort(portDetectionIndex)
                         } else { // No more ports available
-                            await Swal.fire({
-                                title: "No response from scan device!",
-                                html: `<b>${RFExplorer.NAME}</b> could not be found or identified properly on any of the available ports!` +
-                                        `<br><br>Please choose the correct device type from the menu or connect the chosen device. If the correct` +
-                                        ` device is already connected, please restart it and then click 'Reconnect'.`,
-                                icon: "error",
-                                showCancelButton: false,
-                                confirmButtonColor: "#0099ff",
-                                confirmButtonText: 'Reconnect',
-                                customClass: {
-                                    title: 'sweetalert2-title',
-                                    container: 'sweetalert2-container'
+                            showPopup (
+                                "error",
+                                'POPUP_CAT_CONNECTION_ISSUE',
+                                "No or invalid response from scan device!",
+                                `<b>${RFExplorer.NAME}</b> could not be found or identified properly on any of the available ports!` +
+                                    `<br><br>Please choose the correct device type from the menu or connect the chosen device. If the correct` +
+                                    ` device is already connected, please restart it and then click 'Reconnect'.`,
+                                ['Reconnect']                                
+                            ).then ( result => {
+                                if ( result.isConfirmed ) {
+                                    popupCategory = ''
+                                    portDetectionIndex = 0
+                                    scanPorts().then (() => connectPort() )
                                 }
                             })
-
-                            portDetectionIndex = 0
-                            scanPorts().then (() => connectPort() )
                         }
                     })
                 }, SERIAL_RESPONSE_TIMEOUT)
-
                 scanDevice.getConfiguration()
             } else {
                 console.error ("Unable to instantiate class RFExplorer!")
@@ -850,6 +855,7 @@ const portOpenCb = () => {
                             FREQ_STEP = data[0].values.FREQ_STEP
                             MIN_FREQ = data[0].values.MIN_FREQ
                             MAX_FREQ = data[0].values.MAX_FREQ
+                            MIN_SPAN = TinySA.MIN_SPAN
                             MAX_SPAN = data[0].values.MAX_SPAN
 
                             configStore.set ( 'start_freq', global.START_FREQ )
@@ -875,8 +881,8 @@ const portOpenCb = () => {
                                 return
                             }
 
-                            const range = "Range: " + formatFrequencyString(global.START_FREQ) + " - " + formatFrequencyString(global.STOP_FREQ) + " MHz"
-                            const span  = "    |    Span: " + formatFrequencyString(global.STOP_FREQ - global.START_FREQ) + " MHz"
+                            const range = "Range: " + formatFrequencyString(global.START_FREQ) + " - " + formatFrequencyString(global.STOP_FREQ) + " Hz"
+                            const span  = "    |    Span: " + formatFrequencyString(global.STOP_FREQ - global.START_FREQ) + " Hz"
 
                             let country = ''
 
@@ -930,12 +936,20 @@ const portOpenCb = () => {
                                 myChart.update()
                             }
                         } break
+
+                        case 'ERROR_RECEIVED_TRASH':
+                            portDetectionIndex = 0
+                            clearTimeout ( responseCheckTimer )
+                            disconnectPort().then ( () => {
+                                scanPorts().then (() => connectPort() )
+                            })
+                            return
                     }
                 })
 
                 console.log ( "Starting response check timer ..." )
 
-                let responseCheckTimer = setTimeout ( () => {
+                responseCheckTimer = setTimeout ( () => {
                     console.error ( `No or invalid response from ${TinySA.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}!`)
 
                     // If serial port was connected successfully but to a different device type, disconnect it
@@ -951,21 +965,24 @@ const portOpenCb = () => {
                             console.log ( `Now trying port with index ${portDetectionIndex}`)
                             connectPort(portDetectionIndex)
                         } else { // No more ports available
-                            await showPopup (
+                            showPopup (
                                 "error",
+                                'POPUP_CAT_CONNECTION_ISSUE',
                                 "No or invalid response from scan device!",
                                 `<b>${TinySA.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}</b> could not be found or identified properly on any of the available ports!` +
                                     `<br><br>Please choose the correct device type from the menu or connect the chosen device. If the correct` +
                                     ` device is already connected, please restart it and then click 'Reconnect'.`,
                                 ['Reconnect']
-                            )
-
-                            portDetectionIndex = 0
-                            scanPorts().then (() => connectPort() )
+                            ).then ( result => {
+                                if ( result.isConfirmed ) {
+                                    popupCategory = ''
+                                    portDetectionIndex = 0
+                                    scanPorts().then (() => connectPort() )
+                                }
+                            })
                         }
                     })
                 }, SERIAL_RESPONSE_TIMEOUT )
-
                 scanDevice.getConfiguration()
             } else {
                 console.error ("Unable to instantiate class TinySA!")
@@ -979,19 +996,16 @@ const portOpenCb = () => {
 }
 
 function showPortHwError ( msg ) {
-    Swal.fire({
-        title: "Hardware error!",
-        html: msg + `<br><ul style="text-align:left"><li>Make sure that the scan device is connected</li>` +
-                    `<li>Select the corresponding serial port (or leave default: \'Auto\')</li>`+
-                    `<li>If it still doesn\'t work please disconnect/power off the scan device, stop this tool, leave the scan device unpowered for approx 10s, then start the scan device and wait until its "pre-calibration" phase is over and it shows a graph on the display. Now start the software again!</li></ul>`,
-        icon: "error",
-        showCancelButton: false,
-        confirmButtonColor: "#0099ff",
-        customClass: {
-            title: 'sweetalert2-title',
-            container: 'sweetalert2-container'
+    showPopup ('error', 'POPUP_CAT_CONNECTION_ISSUE', "Hardware error!", msg + `<br><ul style="text-align:left"><li>Make sure that the scan device is connected</li>` +
+        `<li>Select the corresponding serial port (or leave default: \'Auto\')</li>`+
+        `<li>If it still doesn\'t work please disconnect/power off the scan device, stop this tool, leave the scan device unpowered for approx 10s, then start the scan device and wait until its "pre-calibration" phase is over and it shows a graph on the display. Now start the software again!</li></ul>`,
+        ['Retry', 'Cancel']
+    ).then ( result => {
+        if ( result.isConfirmed ) {
+            portDetectionIndex = 0;
+            scanPorts().then (() => connectPort() )
         }
-    }) 
+    })
 
     console.error ( msg )
 }
@@ -1008,7 +1022,7 @@ function scanPorts() {
 
             if ( ports.length === 0 ) {
                 showPortHwError ( "No serial ports detected!" )
-                reject ( "No serial ports detected!" )
+                reject ( "ERROR_NO_PORTS" )
                 return
             }
 
@@ -1307,7 +1321,8 @@ ipcRenderer.on ( 'DARK_MODE', (event, message) => {
             configStore.set('dark_mode', false)
         }
 
-        showPopup('warning', 'Restart', 'App must be restarted for changes to take effect', ['Ok', 'Cancel']).then (result => {
+        showPopup('warning', 'RESTART_REQUIRED', 'Restart', 'App must be restarted for changes to take effect', ['Ok', 'Cancel']).then (result => {
+            popupCategory = ''
             if ( result.isConfirmed ) {
                 restartApp()
             }
@@ -1390,47 +1405,96 @@ ipcRenderer.on ( 'DEVICE_SETTINGS', async (event, message) => {
     }
 })
 
-function alignToMaxSpan () {
-    if ( global.STOP_FREQ - global.START_FREQ > MAX_SPAN ) {
-        let fill = Math.floor ( (MAX_SPAN - (global.STOP_FREQ - global.START_FREQ)) / 2 );
-        global.START_FREQ -= fill;
-        global.STOP_FREQ  = global.STOP_FREQ  + fill;
-        console.log ( "Maximum span reached!" );
+function getFreqFromPercent (percent) {
+    return Math.round ( ((global.STOP_FREQ - global.START_FREQ) / 100) * percent );
+}
+
+function zoom ( deltaPercent ) { // delta deltaPercent
+    const deltaFreq = getFreqFromPercent ( Math.abs(deltaPercent) )
+
+    if ( deltaPercent < 0 ) { // zoom out
+        let isMinimum = false
+        let isMaximum = false
+
+        console.log ( `Zooming OUT to ${Math.abs(deltaPercent) * 2 + 100}% of current view ...` )
+
+        if ( global.START_FREQ - deltaFreq < MIN_FREQ ) {
+            console.log ( `New start frequency exceeds minimum of ${MIN_FREQ}. Thus setting it to ${MIN_FREQ}!` )
+            global.START_FREQ = MIN_FREQ
+            isMinimum = true
+        } else {
+            global.START_FREQ = global.START_FREQ - deltaFreq
+        }
+
+        if ( global.STOP_FREQ + deltaFreq > MAX_FREQ ) {
+            console.log ( `New stop frequency exceeds maximum of ${MAX_FREQ}. Thus setting it to ${MAX_FREQ}!` )
+            global.STOP_FREQ = MAX_FREQ
+            isMaximum = true
+        } else {
+            global.STOP_FREQ = global.STOP_FREQ + deltaFreq
+        }
+
+        let tmpSpan = global.STOP_FREQ - global.START_FREQ
+
+        if ( tmpSpan > MAX_SPAN ) {
+            console.log ( `Selected span of ${tmpSpan} would exceed maximum span of ${MAX_SPAN}! Aligning zoom to max span value ${MAX_SPAN}.` )
+            let fill = Math.round ( ((global.STOP_FREQ - global.START_FREQ) - MAX_SPAN) / 2 )
+
+            if ( isMinimum ) {
+                global.STOP_FREQ = global.START_FREQ + MAX_SPAN
+            } else if ( isMaximum ) {
+                global.START_FREQ = global.STOP_FREQ - MAX_SPAN
+            } else {
+                global.START_FREQ -= fill
+                global.STOP_FREQ  += fill    
+            }
+        }
+    } else { // zoom in
+        console.log ( `Zooming IN to ${100 - Math.abs(deltaPercent) * 2}% of current view ...` )
+
+        // If smaller than minimal frequency span
+        if ( (global.STOP_FREQ - deltaFreq) - (global.START_FREQ + deltaFreq) < MIN_SPAN ) {
+            console.log ( `Selected span of ${global.STOP_FREQ - global.START_FREQ} is smaller than ${MIN_SPAN}! Aligning zoom to min span value ${MIN_SPAN}.` )
+            let fill = Math.floor ( ((global.STOP_FREQ - global.START_FREQ) - MIN_SPAN) / 2 )
+            global.STOP_FREQ -= fill
+            global.START_FREQ += fill
+        }
+
+        // If smaller than minimum number of sweep points
+        if ( global.STOP_FREQ - global.START_FREQ < global.SWEEP_POINTS ) {
+            console.log ( `Selected span of ${global.STOP_FREQ - global.START_FREQ} is smaller than number of sweep points ${global.SWEEP_POINTS}! Aligning zoom to number of sweep points ${global.SWEEP_POINTS}.` )
+            let fill = Math.floor ( ((global.STOP_FREQ - global.START_FREQ) - MIN_SPAN) / 2 )
+            global.START_FREQ += fill;
+            global.STOP_FREQ  -= fill;
+        } else {
+            global.START_FREQ += deltaFreq;
+            global.STOP_FREQ  -= deltaFreq;
+        }
     }
 }
 
-function getFreqPercentOfSpan (percent) {
-    return Math.floor( ((global.STOP_FREQ - global.START_FREQ) / 100) * percent );
-}
+function move (deltaPercent) {
+    console.log ( `Move frequency band to ${deltaPercent < 0 ? 'LEFT' : 'RIGHT'} by ${Math.abs(deltaPercent)}% of span` )
+    const deltaFreq = getFreqFromPercent(Math.abs(deltaPercent))
 
-function zoom (percent) { // delta percent
-    if ( percent < 0 ) {
-        console.log (`Zoom OUT to ${Math.abs(percent) * 2 + 100}% of current view ...`);
+    if ( deltaPercent < 0 ) {
+        if ( global.START_FREQ - deltaFreq < MIN_FREQ ) {
+            console.info ( `New start frequency ${global.START_FREQ - deltaFreq} would exceed minimum value of ${MIN_FREQ}. Moving to ${MIN_FREQ} instead!`)
+            global.STOP_FREQ  = global.STOP_FREQ - (global.START_FREQ - MIN_FREQ)
+            global.START_FREQ = MIN_FREQ
+        } else {
+            global.START_FREQ -= deltaFreq
+            global.STOP_FREQ  -= deltaFreq
+        }
     } else {
-        console.log (`Zoom IN to ${100 - Math.abs(percent) * 2}% of current view ...`);
-    }
-
-    const delta_freq = getFreqPercentOfSpan(Math.abs(percent));
-
-    if ( percent < 0 ) {
-        global.START_FREQ -= delta_freq;
-        global.STOP_FREQ  += delta_freq;
-    } else {
-        global.START_FREQ += delta_freq;
-        global.STOP_FREQ  -= delta_freq;
-    }
-}
-
-function move (percent) {
-    console.log (`Move frequency band to ${percent < 0 ? 'LEFT' : 'RIGHT'} by ${Math.abs(percent)}% of span`)
-    const delta_freq = getFreqPercentOfSpan(Math.abs(percent));
-
-    if ( percent < 0 ) {
-        global.START_FREQ -= delta_freq;
-        global.STOP_FREQ  -= delta_freq;
-    } else {
-        global.START_FREQ += delta_freq;
-        global.STOP_FREQ  += delta_freq;
+        if ( global.STOP_FREQ + deltaFreq > MAX_FREQ ) {
+            console.info ( `New stop frequency ${global.STOP_FREQ + deltaFreq} would exceed maximum value of ${MAX_FREQ}. Moving to ${MAX_FREQ} instead!`)
+            global.START_FREQ = global.START_FREQ + (MAX_FREQ - global.STOP_FREQ)
+            global.STOP_FREQ  = MAX_FREQ
+        } else {
+            global.START_FREQ += deltaFreq
+            global.STOP_FREQ  += deltaFreq
+        }
     }
 }
 
@@ -1446,24 +1510,18 @@ document.addEventListener ( "wheel", async e => {
     isExecuting = true
 
     if ( e.deltaY > 0 ) { // Zoom out
-        if ( !e.shiftKey && !e.ctrlKey ) { // Zoom out by adding 10% of span on both sides ( = 20% )
-            zoom(-10); // Zoom out to 120% by adding 10% of span on both sides ( = 20% )
+        if ( !e.shiftKey && !e.ctrlKey ) {
+            zoom(-10) // Zoom out to 120 % by adding 10% of current span on both sides ( = 20% )
         } else if ( e.shiftKey && !e.ctrlKey ) {
-            zoom(-50); // Zoom out by adding 50% of span on both sides ( = 100% )
+            zoom(-50) // Zoom out to 200% by adding 50% of span on both sides ( = 100% )
         }
 
-        alignToMaxSpan ();
         BAND_DETAILS = "";
     } else if ( e.deltaY < 0 ) { // Zoom in
         if ( !e.shiftKey && !e.ctrlKey ) {
-            zoom(10); // Zoom in by removing 10% of span on both sides ( = 20% )
+            zoom(10) // Zoom in by removing 10% of span on both sides ( = 20% )
         } else if ( e.shiftKey && !e.ctrlKey ) {
-            zoom(25); // Zoom in by removing 25% of span on both sides ( = 50% )
-        }
-        
-        if ( global.STOP_FREQ - global.START_FREQ < global.SWEEP_POINTS ) {
-            isExecuting = false
-            return;
+            zoom(25) // Zoom in by removing 25% of span on both sides ( = 50% )
         }
     } else if ( e.deltaX < 0 ) { // Move left
         if ( e.ctrlKey && !e.shiftKey ) { // Toggle vendor specific channel presets/banks down
@@ -1606,7 +1664,6 @@ document.addEventListener ( "keydown", async e => {
                 zoom(-50); // Zoom out by adding 50% of span on both sides ( = 100% )
             }
 
-            alignToMaxSpan ();
             BAND_DETAILS = "";
             break;
 
