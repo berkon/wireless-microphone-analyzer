@@ -1,6 +1,9 @@
 V2.0.0
 ## New Features
 * Added Support for TinySA and TinySA Ultra hardware
+* Configurable number of sweep points for TinySA hardware
+* Automatic port detection
+* Hot pluging (no need to restart the app when connecting a device)
 * Added menu option to reset settings (in case the app hangs)
 * Added dark mode
 * Vendor presets can now also be toggled by <CTRL> + mouse wheel tilt

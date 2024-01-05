@@ -334,13 +334,13 @@ if ( !COUNTRY_CODE || !fs.existsSync ( __dirname + '/frequency_data/forbidden/FO
 
 if ( !COM_PORT ) {
     COM_PORT = 'AUTO'
-    configStore.set('com_port', COM_PORT )
+    configStore.set ( 'com_port', COM_PORT )
 } else {
     ipcRenderer.send ('SET_PORT', { portPath : COM_PORT });
 }
 
 if ( !SWEEP_POINTS ) {
-    configStore.set('sweep_points', global.SWEEP_POINTS )
+    configStore.set ( 'sweep_points', global.SWEEP_POINTS )
 } else {
     global.SWEEP_POINTS = SWEEP_POINTS
 }
@@ -354,11 +354,23 @@ else
 
 var chDispValShadowArr = [];
 
+function connectDevice (portIdentifier, shouldScan ) {
+    if ( shouldScan ) {
+        portDetectionIndex = 0 // when a port scan is requested, it can be considered that all ports should be checked
+        scanPorts()
+            .then ( () => connectPort(portIdentifier) )
+            .then ( () => scanDevice.getConfiguration() )
+    } else {
+        connectPort(portIdentifier)
+            .then ( () => scanDevice.getConfiguration() )
+    }
+}
+
 if ( SCAN_DEVICE ) {
     ipcRenderer.send ('SET_SCAN_DEVICE', { scanDevice : SCAN_DEVICE });
     console.log ( `Scan device is '${SCAN_DEVICE}'`)
     initChart()
-    scanPorts().then (() => connectPort() )
+    connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
 } else {
     console.log ( `No scan device selected. Waiting for user to select via popup ...`)
 
@@ -394,14 +406,14 @@ if ( SCAN_DEVICE ) {
                 ipcRenderer.send ('SET_SCAN_DEVICE', { scanDevice : RFExplorer.HW_TYPE });
                 configStore.set ('scan_device', 'RF_EXPLORER')
                 SCAN_DEVICE = RFExplorer.HW_TYPE;
-                scanPorts().then (() => connectPort() )
+                connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
                 break
 
             case TinySA.HW_TYPE:
                 ipcRenderer.send ('SET_SCAN_DEVICE', { scanDevice : TinySA.HW_TYPE });
                 configStore.set ('scan_device', 'TINY_SA')
                 SCAN_DEVICE = TinySA.HW_TYPE;
-                scanPorts().then (() => connectPort() )
+                connectDevice(COM_PORT?COM_PORT:'AUTO', true )
                 break
         }
     })
@@ -627,7 +639,7 @@ function updateChart () {
 let tryPort = (index) => {
     return new Promise ( (resolve, reject) => {
         if ( index > globalPorts.length -1 ) {
-            reject('ERR_PORT_INVALID_INDEX')
+            reject ( 'ERR_PORT_INVALID_INDEX' )
             return
         }
 
@@ -635,7 +647,7 @@ let tryPort = (index) => {
         console.log ( `Trying port ${globalPorts[index].path} with baud rate ${baudRate} ...` );
         port = new SerialPort ({ path: globalPorts[index].path, baudRate : baudRate }, err => {
             if ( err ) {
-                if ( err.toString().indexOf('Access denied') !== -1 ) {
+                if ( err.toString().indexOf('Access denied') !== -1 ) { // If access denied error
                     showPopup (
                         'error',
                         'POPUP_CAT_CONNECTION_ISSUE',
@@ -660,18 +672,22 @@ let tryPort = (index) => {
             }
 
             console.log( `Successfully connected to ${globalPorts[index].path}!` )
-            resolve ()
+            resolve ( 'SUCCESS' )
         })
 
         // Create a promise of write() function
         port.writePromise = async (data, type ) => {
-            port.write (data, type, (err) => {
-                if (err) {
-                    return Promise.reject(err);
-                }
+            if ( port.isOpen ) {
+                port.write (data, type, (err) => {
+                    if (err) {
+                        return Promise.reject(err);
+                    }
 
-                return Promise.resolve();
-            });
+                    return Promise.resolve();
+                });
+            } else {
+                console.error ( `Tried to write the following data to port '${port.settings.path}', but the stream was already closed: '${data}'`)
+            }
         }
     })
 }
@@ -692,9 +708,14 @@ const portOpenCb = () => {
                     switch ( data[0].type ) {
                         case 'NAME':
                             if ( data[0].values.NAME === RFExplorer.NAME ) {
+                                console.log ( `Stoping response check timer ${responseCheckTimer} ...` )
                                 clearTimeout ( responseCheckTimer )
-                                console.log ( "Stoped response check timer" )
+                                responseCheckTimer = null
                                 console.log ( `Successfully detected '${data[0].values.NAME}' hardware!` )
+                                if ( popupCategory === 'POPUP_CAT_CONNECTION_ISSUE' ) {
+                                    popupCategory = ''
+                                    Swal.close()
+                                }
                                 return
                             }
                             break
@@ -786,43 +807,57 @@ const portOpenCb = () => {
                     }
                 })
 
-                console.log ( "Starting response check timer ..." )
+                // In case another timer is running stop it!
+                if ( responseCheckTimer ) {
+                    console.log ( `Stoping response check timer ${responseCheckTimer} ...` )
+                    clearTimeout ( responseCheckTimer )
+                    responseCheckTimer = null
+                }
 
                 responseCheckTimer = setTimeout ( () => {
+                    console.log ( `Response check timer ${responseCheckTimer} expired!`)
+                    responseCheckTimer = null
                     console.error ( `No or invalid response from ${RFExplorer.NAME}!`)
 
                     // If serial port was connected successfully but to a different device type
-                    disconnectPort().then( async err => {
+                    disconnectPort().then ( async err => {
                         if (err) {
                             console.error(err)
                             return
                         }
 
-                        portDetectionIndex++
+                        if ( COM_PORT === 'AUTO' ) {
+                            portDetectionIndex++
 
-                        if ( portDetectionIndex < globalPorts.length ) {
-                            console.log ( `Now trying port with index ${portDetectionIndex}`)
-                            connectPort(portDetectionIndex)
-                        } else { // No more ports available
-                            showPopup (
-                                "error",
-                                'POPUP_CAT_CONNECTION_ISSUE',
-                                "No or invalid response from scan device!",
-                                `<b>${RFExplorer.NAME}</b> could not be found or identified properly on any of the available ports!` +
-                                    `<br><br>Please choose the correct device type from the menu or connect the chosen device. If the correct` +
-                                    ` device is already connected, please restart it and then click 'Reconnect'.`,
-                                ['Reconnect']                                
-                            ).then ( result => {
-                                if ( result.isConfirmed ) {
-                                    popupCategory = ''
-                                    portDetectionIndex = 0
-                                    scanPorts().then (() => connectPort() )
-                                }
-                            })
+                            if ( portDetectionIndex < globalPorts.length ) {
+                                console.log ( `Now trying port with index ${portDetectionIndex}`)
+                                connectDevice ( portDetectionIndex, false )
+                            } else {
+                                console.log ( `No more ports available!` )
+                            }
+
+                            if ( portDetectionIndex === globalPorts.length || COM_PORT !== 'AUTO' ) {
+                                // No more ports available
+                                showPopup (
+                                    "error",
+                                    'POPUP_CAT_CONNECTION_ISSUE',
+                                    "No or invalid response from scan device!",
+                                    `<b>${RFExplorer.NAME}</b> could not be found or identified properly on any of the available ports!` +
+                                        `<br><br>Please choose the correct device type from the menu or connect the chosen device. If the correct` +
+                                        ` device is already connected, please restart it and then click 'Reconnect'.`,
+                                    ['Reconnect']                                
+                                ).then ( result => {
+                                    if ( result.isConfirmed ) {
+                                        popupCategory = ''
+                                        connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
+                                    }
+                                })
+                            }
                         }
                     })
                 }, SERIAL_RESPONSE_TIMEOUT)
-                scanDevice.getConfiguration()
+
+                console.log ( `Started response check timer ${responseCheckTimer}` )
             } else {
                 console.error ("Unable to instantiate class RFExplorer!")
             }
@@ -842,9 +877,14 @@ const portOpenCb = () => {
                     switch ( data[0].type ) {
                         case 'NAME':
                             if ( data[0].values.NAME === TinySA.NAME ) {
+                                console.log ( `Stoping response check timer ${responseCheckTimer} ...` )
                                 clearTimeout ( responseCheckTimer )
-                                console.log ( "Stoped response check timer" )
+                                responseCheckTimer = null
                                 console.log ( `Successfully detected '${data[0].values.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}' hardware!` )
+                                if ( popupCategory === 'POPUP_CAT_CONNECTION_ISSUE' ) {
+                                    popupCategory = ''
+                                    Swal.close()
+                                }
                                 return
                             }
                             break
@@ -938,33 +978,50 @@ const portOpenCb = () => {
                         } break
 
                         case 'ERROR_RECEIVED_TRASH':
-                            portDetectionIndex = 0
+                            console.log ( `Stoping response check timer ${responseCheckTimer} ...` )
                             clearTimeout ( responseCheckTimer )
-                            disconnectPort().then ( () => {
-                                scanPorts().then (() => connectPort() )
-                            })
+                            responseCheckTimer = null
+                            disconnectPort().then ( () => connectDevice(COM_PORT?COM_PORT:'AUTO', true) )
                             return
                     }
                 })
 
-                console.log ( "Starting response check timer ..." )
+                // In case another timer is running stop it!
+                if ( responseCheckTimer ) {
+                    console.log ( `Stopped response check timer ${responseCheckTimer} ...` )
+                    clearTimeout ( responseCheckTimer )
+                    responseCheckTimer = null
+                }
 
                 responseCheckTimer = setTimeout ( () => {
+                    console.log ( `Response check timer ${responseCheckTimer} expired!`)
+                    responseCheckTimer = null
                     console.error ( `No or invalid response from ${TinySA.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}!`)
+                    data$.next([{
+                        type: 'ERROR_NO_RESPONSE',
+                        status: 'ERROR'
+                    }])
 
                     // If serial port was connected successfully but to a different device type, disconnect it
-                    disconnectPort().then( async (err) => {
+                    disconnectPort().then ( async err => {
                         if ( err ) {
                             console.error (err )
                             return
                         }
 
-                        portDetectionIndex++
+                        if ( COM_PORT === 'AUTO' ) {
+                            portDetectionIndex++
 
-                        if ( portDetectionIndex < globalPorts.length ) {
-                            console.log ( `Now trying port with index ${portDetectionIndex}`)
-                            connectPort(portDetectionIndex)
-                        } else { // No more ports available
+                            if ( portDetectionIndex < globalPorts.length ) {
+                                console.log ( `Now trying port with index ${portDetectionIndex}` )
+                                connectDevice ( portDetectionIndex, false )
+                            } else {
+                                console.log ( `No more ports available!` )
+                            }
+                        } 
+                        
+                        if ( portDetectionIndex === globalPorts.length || COM_PORT !== 'AUTO' ) {
+                            // No more ports available
                             showPopup (
                                 "error",
                                 'POPUP_CAT_CONNECTION_ISSUE',
@@ -977,13 +1034,14 @@ const portOpenCb = () => {
                                 if ( result.isConfirmed ) {
                                     popupCategory = ''
                                     portDetectionIndex = 0
-                                    scanPorts().then (() => connectPort() )
+                                    connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
                                 }
                             })
                         }
                     })
                 }, SERIAL_RESPONSE_TIMEOUT )
-                scanDevice.getConfiguration()
+
+                console.log ( `Started response check timer ${responseCheckTimer}` )
             } else {
                 console.error ("Unable to instantiate class TinySA!")
             }
@@ -1002,8 +1060,7 @@ function showPortHwError ( msg ) {
         ['Retry', 'Cancel']
     ).then ( result => {
         if ( result.isConfirmed ) {
-            portDetectionIndex = 0;
-            scanPorts().then (() => connectPort() )
+            connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
         }
     })
 
@@ -1034,11 +1091,14 @@ function scanPorts() {
             }
 
             resolve ( ports )
+
+            // Sending SET_PORT to update port list in menu
+            ipcRenderer.send ( 'SET_PORT', { portPath : COM_PORT } )
         })
     })
 }
 
-function connectPort ( index ) {
+function connectPort ( portIdentifier ) {
     return new Promise ( (resolve, reject) => {
         baudRate = getBaudrate()
 
@@ -1047,47 +1107,46 @@ function connectPort ( index ) {
             return reject('ERR_PORT_NO_BAUDRATE')
         }
 
-        if ( index !== undefined ) {
-            console.log ( `Connecting to port with index '${index}'`)
-            tryPort(index).then ( () => {
+        if ( typeof portIdentifier === 'number' ) { // Select port by array index
+            console.log ( `Connecting to port with index ${portIdentifier}`)
+            tryPort ( portIdentifier ).then ( () => {
                 portOpenCb()
-                return resolve()
+                return resolve ()
             }).catch ( err => {
-                return reject (err)
+                return reject ( err )
             })
-        } else if ( COM_PORT && COM_PORT !== 'AUTO' ) { // Select specific port
-            console.log ( `Connecting to dedicated port '${COM_PORT}'`)
-            for ( const [index, port] of globalPorts.entries() ) {
-                if ( port.path === COM_PORT) {
-                    tryPort(index).then (() => {
-                        portOpenCb()
-                        return resolve()
-                    }).catch ( err => {
-                        return reject (err)
-                    })
-                }
-            }
-        } else { // Automatic port selection
-            console.log ( `Auto-detecting port ...`)
-            tryPort(portDetectionIndex).then ( () => {
-                portOpenCb ()
-                return resolve()
-            }).catch ( err => {
-                if ( err !== 'ERR_PORT_ACCESS_DENIED' ) {
+        } else if ( typeof portIdentifier === 'string') {
+            if ( portIdentifier === 'AUTO' ) { // Automatic port selection
+                console.log ( `Auto-detecting port ...`)
+
+                tryPort ( portDetectionIndex ).then ( () => {
+                    portOpenCb ()
+                    return resolve()
+                }).catch ( err => {
                     portDetectionIndex++
 
                     if ( portDetectionIndex < globalPorts.length ) {
-                        tryPort(portDetectionIndex).then ( () => {
-                            portOpenCb ()
-                            return resolve()
-                        })
+                        connectPort ( 'AUTO' )
+                            .then ( () => resolve() )
+                            .catch( () => reject () )
                     } else {
                         reject ('ERR_PORT_DEVICE_NOT_FOUND')
-                        portDetectionIndex = 0
                     }
-                }
-                return
-            })
+                })
+            } else { // Select port by port name string
+                console.log ( `Connecting to dedicated port '${COM_PORT}'`)
+
+                for ( const [index, port] of globalPorts.entries() ) {
+                    if ( port.path === COM_PORT) {
+                        tryPort(index).then ( () => {
+                            portOpenCb()
+                            return resolve()
+                        }).catch ( err => {
+                            return reject (err)
+                        })
+                    }
+                }    
+            }
         }
     })
 }
@@ -1247,9 +1306,8 @@ ipcRenderer.on ( 'SET_PORT', async (event, message) => {
     console.log ( "Wait for lastly requested scan data to be received before continuing ..." )
     await firstValueFrom(data$) // Wait for last scan data to arrive
     console.log ( "Reconnecting port ..." )
-    await disconnectPort()
-    connectPort()
-});
+    disconnectPort().then ( () => connectDevice ( COM_PORT, false ) )
+})
 
 ipcRenderer.on ( 'EXPORT_WW6_IAS_CSV', (event, message) => {
     let i = 0;
@@ -1345,15 +1403,13 @@ ipcRenderer.on ( 'SET_SCAN_DEVICE', async (event, message) => {
         case 'RF_EXPLORER':
             configStore.set ('scan_device', 'RF_EXPLORER')
             SCAN_DEVICE = message.scanDevice;
-            portDetectionIndex = 0
-            connectPort();
+            connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
             break;
 
         case 'TINY_SA':
             configStore.set ('scan_device', 'TINY_SA')
             SCAN_DEVICE = message.scanDevice;
-            portDetectionIndex = 0
-            connectPort();
+            connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
             break;
 
         default: console.error (`Unknown device: ${message.scanDevice}`);

@@ -126,7 +126,7 @@ class TinySA {
 
     async getConfiguration () {
         const deviceInfo = await this.sendPromise (`Probing for '${TinySA.NAME}' hardware ...`, TinySA.deviceCommands.GET_VERSION, null )
-        if ( deviceInfo[0].type === 'ERROR_RECEIVED_TRASH') {
+        if ( deviceInfo[0].status === 'ERROR' ) {
             return
         }
         const freqConfig = await this.sendPromise (`Obtain current frequency settings ...`, TinySA.deviceCommands.GET_FREQ_CONFIG, null )
@@ -236,7 +236,8 @@ class TinySA {
                         if (!(line === this.lastCmdLineSent && index === 0)) {
                             console.log ( `Ignoring trash data from device buffer`)
                             returnData.push ({
-                                type: 'ERROR_RECEIVED_TRASH'
+                                type: 'ERROR_RECEIVED_TRASH',
+                                status: 'ERROR'
                             })
                         }
                     }

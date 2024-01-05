@@ -73,6 +73,41 @@ if ( !gotLock ) {
     })
 }
 
+function addMenuEntryOrSubmenu ( menu_label, menu_data, menu_location ) {
+    if ( !Array.isArray (menu_data) ) {
+        menu_location.push ({
+            "label": menu_label,
+            click () { wc.send ( "CHANGE_BAND", {
+                start_freq : menu_data.start_freq,
+                stop_freq  : menu_data.stop_freq,
+                details    : menu_data.details,
+                band       : menu_data.band
+            }); }
+        });
+        return;
+    }
+
+    let len = menu_location.push ({ "label": menu_label, "submenu": [] });
+
+    menu_data.forEach ( (submenu_entry) => {
+        if ( submenu_entry.hasOwnProperty ('submenu') ) {
+            addMenuEntryOrSubmenu ( submenu_entry.label, submenu_entry.submenu, menu_location[len-1].submenu );
+        } else if ( submenu_entry.hasOwnProperty ('type') && submenu_entry.type === 'separator' ) {
+            menu_location[len-1].submenu.push ({type: "separator"});
+        } else {
+            menu_location[len-1].submenu.push ({
+                "label": submenu_entry.label,
+                click () { wc.send ( "CHANGE_BAND", {
+                    "start_freq" : submenu_entry.start_freq,
+                    "stop_freq"  : submenu_entry.stop_freq,
+                    "details"    : submenu_entry.details,
+                    "band"       : submenu_entry.band
+                }); }
+            });
+        }
+    });
+}
+
 function createWindow () {
     mainWindow = new BrowserWindow ({
         width: 1200,
@@ -98,110 +133,13 @@ function createWindow () {
     });
 
     mainWindow.setTitle ( productName + " V" + version );
-
-/*        { label: 'Analyze', submenu: [
-            { label: 'No channel analysis', type: 'radio', checked: true, click () { wc.send ( 'SET_VENDOR_4_ANALYSIS', { vendor: 'NON' } ); } },
-            { label: 'Sennheiser channels', type: 'radio',                click () { wc.send ( 'SET_VENDOR_4_ANALYSIS', { vendor: 'SEN' } ); } },
-            { label: 'Shure channels'     , type: 'radio',                click () { wc.send ( 'SET_VENDOR_4_ANALYSIS', { vendor: 'SHU' } ); } }
-        ]}, */
-        
-    var portMenuJSON = { label: 'Port', submenu: [] };
-
-    var scanDeviceMenuJSON = { label: 'Device', submenu: [{
-        label : 'RF Explorer',
-        code  : 'RF_EXPLORER',
-        type  : 'radio',
-        click () { wc.send ( 'SET_SCAN_DEVICE', { scanDevice : 'RF_EXPLORER' } ); }
-    }, {
-        label : 'Tiny SA',
-        code  : 'TINY_SA',
-        type  : 'radio',
-        click () { wc.send ( 'SET_SCAN_DEVICE', { scanDevice : 'TINY_SA' } ); }
-    }, {
-        label : 'Settings',
-        code  : 'DEVICE_SETTINGS',
-        click () { wc.send ( 'DEVICE_SETTINGS', {} ); }
-    }]};
-
-    var toolsMenuJSON = { label: 'Tools', submenu: [
-        { label: 'Export', submenu: [
-            { label: "Shure WW6 and IAS (CSV Format)", click () {
-                dialog.showSaveDialog ({
-                    title: "Export for Shure WW6 and IAS (CSV Format)",
-                    filters: [ {name: "CSV", extensions: ["csv"]} ]
-                }).then ( (res) => {
-                    wc.send ( 'EXPORT_WW6_IAS_CSV', { filename : res.filePath })
-                })  }
-            }
-        ]},
-        { label : 'MX Linux Workaround',
-            type  : 'checkbox',
-            click (ev) {
-                wc.send ( 'MX_LINUX_WORKAROUND', { enabled : ev.checked ? true : false })
-            }
-        },
-        { label: 'Reset Peak             R', click () {
-            wc.send ('RESET_PEAK', {});
-        }},
-        { label: 'Reset Settings', click () {
-            wc.send ('RESET_SETTINGS', {});
-        }},
-        { label: 'Dark mode',
-            type: 'checkbox',
-            click (ev) {
-                wc.send ( 'DARK_MODE', { enabled : ev.checked ? true : false })
-            }
-        }
-    ]};
-
-    var helpMenuJSON = { label: 'Help', submenu: [
-        { label: "Documentation", click () { openHelpWindow() ; } },
-        { label: "Developer tools", click () { wc.openDevTools(); } },
-        { label: "About"        , click () { openAboutWindow(); } }
-    ]};
-
-    function addMenuEntryOrSubmenu ( menu_label, menu_data, menu_location ) {
-        if ( !Array.isArray (menu_data) ) {
-            menu_location.push ({
-                "label": menu_label,
-                click () { wc.send ( "CHANGE_BAND", {
-                    start_freq : menu_data.start_freq,
-                    stop_freq  : menu_data.stop_freq,
-                    details    : menu_data.details,
-                    band       : menu_data.band
-                }); }
-            });
-            return;
-        }
-
-        let len = menu_location.push ({ "label": menu_label, "submenu": [] });
-
-        menu_data.forEach ( (submenu_entry) => {
-            if ( submenu_entry.hasOwnProperty ('submenu') ) {
-                addMenuEntryOrSubmenu ( submenu_entry.label, submenu_entry.submenu, menu_location[len-1].submenu );
-            } else if ( submenu_entry.hasOwnProperty ('type') && submenu_entry.type === 'separator' ) {
-                menu_location[len-1].submenu.push ({type: "separator"});
-            } else {
-                menu_location[len-1].submenu.push ({
-                    "label": submenu_entry.label,
-                    click () { wc.send ( "CHANGE_BAND", {
-                        "start_freq" : submenu_entry.start_freq,
-                        "stop_freq"  : submenu_entry.stop_freq,
-                        "details"    : submenu_entry.details,
-                        "band"       : submenu_entry.band
-                    }); }
-                });
-            }
-        });
-    }
-
     var menuJSON = [];
 
     if ( process.platform === 'darwin' )
         menuJSON.push ({ label: 'App Menu', submenu: [{ role: 'quit'}] })
     
+    // Add bands
     menuJSON.push ({ label: 'Band', submenu: [] });
-
     Object.entries ( FREQ_VENDOR_BANDS ).forEach ( vendorBandData => {
         let key   = vendorBandData[0];
         let value = vendorBandData[1];
@@ -217,7 +155,6 @@ function createWindow () {
         else
             addMenuEntryOrSubmenu ( value.label, value, menuJSON[MENU_BAND].submenu );
     });
-
     if ( country_code && fs.existsSync ( __dirname + '/frequency_data/country_bands/' + country_code ) ) {
         const COUNTRY_BANDS = require ( 'require-all' )(__dirname +'/frequency_data/country_bands/' + country_code );
         menuJSON[MENU_BAND].submenu.push ({ type:'separator' });
@@ -229,8 +166,8 @@ function createWindow () {
         });
     }
 
+    // Add channel presets
     menuJSON.push ({ label: 'Chan. Presets', submenu: [] });
-
     Object.entries ( FREQ_VENDOR_PRESETS ).forEach ( vendorPreset => {
         let key        = vendorPreset[0].split("_");
         let preset     = vendorPreset[1];
@@ -270,8 +207,8 @@ function createWindow () {
         });
     });
 
+    // Add countries
     menuJSON.push ({ label: 'Country', submenu: [] });
-
     COUNTRIES.forEach ( c => {
         if ( fs.existsSync ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + c.code + '.json' ) ) {
             menuJSON[MENU_COUNTRY].submenu.push (
@@ -286,6 +223,84 @@ function createWindow () {
         }
     });
 
+    // Add ports (will be filled later via renderer event)
+    var portMenuJSON = { label: 'Port', submenu: [] };
+    menuJSON.push ( portMenuJSON  );
+
+    // Add scan devices
+    var scanDeviceMenuJSON = { label: 'Device', submenu: [{
+        label : 'RF Explorer',
+        code  : 'RF_EXPLORER',
+        type  : 'radio',
+        click () {
+            menuJSON[MENU_SCAN_DEVICE].submenu[0].checked = true
+            menuJSON[MENU_SCAN_DEVICE].submenu[1].checked = false
+            wc.send ( 'SET_SCAN_DEVICE', { scanDevice : 'RF_EXPLORER' } )
+        }
+    }, {
+        label : 'Tiny SA',
+        code  : 'TINY_SA',
+        type  : 'radio',
+        click () {
+            menuJSON[MENU_SCAN_DEVICE].submenu[0].checked = false
+            menuJSON[MENU_SCAN_DEVICE].submenu[1].checked = true
+            wc.send ( 'SET_SCAN_DEVICE', { scanDevice : 'TINY_SA' } )
+        }
+    }, {
+        label : 'Settings',
+        code  : 'DEVICE_SETTINGS',
+        click () { wc.send ( 'DEVICE_SETTINGS', {} ); }
+    }]};
+    menuJSON.push ( scanDeviceMenuJSON );
+
+    // Add tools menu
+    var toolsMenuJSON = { label: 'Tools', submenu: [
+        { label: 'Export', submenu: [
+            { label: "Shure WW6 and IAS (CSV Format)", click () {
+                dialog.showSaveDialog ({
+                    title: "Export for Shure WW6 and IAS (CSV Format)",
+                    filters: [ {name: "CSV", extensions: ["csv"]} ]
+                }).then ( (res) => {
+                    wc.send ( 'EXPORT_WW6_IAS_CSV', { filename : res.filePath })
+                })  }
+            }
+        ]},
+        { label : 'MX Linux Workaround',
+            type  : 'checkbox',
+            click (ev) {
+                let elem = menuJSON[MENU_TOOLS].submenu.find((elem)=> elem.label === 'MX Linux Workaround')
+                elem.checked = ev.checked;
+                wc.send ( 'MX_LINUX_WORKAROUND', { enabled : ev.checked ? true : false })
+            }
+        },
+        { label: 'Reset Peak             R', click () {
+            wc.send ('RESET_PEAK', {});
+        }},
+        { label: 'Reset Settings', click () {
+            wc.send ('RESET_SETTINGS', {});
+        }},
+        { label: 'Dark mode',
+            type: 'checkbox',
+            click (ev) {
+                let elem = menuJSON[MENU_TOOLS].submenu.find((elem)=> elem.label === 'Dark mode')
+                elem.checked = ev.checked;
+                wc.send ( 'DARK_MODE', { enabled : ev.checked ? true : false })
+            }
+        }
+    ]};
+    menuJSON.push ( toolsMenuJSON );
+
+    // Add help menu
+    var helpMenuJSON = { label: 'Help', submenu: [
+        { label: "Documentation", click () { openHelpWindow() ; } },
+        { label: "Developer tools", click () { wc.openDevTools(); } },
+        { label: "About"        , click () { openAboutWindow(); } }
+    ]};
+    menuJSON.push ( helpMenuJSON  );
+
+    /**************************/
+    /*        Country         */
+    /**************************/
     ipcMain.on ( "SET_COUNTRY", (event, data) => {
         menuJSON[MENU_COUNTRY].submenu.forEach ( function ( elem ) {
             if ( elem.code === data.country_code ) {
@@ -294,28 +309,54 @@ function createWindow () {
                 // Need to rebuild menu to reflect attribute (in this case the 'checked' attribute)
                 Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) );
             }
-        });
-    });
-
-    ipcMain.on ( "MX_LINUX_WORKAROUND", (event, data) => {
-        let elem = menuJSON[MENU_TOOLS].submenu.find((elem)=> elem.label === 'MX Linux Workaround')
-        elem.checked = data.checked;
-        // Need to rebuild menu to reflect attribute (in this case the 'checked' attribute)
-        Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) )
-    });
-
-    ipcMain.on ( "DARK_MODE", (event, data) => {
-        let elem = menuJSON[MENU_TOOLS].submenu.find((elem)=> elem.label === 'Dark mode')
-        elem.checked = data.checked;
-        // Need to rebuild menu to reflect attribute (in this case the 'checked' attribute)
-        Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) )
+        })
     })
 
-    menuJSON.push ( portMenuJSON  );
-    menuJSON.push ( scanDeviceMenuJSON );
-    menuJSON.push ( toolsMenuJSON );
-    menuJSON.push ( helpMenuJSON  );
+    /**************************/
+    /*         Port           */
+    /**************************/
+    ipcMain.on ( "SET_PORT", (event, data) => {
+        SerialPort.list().then ( (ports, err) => {
+            if ( err ) {
+                console.log ( err );
+                return;
+            }
 
+            globalPorts = ports
+
+            let portPathArr = [];
+            menuJSON[MENU_PORT].submenu = []
+    
+            globalPorts.forEach ( ( port ) => {
+                portPathArr.push ( port.path );
+            });
+    
+            menuJSON[MENU_PORT].submenu[0] = {
+                label: 'Auto',
+                type: 'radio',
+                checked: (data.portPath === undefined || data.portPath === 'AUTO') ? true : false,
+                click () { wc.send ( 'SET_PORT',  portPathArr ); }
+            }
+    
+            portPathArr.forEach ( port => {
+                menuJSON[MENU_PORT].submenu.push (
+                    {
+                        'label' : port,
+                        'type'  : 'radio',
+                        'checked': data.portPath === port ? true : false,
+                        click () { wc.send ( 'SET_PORT', { port : port } ); }
+                    }
+                );
+            });
+        
+            // Need to rebuild menu to reflect attribute (in this case the 'checked' attribute)
+            Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) );
+        })
+    })
+
+    /**************************/
+    /*        Device          */
+    /**************************/
     ipcMain.on ( "SET_SCAN_DEVICE", (event, data) => {
         switch ( data.scanDevice ) {
             case 'RF_EXPLORER':
@@ -333,40 +374,26 @@ function createWindow () {
         Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) )
     })
 
-    let createPortMenu = selectedPort => {
-        let portPathArr = [];
-        menuJSON[MENU_PORT].submenu = []
-
-        globalPorts.forEach ( ( port ) => {
-            portPathArr.push ( port.path );
-        });
-
-        menuJSON[MENU_PORT].submenu[0] = {
-            label: 'Auto',
-            type: 'radio',
-            checked: (selectedPort === undefined || selectedPort === 'AUTO') ? true : false,
-            click () { wc.send ( 'SET_PORT',  portPathArr ); }
-        }
-
-        portPathArr.forEach ( port => {
-            menuJSON[MENU_PORT].submenu.push (
-                {
-                    'label' : port,
-                    'type'  : 'radio',
-                    'checked': selectedPort === port ? true : false,
-                    click () { wc.send ( 'SET_PORT', { port : port } ); }
-                }
-            );
-        });
-
+    /**************************/
+    /*         Tools          */
+    /**************************/
+    ipcMain.on ( "MX_LINUX_WORKAROUND", (event, data) => {
+        let elem = menuJSON[MENU_TOOLS].submenu.find((elem)=> elem.label === 'MX Linux Workaround')
+        elem.checked = data.checked;
         // Need to rebuild menu to reflect attribute (in this case the 'checked' attribute)
-        Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) );
-    }
+        Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) )
+    });
 
-    ipcMain.on ( "SET_PORT", (event, data) => {
-        createPortMenu ( data.portPath )
+    ipcMain.on ( "DARK_MODE", (event, data) => {
+        let elem = menuJSON[MENU_TOOLS].submenu.find((elem)=> elem.label === 'Dark mode')
+        elem.checked = data.checked;
+        // Need to rebuild menu to reflect attribute (in this case the 'checked' attribute)
+        Menu.setApplicationMenu ( Menu.buildFromTemplate ( menuJSON ) )
     })
 
+    /************/
+    /*   Init   */
+    /************/
     // Add serial ports to the menu
     SerialPort.list().then ( (ports, err) => {
         if ( err ) {
@@ -375,7 +402,6 @@ function createWindow () {
         }
 
         globalPorts = ports
-        createPortMenu ( err )
     })
 
     function openHelpWindow () {
