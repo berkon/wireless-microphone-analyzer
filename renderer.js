@@ -831,7 +831,7 @@ const portOpenCb = () => {
 
                             if ( portDetectionIndex < globalPorts.length ) {
                                 console.log ( `Now trying port with index ${portDetectionIndex}`)
-                                connectDevice ( portDetectionIndex, false )
+                                connectDevice ( 'AUTO', false )
                             } else {
                                 console.log ( `No more ports available!` )
                             }
@@ -1014,7 +1014,7 @@ const portOpenCb = () => {
 
                             if ( portDetectionIndex < globalPorts.length ) {
                                 console.log ( `Now trying port with index ${portDetectionIndex}` )
-                                connectDevice ( portDetectionIndex, false )
+                                connectDevice ( 'AUTO', false )
                             } else {
                                 console.log ( `No more ports available!` )
                             }
