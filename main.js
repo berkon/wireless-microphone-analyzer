@@ -73,41 +73,6 @@ if ( !gotLock ) {
     })
 }
 
-function addMenuEntryOrSubmenu ( menu_label, menu_data, menu_location ) {
-    if ( !Array.isArray (menu_data) ) {
-        menu_location.push ({
-            "label": menu_label,
-            click () { wc.send ( "CHANGE_BAND", {
-                start_freq : menu_data.start_freq,
-                stop_freq  : menu_data.stop_freq,
-                details    : menu_data.details,
-                band       : menu_data.band
-            }); }
-        });
-        return;
-    }
-
-    let len = menu_location.push ({ "label": menu_label, "submenu": [] });
-
-    menu_data.forEach ( (submenu_entry) => {
-        if ( submenu_entry.hasOwnProperty ('submenu') ) {
-            addMenuEntryOrSubmenu ( submenu_entry.label, submenu_entry.submenu, menu_location[len-1].submenu );
-        } else if ( submenu_entry.hasOwnProperty ('type') && submenu_entry.type === 'separator' ) {
-            menu_location[len-1].submenu.push ({type: "separator"});
-        } else {
-            menu_location[len-1].submenu.push ({
-                "label": submenu_entry.label,
-                click () { wc.send ( "CHANGE_BAND", {
-                    "start_freq" : submenu_entry.start_freq,
-                    "stop_freq"  : submenu_entry.stop_freq,
-                    "details"    : submenu_entry.details,
-                    "band"       : submenu_entry.band
-                }); }
-            });
-        }
-    });
-}
-
 function createWindow () {
     mainWindow = new BrowserWindow ({
         width: 1200,
@@ -134,6 +99,41 @@ function createWindow () {
 
     mainWindow.setTitle ( productName + " V" + version );
     var menuJSON = [];
+
+    function addMenuEntryOrSubmenu ( menu_label, menu_data, menu_location ) {
+        if ( !Array.isArray (menu_data) ) {
+            menu_location.push ({
+                "label": menu_label,
+                click () { wc.send ( "CHANGE_BAND", {
+                    start_freq : menu_data.start_freq,
+                    stop_freq  : menu_data.stop_freq,
+                    details    : menu_data.details,
+                    band       : menu_data.band
+                }); }
+            });
+            return;
+        }
+    
+        let len = menu_location.push ({ "label": menu_label, "submenu": [] });
+    
+        menu_data.forEach ( (submenu_entry) => {
+            if ( submenu_entry.hasOwnProperty ('submenu') ) {
+                addMenuEntryOrSubmenu ( submenu_entry.label, submenu_entry.submenu, menu_location[len-1].submenu );
+            } else if ( submenu_entry.hasOwnProperty ('type') && submenu_entry.type === 'separator' ) {
+                menu_location[len-1].submenu.push ({type: "separator"});
+            } else {
+                menu_location[len-1].submenu.push ({
+                    "label": submenu_entry.label,
+                    click () { wc.send ( "CHANGE_BAND", {
+                        "start_freq" : submenu_entry.start_freq,
+                        "stop_freq"  : submenu_entry.stop_freq,
+                        "details"    : submenu_entry.details,
+                        "band"       : submenu_entry.band
+                    }); }
+                });
+            }
+        });
+    }
 
     if ( process.platform === 'darwin' )
         menuJSON.push ({ label: 'App Menu', submenu: [{ role: 'quit'}] })
