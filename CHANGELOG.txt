@@ -1,3 +1,7 @@
+V2.0.2
+##FIXES
+* Fixed issue regarding Shure Wireless Workbench export
+
 V2.0.1
 ##FIXES
 * Fixed issue of not being able to select frequency bands

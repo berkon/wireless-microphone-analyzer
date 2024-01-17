@@ -1313,7 +1313,10 @@ ipcRenderer.on ( 'EXPORT_WW6_IAS_CSV', (event, message) => {
     let i = 0;
 
     for ( var freq = global.START_FREQ; freq <= global.STOP_FREQ ; freq += FREQ_STEP ) {
-        fs.appendFileSync ( message.filename, formatFrequencyString(freq) + ", " + myChart.data.datasets[LINE_LIVE].data[i] + "\n", 'utf-8');
+        const freqStr = Math.round(freq/1000).toString()
+        const mHz = freqStr.slice(0, -3)
+        const kHz = freqStr.substr(-3, 3).padEnd(3, '0')
+        fs.appendFileSync ( message.filename, mHz + '.' + kHz + ", " + myChart.data.datasets[LINE_LIVE].data[i] + "\n", 'utf-8');
         i++;
     }
 });
