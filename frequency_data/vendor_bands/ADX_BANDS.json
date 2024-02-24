@@ -6,11 +6,11 @@
     ]},
     { "label":"R41/R42", "submenu": [
         { "label": "A-Band (522 - 554MHz)", "start_freq": 522000, "stop_freq": 554000, "details": "Audix R41/R42 A-Band (522 - 554MHz)", "band": "ADX_A_NONE_RAD-R41-R42" },
-        { "label": "B-Band (554 - 586MHz)", "start_freq": 554000, "stop_freq": 586000, "details": "Audix R41/R42 B-Band (554 - 586MHz)", "band": "ADX_B_NONE_RAD-R41-R42" }
+        { "label": "B-Band (554 - 586MHz)", "start_freq": 554000, "stop_freq": 586000, "details": "Audix R41/R42 B-Band (554 - 586MHz)", "band": "ADX_B_NONE_RAD-R41-R42" },
+        { "label": "E-Band (823 - 865MHz)", "start_freq": 823000, "stop_freq": 865000, "details": "Audix R41/R42 E-Band (823 - 865MHz)", "band": "ADX_E_NONE_RAD-R41-R42" }
     ]},
     { "label":"R61/R62", "submenu": [
-        { "label": "A+B-Band (522 - 586MHz)", "start_freq": 522000, "stop_freq": 586000, "details": "Audix A+B-Band (522 - 586MHz)", "band": "ADX_AB_RAD-R61-R62"      },
-        { "label": "823 - 832MHz"           , "start_freq": 823000, "stop_freq": 832000, "details": "Audix R61/R62 (823 - 832MHz)" , "band": "ADX_823-832_RAD-R61-R62" },
-        { "label": "863 - 865MHz"           , "start_freq": 863000, "stop_freq": 865000, "details": "Audix R61/R62 (863 - 865MHz)" , "band": "ADX_863-865_RAD-R61-R62" }
+        { "label": "A+B-Band (522 - 586MHz)", "start_freq": 522000, "stop_freq": 586000, "details": "Audix R61/R62 A+B-Band (522 - 586MHz)", "band": "ADX_AB_NONE_RAD-R61-R62" },
+        { "label": "E-Band (823 - 865MHz)"  , "start_freq": 823000, "stop_freq": 865000, "details": "Audix R61/R62 E-Band (823 - 865MHz)"  , "band": "ADX_E_NONE_RAD-R61-R62"  }
     ]}
 ]}

@@ -1,3 +1,7 @@
+V2.0.3
+##New Features
+* Added Audix vendor presets for R41/R42 and R61/R62
+
 V2.0.2
 ##FIXES
 * Fixed issue regarding Shure Wireless Workbench export
@@ -7,7 +11,7 @@ V2.0.1
 * Fixed issue of not being able to select frequency bands
 
 V2.0.0
-## New Features
+##New Features
 * Added Support for TinySA and TinySA Ultra hardware
 * Configurable number of sweep points for TinySA hardware
 * Automatic port detection
