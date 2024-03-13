@@ -54,7 +54,6 @@ In order to run the tool as non-root, you have to add your username to the "dial
 
     sudo gpasswd --add <your_username> dialout
     
-IMPORTANT: After adding your username to the group you have to reboot your system! Doing a re-login is NOT enough (at least on Ubuntu)! If, for whatever reasons you can't or don't want to restart your system, you can also do **su <your_username>** and then either start the AppImage or **wireless-microphone-analyzer** from this new shell.
+IMPORTANT: After adding your username to the group you should reboot your system.
 
-
-For linux normally no special driver is required, as the corresponding driver is already included in most Linux distribuitions. In case the driver is missing in your installation, you can download it from here: https://j3.rf-explorer.com/43-rfe/how-to
+For Linux normally no special driver is required, as the corresponding driver is already included in most Linux distribuitions. In case you are on a different OS and the driver is missing in your installation, you can download it from [here](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers?tab=downloads).
