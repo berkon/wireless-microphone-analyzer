@@ -17,6 +17,8 @@ const { dialog }                     = require ( 'electron'               );
 app.commandLine.appendSwitch('disable-gpu');
 require('@electron/remote/main').initialize()
 
+require ( './logger.js' );
+
 // See the following discussions for next setting
 // https://stackoverflow.com/questions/60106922/electron-non-context-aware-native-module-in-renderer
 //https://github.com/electron/electron/issues/18397#issuecomment-583221969
@@ -52,7 +54,7 @@ let globalPorts = []
 let country_code = configStore.get('country_code');
 
 if ( !country_code ) {
-    console.log ( "No country setting saved! Using default: 'DE'");
+    log.info ( "No country setting saved! Using default: 'DE'");
     country_code = "DE";
 }
 
@@ -293,6 +295,14 @@ function createWindow () {
     // Add help menu
     var helpMenuJSON = { label: 'Help', submenu: [
         { label: "Documentation", click () { openHelpWindow() ; } },
+        { label: "Download logs", click () { 
+            dialog.showSaveDialog ({
+                title: "Save logs",
+                defaultPath: 'logs.zip'
+            }).then ( (res) => {
+                zipLogs(res.filePath)
+            })
+        } },
         { label: "Developer tools", click () { wc.openDevTools(); } },
         { label: "About"        , click () { openAboutWindow(); } }
     ]};
@@ -318,7 +328,7 @@ function createWindow () {
     ipcMain.on ( "SET_PORT", (event, data) => {
         SerialPort.list().then ( (ports, err) => {
             if ( err ) {
-                console.log ( err );
+                log.info ( err );
                 return;
             }
 
@@ -397,7 +407,7 @@ function createWindow () {
     // Add serial ports to the menu
     SerialPort.list().then ( (ports, err) => {
         if ( err ) {
-            console.log ( err );
+            log.info ( err );
             return;
         }
 

@@ -55,7 +55,7 @@ class TinySA {
                 return TinySA.MIN_FREQ_ULTRA
 
             default:
-                console.error ("getMinFreq(): Unknown TinySa model!")
+                log.error ("getMinFreq(): Unknown TinySa model!")
         }
     }
 
@@ -68,7 +68,7 @@ class TinySA {
                 return TinySA.MAX_FREQ_ULTRA
 
             default:
-                console.error ("getMaxFreq(): Unknown TinySa model!")
+                log.error ("getMaxFreq(): Unknown TinySa model!")
         }
     }
 
@@ -81,7 +81,7 @@ class TinySA {
                 return TinySA.MAX_SPAN_ULTRA
 
             default:
-                console.error ("getMaxSpan(): Unknown TinySa model!")
+                log.error ("getMaxSpan(): Unknown TinySa model!")
         }
     }
 
@@ -113,13 +113,13 @@ class TinySA {
             }
         }
 
-        console.log ( "----------------- New Command -----------------" )
+        log.info ( "----------------- New Command -----------------" )
 
         if ( logMsg ) {   
-            console.log ( logMsg )
+            log.info ( logMsg )
         }
 
-        console.log ( `T: '${this.lastCmdLineSent}'`)
+        log.info ( `T: '${this.lastCmdLineSent}'`)
         this.port.writePromise ( Buffer.from ( this.lastCmdLineSent + '\r' ), 'ascii' );
         return await firstValueFrom(this.data$)
     }
@@ -133,25 +133,25 @@ class TinySA {
 
         if ( freqConfig[0].status === 'VALID' ) {
             this.scanningActive = true;
-            console.log ( "Periodic scan is enabled" )
+            log.info ( "Periodic scan is enabled" )
             await this.sendPromise (`Starting periodic scan ...`, TinySA.deviceCommands.SCAN, [ global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS ] )
         } else {
-            console.error ( "Device returned invalid frequency configuration!" )
+            log.error ( "Device returned invalid frequency configuration!" )
         }
     }
 
     async setConfiguration ( startFreq, stopFreq ) {
-        console.log ( "Setting new frequency configuration ... ")
+        log.info ( "Setting new frequency configuration ... ")
         this.scanningActive = false;
-        console.log ( "Disabling periodic scan ..." )
-        console.log ( "Wait for lastly requested scan data to be received before continuing ...")
+        log.info ( "Disabling periodic scan ..." )
+        log.info ( "Wait for lastly requested scan data to be received before continuing ...")
         await firstValueFrom(this.data$) // Wait for last scan data to arrive
-        console.log ( "Periodic scan was active and is now disabled")
+        log.info ( "Periodic scan was active and is now disabled")
         await this.sendPromise ( `Setting start frequency to: ${startFreq} ...`, TinySA.deviceCommands.SET_FREQ_CONFIG_START, [startFreq] )
         await this.sendPromise ( `Setting stop frequency to: ${stopFreq} ...`, TinySA.deviceCommands.SET_FREQ_CONFIG_STOP, [stopFreq] )
         await this.sendPromise ( `Reading back current frequency settings ...`, TinySA.deviceCommands.GET_FREQ_CONFIG, null )
         this.scanningActive = true;
-        console.log ( "Periodic scan is enabled" )
+        log.info ( "Periodic scan is enabled" )
         await this.sendPromise ( `Starting periodic scan ...`, TinySA.deviceCommands.SCAN, [ global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS ])    
     }
 
@@ -165,7 +165,7 @@ class TinySA {
         tmp_buf = tmp_buf.replace(/{.*}/, `{${tmp_buf.lastIndexOf('}') - tmp_buf.indexOf('{') -1 } bytes scan data}`)
 
 //        if ( this.lastCmdSent !== 'scanraw') {
-            console.log(`R: '${tmp_buf}'`)
+            log.info(`R: '${tmp_buf}'`)
 //        }
 
         // If the returned data is a scan result do a special handling here to avoid
@@ -185,16 +185,16 @@ class TinySA {
         for (let [index, line] of respLineArr.entries()) {
             if ( this.lastCmdSent !== 'scanraw') {
                 if (respLineArr[0] === this.lastCmdLineSent && index === 0) {
-                    console.log ( `[${index}]: ${line}  (cmd echo)` )
+                    log.info ( `[${index}]: ${line}  (cmd echo)` )
                 } else if (line.indexOf('{') === 0 && line.lastIndexOf('}') === line.length -1) {
                     //line = line.replace(/{.*}/, `{${ line.lastIndexOf('}') - line.indexOf('{') -1 } bytes scan data}`)
                     let tmp_line = line.replaceAll(String.fromCharCode(0x0d),'⏎')
                     tmp_line = tmp_line.replaceAll(String.fromCharCode(0x0a),'⇩')
                     tmp_line = tmp_line.replaceAll(String.fromCharCode(0x09),'⇥')
                     tmp_line = tmp_line.replace(/{.*}/, `{${tmp_line.lastIndexOf('}') - tmp_line.indexOf('{') -1} bytes scan data}`)
-                    console.log ( `[${index}]: ${tmp_line}` )
+                    log.info ( `[${index}]: ${tmp_line}` )
                 } else {
-                    console.log ( `[${index}]: ${line}` )    
+                    log.info ( `[${index}]: ${line}` )    
                 }
             }
         }
@@ -234,7 +234,7 @@ class TinySA {
                         // from the device. So if the response to the 'version' command is not a command
                         // echo (as it should be) consider it to be trash data.
                         if (!(line === this.lastCmdLineSent && index === 0)) {
-                            console.log ( `Ignoring trash data from device buffer`)
+                            log.info ( `Ignoring trash data from device buffer`)
                             returnData.push ({
                                 type: 'ERROR_RECEIVED_TRASH',
                                 status: 'ERROR'
@@ -243,8 +243,8 @@ class TinySA {
                     }
                 }
 
-                console.log (`Parsed version info:`)
-                console.log (returnData)
+                log.info (`Parsed version info:`)
+                log.info (returnData)
                 this.data$.next(returnData)
                 break;
 
@@ -271,8 +271,8 @@ class TinySA {
                     resultData.values.MAX_SPAN     = TinySA.getMaxSpan()
                 }
                 
-                console.log (`Parsed frequency settings:`)
-                console.log ([resultData])
+                log.info (`Parsed frequency settings:`)
+                log.info ([resultData])
                 this.data$.next([resultData]);
                 break
 
@@ -297,7 +297,7 @@ class TinySA {
                             values: newBuf
                         }])
                     } else {
-                        console.log(`Bad scan after ${this.goodScanCounter} good. Received ${stopPos + 1} bytes (expected ${(global.SWEEP_POINTS * 3 )}). Discarding ...`)
+                        log.info(`Bad scan after ${this.goodScanCounter} good. Received ${stopPos + 1} bytes (expected ${(global.SWEEP_POINTS * 3 )}). Discarding ...`)
                         this.goodScanCounter = 0;
                         this.data$.next([{
                             type: "NO_DATA"
@@ -321,14 +321,14 @@ class TinySA {
                 break
     
             default:
-                console.error (`Last command was: '${this.lastCmdSent}'`)
-                console.error (`R: '${respLineArr}'  (unknown response`)
+                log.error (`Last command was: '${this.lastCmdSent}'`)
+                log.error (`R: '${respLineArr}'  (unknown response`)
         }
     }    
 
 
     setHandler () {
-        console.log ( `Setting handler for ${TinySA.NAME} data receiption ... ` )
+        log.info ( `Setting handler for ${TinySA.NAME} data receiption ... ` )
         const delimiterParser = this.port.pipe ( new DelimiterParser({ delimiter: 'ch> ' }) )
         delimiterParser.on ( 'data', res => this.processData(res) )
     }

@@ -11,6 +11,7 @@ const Pkg             = require ('./package.json');
 const fs              = require ('fs');
 var { Subject, firstValueFrom } = require('rxjs');
 const configStore     = new ConfigStore ( Pkg.name )
+require ( './logger.js' );
 
 const RFExplorer = require('./scan_devices/rf_explorer.js');
 const TinySA = require('./scan_devices/tiny_sa.js');
@@ -78,7 +79,7 @@ if ( !saved_data_version ) {
             break;
 
         default:
-            console.log ( "Unknown version of saved data!" )
+            log.info ( "Unknown version of saved data!" )
     }
 }
 
@@ -129,7 +130,9 @@ if ( !global.MX_LINUX_WORKAROUND ) {
     global.MX_LINUX_WORKAROUND = false
 }
 
-console.log ( "MX Linux workaround is " + (global.MX_LINUX_WORKAROUND ? "enabled" : "disabled"))
+log.info ( "=========== Starting application ===========")
+log.info ( `Running on platform: '${process.platform}'`)
+log.info ( "MX Linux workaround is " + (global.MX_LINUX_WORKAROUND ? "enabled" : "disabled"))
 ipcRenderer.send ('MX_LINUX_WORKAROUND', { checked : global.MX_LINUX_WORKAROUND });
 
 if ( !DARK_MODE) {
@@ -137,7 +140,7 @@ if ( !DARK_MODE) {
     DARK_MODE = false
 }
 
-console.log ( "Dark mode is " + (DARK_MODE ? "enabled" : "disabled"))
+log.info ( "Dark mode is " + (DARK_MODE ? "enabled" : "disabled"))
 ipcRenderer.send ('DARK_MODE', { checked : DARK_MODE });
 
 var ctx = document.getElementById("graph2d").getContext('2d');
@@ -329,7 +332,7 @@ let initChart = () => {
 
 if ( !COUNTRY_CODE || !fs.existsSync ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + COUNTRY_CODE + '.json' ) ) {
     COUNTRY_CODE = 'DE';
-    console.log ( "No country set or file with forbidden ranges for that country does not exist! Falling back to 'DE'");
+    log.info ( "No country set or file with forbidden ranges for that country does not exist! Falling back to 'DE'");
 }
 
 if ( !COM_PORT ) {
@@ -360,6 +363,9 @@ function connectDevice (portIdentifier, shouldScan ) {
         scanPorts()
             .then ( () => connectPort(portIdentifier) )
             .then ( () => scanDevice.getConfiguration() )
+            .catch( (error) => {
+                log.error ( "scanPorts(): " + error )
+            })
     } else {
         connectPort(portIdentifier)
             .then ( () => scanDevice.getConfiguration() )
@@ -368,11 +374,11 @@ function connectDevice (portIdentifier, shouldScan ) {
 
 if ( SCAN_DEVICE ) {
     ipcRenderer.send ('SET_SCAN_DEVICE', { scanDevice : SCAN_DEVICE });
-    console.log ( `Scan device is '${SCAN_DEVICE}'`)
+    log.info ( `Scan device is '${SCAN_DEVICE}'`)
     initChart()
     connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
 } else {
-    console.log ( `No scan device selected. Waiting for user to select via popup ...`)
+    log.info ( `No scan device selected. Waiting for user to select via popup ...`)
 
     Swal.fire({
         title: "Device selection",
@@ -643,8 +649,8 @@ let tryPort = (index) => {
             return
         }
 
-        console.log ( "=========================================================" )
-        console.log ( `Trying port ${globalPorts[index].path} with baud rate ${baudRate} ...` );
+        log.info ( "=========================================================" )
+        log.info ( `Trying port ${globalPorts[index].path} with baud rate ${baudRate} ...` );
         port = new SerialPort ({ path: globalPorts[index].path, baudRate : baudRate }, err => {
             if ( err ) {
                 if ( err.toString().indexOf('Access denied') !== -1 ) { // If access denied error
@@ -661,17 +667,17 @@ let tryPort = (index) => {
                         }
                     })
 // TODO: Show popup to restart the app in case of: "Error: Opening COM4: File not found"
-                    console.error ( err )
+                    log.error ( err )
                     reject ( 'ERR_PORT_ACCESS_DENIED' )
                     return
                 }
 
-                console.error ( err )
+                log.error ( err )
                 reject ( err )
                 return
             }
 
-            console.log( `Successfully connected to ${globalPorts[index].path}!` )
+            log.info( `Successfully connected to ${globalPorts[index].path}!` )
             resolve ( 'SUCCESS' )
         })
 
@@ -686,7 +692,7 @@ let tryPort = (index) => {
                     return Promise.resolve();
                 });
             } else {
-                console.error ( `Tried to write the following data to port '${port.settings.path}', but the stream was already closed: '${data}'`)
+                log.error ( `Tried to write the following data to port '${port.settings.path}', but the stream was already closed: '${data}'`)
             }
         }
     })
@@ -708,10 +714,10 @@ const portOpenCb = () => {
                     switch ( data[0].type ) {
                         case 'NAME':
                             if ( data[0].values.NAME === RFExplorer.NAME ) {
-                                console.log ( `Stoping response check timer ${responseCheckTimer} ...` )
+                                log.info ( `Stoping response check timer ${responseCheckTimer} ...` )
                                 clearTimeout ( responseCheckTimer )
                                 responseCheckTimer = null
-                                console.log ( `Successfully detected '${data[0].values.NAME}' hardware!` )
+                                log.info ( `Successfully detected '${data[0].values.NAME}' hardware!` )
                                 if ( popupCategory === 'POPUP_CAT_CONNECTION_ISSUE' ) {
                                     popupCategory = ''
                                     Swal.close()
@@ -735,7 +741,7 @@ const portOpenCb = () => {
                             configStore.set ( 'freq_step' , FREQ_STEP  )
 
                             if ( !RFExplorer.isValidFreqConfig ( data[0].values.START_FREQ, data[0].values.STOP_FREQ ) ) {
-                                console.error ( `Invalid frequency range: ${data[0].values.START_FREQ} - ${data[0].values.STOP_FREQ} Hz!` )
+                                log.error ( `Invalid frequency range: ${data[0].values.START_FREQ} - ${data[0].values.STOP_FREQ} Hz!` )
 
                                 Swal.fire({
                                     title: "Invalid frequency range!",
@@ -809,20 +815,20 @@ const portOpenCb = () => {
 
                 // In case another timer is running stop it!
                 if ( responseCheckTimer ) {
-                    console.log ( `Stoping response check timer ${responseCheckTimer} ...` )
+                    log.info ( `Stoping response check timer ${responseCheckTimer} ...` )
                     clearTimeout ( responseCheckTimer )
                     responseCheckTimer = null
                 }
 
                 responseCheckTimer = setTimeout ( () => {
-                    console.log ( `Response check timer ${responseCheckTimer} expired!`)
+                    log.info ( `Response check timer ${responseCheckTimer} expired!`)
                     responseCheckTimer = null
-                    console.error ( `No or invalid response from ${RFExplorer.NAME}!`)
+                    log.error ( `No or invalid response from ${RFExplorer.NAME}!`)
 
                     // If serial port was connected successfully but to a different device type
                     disconnectPort().then ( async err => {
                         if (err) {
-                            console.error(err)
+                            log.error(err)
                             return
                         }
 
@@ -830,10 +836,10 @@ const portOpenCb = () => {
                             portDetectionIndex++
 
                             if ( portDetectionIndex < globalPorts.length ) {
-                                console.log ( `Now trying port with index ${portDetectionIndex}`)
+                                log.info ( `Now trying port with index ${portDetectionIndex}`)
                                 connectDevice ( 'AUTO', false )
                             } else {
-                                console.log ( `No more ports available!` )
+                                log.info ( `No more ports available!` )
                             }
 
                             if ( portDetectionIndex === globalPorts.length || COM_PORT !== 'AUTO' ) {
@@ -857,9 +863,9 @@ const portOpenCb = () => {
                     })
                 }, SERIAL_RESPONSE_TIMEOUT)
 
-                console.log ( `Started response check timer ${responseCheckTimer}` )
+                log.info ( `Started response check timer ${responseCheckTimer}` )
             } else {
-                console.error ("Unable to instantiate class RFExplorer!")
+                log.error ("Unable to instantiate class RFExplorer!")
             }
             break;
 
@@ -877,10 +883,10 @@ const portOpenCb = () => {
                     switch ( data[0].type ) {
                         case 'NAME':
                             if ( data[0].values.NAME === TinySA.NAME ) {
-                                console.log ( `Stoping response check timer ${responseCheckTimer} ...` )
+                                log.info ( `Stoping response check timer ${responseCheckTimer} ...` )
                                 clearTimeout ( responseCheckTimer )
                                 responseCheckTimer = null
-                                console.log ( `Successfully detected '${data[0].values.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}' hardware!` )
+                                log.info ( `Successfully detected '${data[0].values.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}' hardware!` )
                                 if ( popupCategory === 'POPUP_CAT_CONNECTION_ISSUE' ) {
                                     popupCategory = ''
                                     Swal.close()
@@ -903,7 +909,7 @@ const portOpenCb = () => {
                             configStore.set ( 'freq_step' , FREQ_STEP  )
 
                             if ( !TinySA.isValidFreqConfig ( data[0].values.START_FREQ, data[0].values.STOP_FREQ ) ) {
-                                console.error ( `Invalid frequency range: ${data[0].values.START_FREQ} - ${data[0].values.STOP_FREQ} Hz!` )
+                                log.error ( `Invalid frequency range: ${data[0].values.START_FREQ} - ${data[0].values.STOP_FREQ} Hz!` )
 
                                 Swal.fire({
                                     title: "Invalid frequency range!",
@@ -978,7 +984,7 @@ const portOpenCb = () => {
                         } break
 
                         case 'ERROR_RECEIVED_TRASH':
-                            console.log ( `Stoping response check timer ${responseCheckTimer} ...` )
+                            log.info ( `Stoping response check timer ${responseCheckTimer} ...` )
                             clearTimeout ( responseCheckTimer )
                             responseCheckTimer = null
                             disconnectPort().then ( () => connectDevice(COM_PORT?COM_PORT:'AUTO', true) )
@@ -988,15 +994,15 @@ const portOpenCb = () => {
 
                 // In case another timer is running stop it!
                 if ( responseCheckTimer ) {
-                    console.log ( `Stopped response check timer ${responseCheckTimer} ...` )
+                    log.info ( `Stopped response check timer ${responseCheckTimer} ...` )
                     clearTimeout ( responseCheckTimer )
                     responseCheckTimer = null
                 }
 
                 responseCheckTimer = setTimeout ( () => {
-                    console.log ( `Response check timer ${responseCheckTimer} expired!`)
+                    log.info ( `Response check timer ${responseCheckTimer} expired!`)
                     responseCheckTimer = null
-                    console.error ( `No or invalid response from ${TinySA.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}!`)
+                    log.error ( `No or invalid response from ${TinySA.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}!`)
                     data$.next([{
                         type: 'ERROR_NO_RESPONSE',
                         status: 'ERROR'
@@ -1005,7 +1011,7 @@ const portOpenCb = () => {
                     // If serial port was connected successfully but to a different device type, disconnect it
                     disconnectPort().then ( async err => {
                         if ( err ) {
-                            console.error (err )
+                            log.error (err )
                             return
                         }
 
@@ -1013,10 +1019,10 @@ const portOpenCb = () => {
                             portDetectionIndex++
 
                             if ( portDetectionIndex < globalPorts.length ) {
-                                console.log ( `Now trying port with index ${portDetectionIndex}` )
+                                log.info ( `Now trying port with index ${portDetectionIndex}` )
                                 connectDevice ( 'AUTO', false )
                             } else {
-                                console.log ( `No more ports available!` )
+                                log.info ( `No more ports available!` )
                             }
                         } 
                         
@@ -1041,14 +1047,14 @@ const portOpenCb = () => {
                     })
                 }, SERIAL_RESPONSE_TIMEOUT )
 
-                console.log ( `Started response check timer ${responseCheckTimer}` )
+                log.info ( `Started response check timer ${responseCheckTimer}` )
             } else {
-                console.error ("Unable to instantiate class TinySA!")
+                log.error ("Unable to instantiate class TinySA!")
             }
             break;
 
         default:
-            console.error ( `Unknown scan device ${SCAN_DEVICE}` )
+            log.error ( `Unknown scan device ${SCAN_DEVICE}` )
             scanDevice = null
     }
 }
@@ -1064,7 +1070,7 @@ function showPortHwError ( msg ) {
         }
     })
 
-    console.error ( msg )
+    log.error ( msg )
 }
 
 function scanPorts() {
@@ -1084,10 +1090,10 @@ function scanPorts() {
             }
 
             globalPorts = ports
-            console.log ( "The following ports were found:" )
+            log.info ( "The following ports were found:" )
 
             for ( const [ index, port ] of ports.entries()  ) {
-                console.log ( `[${index}] ${port.friendlyName} (VendorID: ${port.vendorId}, ProductID: ${port.productId})`)
+                log.info ( `[${index}] ${port.friendlyName} (VendorID: ${port.vendorId}, ProductID: ${port.productId})`)
             }
 
             resolve ( ports )
@@ -1103,12 +1109,12 @@ function connectPort ( portIdentifier ) {
         baudRate = getBaudrate()
 
         if ( baudRate === null ) {
-            console.error ( `Unable to get default baudrate for device ${SCAN_DEVICE}!` )
+            log.error ( `Unable to get default baudrate for device ${SCAN_DEVICE}!` )
             return reject('ERR_PORT_NO_BAUDRATE')
         }
 
         if ( typeof portIdentifier === 'number' ) { // Select port by array index
-            console.log ( `Connecting to port with index ${portIdentifier}`)
+            log.info ( `Connecting to port with index ${portIdentifier}`)
             tryPort ( portIdentifier ).then ( () => {
                 portOpenCb()
                 return resolve ()
@@ -1117,7 +1123,7 @@ function connectPort ( portIdentifier ) {
             })
         } else if ( typeof portIdentifier === 'string') {
             if ( portIdentifier === 'AUTO' ) { // Automatic port selection
-                console.log ( `Auto-detecting port ...`)
+                log.info ( `Auto-detecting port ...`)
 
                 tryPort ( portDetectionIndex ).then ( () => {
                     portOpenCb ()
@@ -1134,7 +1140,7 @@ function connectPort ( portIdentifier ) {
                     }
                 })
             } else { // Select port by port name string
-                console.log ( `Connecting to dedicated port '${COM_PORT}'`)
+                log.info ( `Connecting to dedicated port '${COM_PORT}'`)
 
                 for ( const [index, port] of globalPorts.entries() ) {
                     if ( port.path === COM_PORT) {
@@ -1154,10 +1160,10 @@ function connectPort ( portIdentifier ) {
 function disconnectPort () {
     return new Promise ((resolve, reject) => {
         if ( port && port.isOpen) {
-            console.log ( "Closing existing connection to current scan device ..." )
+            log.info ( "Closing existing connection to current scan device ..." )
             port.close(() => {
                 port = null
-                console.log ( "Port closed successfully.")
+                log.info ( "Port closed successfully.")
                 resolve()
             })
         } else {
@@ -1215,7 +1221,7 @@ ipcRenderer.on ( 'SET_VENDOR_4_ANALYSIS', (event, message) => {
             break;
         
         default:
-            console.log ( "Vendor missing in message!")
+            log.info ( "Vendor missing in message!")
     }
 });
 
@@ -1238,7 +1244,7 @@ ipcRenderer.on ( 'SET_CHAN_PRESET', (event, message) => {
 
 ipcRenderer.on ( 'SET_COUNTRY', async (event, message) => {
     if ( !message.country_code ) {
-        console.log ( "Empty or invalid country code!" )
+        log.info ( "Empty or invalid country code!" )
         await Swal.fire({
             title: "Empty or invalid country code!",
             html: `country_codes.json might be corrupted!`,
@@ -1270,7 +1276,7 @@ ipcRenderer.on ( 'SET_COUNTRY', async (event, message) => {
         COUNTRY_NAME = 'Germany';
         ipcRenderer.send ('SET_COUNTRY', { country_code : COUNTRY_CODE });
 
-        console.log ( "No frequency related information available for country code: '" + message.country_code +"' => Falling back to: 'DE'");
+        log.info ( "No frequency related information available for country code: '" + message.country_code +"' => Falling back to: 'DE'");
     } else {
         COUNTRY_CODE = message.country_code;
         COUNTRY_NAME = message.country_label;
@@ -1298,14 +1304,14 @@ ipcRenderer.on ( 'SET_PORT', async (event, message) => {
     else
         COM_PORT = message.port;
 
-    console.log ( `User has changed port to: '${COM_PORT}'`)
+    log.info ( `User has changed port to: '${COM_PORT}'`)
     configStore.set ( 'com_port', COM_PORT )
     ipcRenderer.send ('SET_PORT', { portPath : COM_PORT });
     scanDevice.scanningActive = false
-    console.log ( "Periodic scan is now disabled" )
-    console.log ( "Wait for lastly requested scan data to be received before continuing ..." )
+    log.info ( "Periodic scan is now disabled" )
+    log.info ( "Wait for lastly requested scan data to be received before continuing ..." )
     await firstValueFrom(data$) // Wait for last scan data to arrive
-    console.log ( "Reconnecting port ..." )
+    log.info ( "Reconnecting port ..." )
     disconnectPort().then ( () => connectDevice ( COM_PORT, false ) )
 })
 
@@ -1322,7 +1328,7 @@ ipcRenderer.on ( 'EXPORT_WW6_IAS_CSV', (event, message) => {
 });
 
 ipcRenderer.on ( 'RESET_PEAK', (event, message) => {
-    console.log("Peak values have been reset")
+    log.info("Peak values have been reset")
     for ( let i = 0 ; i < global.SWEEP_POINTS ; i++ )
         myChart.data.datasets[LINE_LIVE].data[i] = undefined;
 
@@ -1342,7 +1348,7 @@ ipcRenderer.on ( 'RESET_SETTINGS', (event, message) => {
         }
     }).then ( result => {
         if (result.isConfirmed) {
-            console.log ( "User has resetted application settings")
+            log.info ( "User has resetted application settings")
             configStore.clear()
             restartApp()
         }
@@ -1351,7 +1357,7 @@ ipcRenderer.on ( 'RESET_SETTINGS', (event, message) => {
 
 ipcRenderer.on ( 'MX_LINUX_WORKAROUND', (event, message) => {
     if ( message.enabled ) {
-        console.log("Enabled workaround for MX Linux")
+        log.info("Enabled workaround for MX Linux")
         configStore.set( 'mx_linux_workaround_enabled', true)
         global.MX_LINUX_WORKAROUND = true
         Swal.fire({
@@ -1366,19 +1372,19 @@ ipcRenderer.on ( 'MX_LINUX_WORKAROUND', (event, message) => {
             }
         }) 
     } else {
-        console.log("Disabled workaround for MX Linux")
+        log.info("Disabled workaround for MX Linux")
         configStore.set( 'mx_linux_workaround_enabled', false)
         global.MX_LINUX_WORKAROUND = false
     }
 });
 
 ipcRenderer.on ( 'DARK_MODE', (event, message) => {
-    console.error(message)
+    log.error(message)
         if ( message.enabled ) {
-            console.log("Enabled dark mode")
+            log.info("Enabled dark mode")
             configStore.set('dark_mode', true)
         } else {
-            console.log("Disabled dark mode")
+            log.info("Disabled dark mode")
             configStore.set('dark_mode', false)
         }
 
@@ -1391,13 +1397,13 @@ ipcRenderer.on ( 'DARK_MODE', (event, message) => {
 })
 
 ipcRenderer.on ( 'SET_SCAN_DEVICE', async (event, message) => {
-    console.log ( `User selected device '${message.scanDevice}'` )
+    log.info ( `User selected device '${message.scanDevice}'` )
 
     await disconnectPort( err => {
         port = null;
 
         if (err) {
-            console.error(err)
+            log.error(err)
             return
         }
     })
@@ -1415,7 +1421,7 @@ ipcRenderer.on ( 'SET_SCAN_DEVICE', async (event, message) => {
             connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
             break;
 
-        default: console.error (`Unknown device: ${message.scanDevice}`);
+        default: log.error (`Unknown device: ${message.scanDevice}`);
     }
 })
 
@@ -1456,7 +1462,7 @@ ipcRenderer.on ( 'DEVICE_SETTINGS', async (event, message) => {
         }).then ( result => {
             if (result.isConfirmed) {
                 global.SWEEP_POINTS = result.value
-                console.log ( "Number of sweep points was set to:", global.SWEEP_POINTS )
+                log.info ( "Number of sweep points was set to: " + global.SWEEP_POINTS )
                 configStore.set ( 'sweep_points', global.SWEEP_POINTS )
                 scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS );        
             }
@@ -1475,10 +1481,10 @@ function zoom ( deltaPercent ) { // delta deltaPercent
         let isMinimum = false
         let isMaximum = false
 
-        console.log ( `Zooming OUT to ${Math.abs(deltaPercent) * 2 + 100}% of current view ...` )
+        log.info ( `Zooming OUT to ${Math.abs(deltaPercent) * 2 + 100}% of current view ...` )
 
         if ( global.START_FREQ - deltaFreq < MIN_FREQ ) {
-            console.log ( `New start frequency exceeds minimum of ${MIN_FREQ}. Thus setting it to ${MIN_FREQ}!` )
+            log.info ( `New start frequency exceeds minimum of ${MIN_FREQ}. Thus setting it to ${MIN_FREQ}!` )
             global.START_FREQ = MIN_FREQ
             isMinimum = true
         } else {
@@ -1486,7 +1492,7 @@ function zoom ( deltaPercent ) { // delta deltaPercent
         }
 
         if ( global.STOP_FREQ + deltaFreq > MAX_FREQ ) {
-            console.log ( `New stop frequency exceeds maximum of ${MAX_FREQ}. Thus setting it to ${MAX_FREQ}!` )
+            log.info ( `New stop frequency exceeds maximum of ${MAX_FREQ}. Thus setting it to ${MAX_FREQ}!` )
             global.STOP_FREQ = MAX_FREQ
             isMaximum = true
         } else {
@@ -1496,7 +1502,7 @@ function zoom ( deltaPercent ) { // delta deltaPercent
         let tmpSpan = global.STOP_FREQ - global.START_FREQ
 
         if ( tmpSpan > MAX_SPAN ) {
-            console.log ( `Selected span of ${tmpSpan} would exceed maximum span of ${MAX_SPAN}! Aligning zoom to max span value ${MAX_SPAN}.` )
+            log.info ( `Selected span of ${tmpSpan} would exceed maximum span of ${MAX_SPAN}! Aligning zoom to max span value ${MAX_SPAN}.` )
             let fill = Math.round ( ((global.STOP_FREQ - global.START_FREQ) - MAX_SPAN) / 2 )
 
             if ( isMinimum ) {
@@ -1509,11 +1515,11 @@ function zoom ( deltaPercent ) { // delta deltaPercent
             }
         }
     } else { // zoom in
-        console.log ( `Zooming IN to ${100 - Math.abs(deltaPercent) * 2}% of current view ...` )
+        log.info ( `Zooming IN to ${100 - Math.abs(deltaPercent) * 2}% of current view ...` )
 
         // If smaller than minimal frequency span
         if ( (global.STOP_FREQ - deltaFreq) - (global.START_FREQ + deltaFreq) < MIN_SPAN ) {
-            console.log ( `Selected span of ${global.STOP_FREQ - global.START_FREQ} is smaller than ${MIN_SPAN}! Aligning zoom to min span value ${MIN_SPAN}.` )
+            log.info ( `Selected span of ${global.STOP_FREQ - global.START_FREQ} is smaller than ${MIN_SPAN}! Aligning zoom to min span value ${MIN_SPAN}.` )
             let fill = Math.floor ( ((global.STOP_FREQ - global.START_FREQ) - MIN_SPAN) / 2 )
             global.STOP_FREQ -= fill
             global.START_FREQ += fill
@@ -1521,7 +1527,7 @@ function zoom ( deltaPercent ) { // delta deltaPercent
 
         // If smaller than minimum number of sweep points
         if ( global.STOP_FREQ - global.START_FREQ < global.SWEEP_POINTS ) {
-            console.log ( `Selected span of ${global.STOP_FREQ - global.START_FREQ} is smaller than number of sweep points ${global.SWEEP_POINTS}! Aligning zoom to number of sweep points ${global.SWEEP_POINTS}.` )
+            log.info ( `Selected span of ${global.STOP_FREQ - global.START_FREQ} is smaller than number of sweep points ${global.SWEEP_POINTS}! Aligning zoom to number of sweep points ${global.SWEEP_POINTS}.` )
             let fill = Math.floor ( ((global.STOP_FREQ - global.START_FREQ) - MIN_SPAN) / 2 )
             global.START_FREQ += fill;
             global.STOP_FREQ  -= fill;
@@ -1533,12 +1539,12 @@ function zoom ( deltaPercent ) { // delta deltaPercent
 }
 
 function move (deltaPercent) {
-    console.log ( `Move frequency band to ${deltaPercent < 0 ? 'LEFT' : 'RIGHT'} by ${Math.abs(deltaPercent)}% of span` )
+    log.info ( `Move frequency band to ${deltaPercent < 0 ? 'LEFT' : 'RIGHT'} by ${Math.abs(deltaPercent)}% of span` )
     const deltaFreq = getFreqFromPercent(Math.abs(deltaPercent))
 
     if ( deltaPercent < 0 ) {
         if ( global.START_FREQ - deltaFreq < MIN_FREQ ) {
-            console.info ( `New start frequency ${global.START_FREQ - deltaFreq} would exceed minimum value of ${MIN_FREQ}. Moving to ${MIN_FREQ} instead!`)
+            log.info ( `New start frequency ${global.START_FREQ - deltaFreq} would exceed minimum value of ${MIN_FREQ}. Moving to ${MIN_FREQ} instead!`)
             global.STOP_FREQ  = global.STOP_FREQ - (global.START_FREQ - MIN_FREQ)
             global.START_FREQ = MIN_FREQ
         } else {
@@ -1547,7 +1553,7 @@ function move (deltaPercent) {
         }
     } else {
         if ( global.STOP_FREQ + deltaFreq > MAX_FREQ ) {
-            console.info ( `New stop frequency ${global.STOP_FREQ + deltaFreq} would exceed maximum value of ${MAX_FREQ}. Moving to ${MAX_FREQ} instead!`)
+            log.info ( `New stop frequency ${global.STOP_FREQ + deltaFreq} would exceed maximum value of ${MAX_FREQ}. Moving to ${MAX_FREQ} instead!`)
             global.START_FREQ = global.START_FREQ + (MAX_FREQ - global.STOP_FREQ)
             global.STOP_FREQ  = MAX_FREQ
         } else {
@@ -1586,13 +1592,13 @@ document.addEventListener ( "wheel", async e => {
         if ( e.ctrlKey && !e.shiftKey ) { // Toggle vendor specific channel presets/banks down
             if ( chPreset_Preset > 1 ) {
                 chPreset_Preset--;
-                console.log (`Toggle vendor specific channel presets/banks down. Now is: ${chPreset_Preset}`)
+                log.info (`Toggle vendor specific channel presets/banks down. Now is: ${chPreset_Preset}`)
 
                 if ( FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series] && chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset)
                     setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
                 myChart.update();
             } else {
-                console.error(`Unable to toggle vendor specific channel presets/banks down! Already on preset ${chPreset_Preset}!`)
+                log.error(`Unable to toggle vendor specific channel presets/banks down! Already on preset ${chPreset_Preset}!`)
             }
             isExecuting = false
             return;
@@ -1606,19 +1612,19 @@ document.addEventListener ( "wheel", async e => {
             if ( chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset && FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series] ) {
                 if ( chPreset_Preset <  FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length ) {
                     chPreset_Preset++;
-                    console.log (`Toggle vendor specific channel presets/banks up. Now is: ${chPreset_Preset}`)
+                    log.info (`Toggle vendor specific channel presets/banks up. Now is: ${chPreset_Preset}`)
                     setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
                     myChart.update();
                 } else {
-                    console.error(`Unable to toggle vendor specific channel presets/banks up! Only ${FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length} presets available!`)
+                    log.error(`Unable to toggle vendor specific channel presets/banks up! Only ${FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length} presets available!`)
                 }
             } else {
-                console.error("Unable to toggle vendor specific channel presets/banks up!")
-                console.error(`chPreset_Vendor: ${chPreset_Vendor}`)
-                console.error(`chPreset_Band: ${chPreset_Band}`)
-                console.error(`chPreset_Series: ${chPreset_Series}`)
-                console.error(`chPreset_Preset: ${chPreset_Preset}`)
-                console.error(`FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series]: ${FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series]}`)
+                log.error("Unable to toggle vendor specific channel presets/banks up!")
+                log.error(`chPreset_Vendor: ${chPreset_Vendor}`)
+                log.error(`chPreset_Band: ${chPreset_Band}`)
+                log.error(`chPreset_Series: ${chPreset_Series}`)
+                log.error(`chPreset_Preset: ${chPreset_Preset}`)
+                log.error(`FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series]: ${FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series]}`)
             }
             isExecuting = false
             return;
@@ -1652,13 +1658,13 @@ document.addEventListener ( "keydown", async e => {
             if ( e.ctrlKey && !e.shiftKey ) { // Toggle vendor specific channel presets/banks down
                 if ( chPreset_Preset > 1 ) {
                     chPreset_Preset--;
-                    console.log (`Toggle vendor specific channel presets/banks down. Now is: ${chPreset_Preset}`)
+                    log.info (`Toggle vendor specific channel presets/banks down. Now is: ${chPreset_Preset}`)
 
                     if ( FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series] && chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset)
                         setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
                     myChart.update();
                 } else {
-                    console.error(`Unable to toggle vendor specific channel presets/banks down! Already on preset ${chPreset_Preset}!`)
+                    log.error(`Unable to toggle vendor specific channel presets/banks down! Already on preset ${chPreset_Preset}!`)
                 }
                 isExecuting = false
                 return;
@@ -1676,19 +1682,19 @@ document.addEventListener ( "keydown", async e => {
                 if ( chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset && FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series] ) {
                     if ( chPreset_Preset <  FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length ) {
                         chPreset_Preset++;
-                        console.log (`Toggle vendor specific channel presets/banks up. Now is: ${chPreset_Preset}`)
+                        log.info (`Toggle vendor specific channel presets/banks up. Now is: ${chPreset_Preset}`)
                         setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
                         myChart.update();
                     } else {
-                        console.error(`Unable to toggle vendor specific channel presets/banks up! Only ${FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length} presets available!`)
+                        log.error(`Unable to toggle vendor specific channel presets/banks up! Only ${FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length} presets available!`)
                     }
                 } else {
-                    console.error("Unable to toggle vendor specific channel presets/banks up!")
-                    console.error(`chPreset_Vendor: ${chPreset_Vendor}`)
-                    console.error(`chPreset_Band: ${chPreset_Band}`)
-                    console.error(`chPreset_Series: ${chPreset_Series}`)
-                    console.error(`chPreset_Preset: ${chPreset_Preset}`)
-                    console.error(`FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series]: ${FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series]}`)
+                    log.error("Unable to toggle vendor specific channel presets/banks up!")
+                    log.error(`chPreset_Vendor: ${chPreset_Vendor}`)
+                    log.error(`chPreset_Band: ${chPreset_Band}`)
+                    log.error(`chPreset_Series: ${chPreset_Series}`)
+                    log.error(`chPreset_Preset: ${chPreset_Preset}`)
+                    log.error(`FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series]: ${FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series]}`)
                 }
                 isExecuting = false
                 return;
@@ -1727,7 +1733,7 @@ document.addEventListener ( "keydown", async e => {
             break;
 
         case 82: // Reset peak
-            console.log ("Resetting peak values ...");
+            log.info ("Resetting peak values ...");
 
             for ( let i = 0 ; i < global.SWEEP_POINTS ; i++ )
                 myChart.data.datasets[LINE_LIVE].data[i] = undefined;
@@ -1755,7 +1761,7 @@ function getBaudrate () {
         case 'RF_EXPLORER': return RFExplorer.BAUD_RATE;
         case 'TINY_SA'    : return TinySA.BAUD_RATE;
         default:
-            console.error (`Cannot get baudrate for unknown device: ${SCAN_DEVICE}`);
+            log.error (`Cannot get baudrate for unknown device: ${SCAN_DEVICE}`);
             return null;
     }
 }

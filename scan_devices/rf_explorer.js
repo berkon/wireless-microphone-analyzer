@@ -33,11 +33,11 @@ class RFExplorer {
     getConfiguration () {
         let buf = Buffer.from ( RFExplorer.deviceCommands.GET_CONFIG )
         buf.writeUInt8 ( 0x4, 1 )
-        console.log ( `Probing for '${this.constructor.NAME}' hardware (with cmd: '${buf.toString()}' ) ...` )
+        log.info ( `Probing for '${this.constructor.NAME}' hardware (with cmd: '${buf.toString()}' ) ...` )
 
         this.port.write ( buf, 'ascii', function(err) {
             if ( err ) {
-                console.error ( err )
+                log.error ( err )
             }
         });
     }
@@ -49,9 +49,9 @@ class RFExplorer {
         // Set DSP mode. Cp0 = Auto ; Cp1 = Filter ; Cp2 = Fast
 //      var config_buf = Buffer.from ( '#0Cp0', 'ascii' ); // Second character will be replaced in next line by a binary lenght value
 //      config_buf.writeUInt8 ( 0x05, 1 );
-//      this.port.write ( config_buf, 'ascii', function(err) { if ( err ) return console.log ( 'Error on write: ', err.message ); });
+//      this.port.write ( config_buf, 'ascii', function(err) { if ( err ) return log.info ( 'Error on write: ', err.message ); });
 
-        console.log ( `Setting frequency configuration to start: ${startFreqStr} stop: ${stopFreqStr} ...` )
+        log.info ( `Setting frequency configuration to start: ${startFreqStr} stop: ${stopFreqStr} ...` )
         let sendBuf = Buffer.from ( RFExplorer.deviceCommands.SET_CONFIG+startFreqStr+','+stopFreqStr+',-0'+Math.abs(global.global.MAX_DBM).toString()+','+global.MIN_DBM.toString(), 'ascii' ); // Second character will be replaced in next line by a binary lenght value
         sendBuf.writeUInt8 ( 0x20, 1 );
 
@@ -62,7 +62,7 @@ class RFExplorer {
                 await this.port.writePromise ( sendBuf2, 'ascii' ) // Workaround for issue with MX Linux (app only works once, then RF explorer must be restarted)
                 await this.port.writePromise ( sendBuf, 'ascii' )
             } catch (err) {
-                console.error ("Unable to write to serial port: ", err)
+                log.error ("Unable to write to serial port: " + err)
             }
         } else {
             await this.port.writePromise ( sendBuf, 'ascii' )
@@ -70,7 +70,7 @@ class RFExplorer {
     }
 
     setHandler (data$) {
-        console.log ( `Setting handler for ${RFExplorer.NAME} data receiption ... ` )
+        log.info ( `Setting handler for ${RFExplorer.NAME} data receiption ... ` )
         const parser = this.port.pipe(new DelimiterParser({ delimiter: '\r\n' }))
 
         parser.on ( 'data', (res) => {
@@ -81,7 +81,7 @@ class RFExplorer {
 
                 if ( buf.indexOf ( deviceEvent ) !== -1 ) {
                     if ( deviceEventType === 'NAME') {
-                        console.log ( `Received device name string '${buf}'` )
+                        log.info ( `Received device name string '${buf}'` )
                         data$.next([{
                             type: 'NAME',
                             values: {
@@ -97,7 +97,7 @@ class RFExplorer {
                     switch ( deviceEvent ) {
                         case this.constructor.deviceEvents.CONFIG_DATA: // Received config data from scan device
                             this.received_config_data = true
-                            console.log ( "Received config data:  ID:", deviceEvent, "DATA LENGTH:", dataLength, "DATA:", data )
+                            log.info ( "Received config data:  ID: " + deviceEvent + " DATA LENGTH: " + dataLength + " DATA: " + data )
 
                             let res_arr = data.split ( "," )
 
@@ -121,15 +121,15 @@ class RFExplorer {
 
                         case '#CAL:': // Calibration data ?? (nothing in the docs)
                         case '#QA:': // Quality data ?? (nothing in the docs)
-                            console.log ( "Received data:  ID:", deviceEvent, "DATA LENGTH:", dataLength, "DATA:", data )
+                            log.info ( "Received data:  ID: " + deviceEvent + " DATA LENGTH: " + dataLength + " DATA: " + data )
                             break
 
                         case '#Sn': // Serial number
-                            console.log ( "Received serial number:  ID:", deviceEvent, "DATA LENGTH:", dataLength, "DATA:", data )
+                            log.info ( "Received serial number:  ID: " + deviceEvent + " DATA LENGTH: " + dataLength + " DATA: " + data )
                             break
 
                         case this.constructor.deviceEvents.DEVICE_DATA: // Model, setup and firmware
-                            console.log ( "Received model, setup and firmware version:  ID:", deviceEvent, "DATA LENGTH:", dataLength, "DATA:", data )
+                            log.info ( "Received model, setup and firmware version:  ID: " + deviceEvent + " DATA LENGTH: " + dataLength + " DATA: " + data )
                             break
 
                         case this.constructor.deviceEvents.SCAN_DATA:
