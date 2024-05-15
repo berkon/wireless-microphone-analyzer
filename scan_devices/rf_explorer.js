@@ -117,6 +117,8 @@ class RFExplorer {
                                     MAX_SPAN: parseInt ( res_arr[9] ) * 1000 // Maximum span returned in kHz thus multiply by 1000
                                 }
                             }])
+                            RFExplorer.MIN_FREQ = parseInt ( res_arr[7] ) * 1000
+                            RFExplorer.MAX_FREQ = parseInt ( res_arr[8] ) * 1000
                             break
 
                         case '#CAL:': // Calibration data ?? (nothing in the docs)
@@ -147,7 +149,8 @@ class RFExplorer {
     }
 
     static isValidFreqConfig ( startFreq, stopFreq ) {
-        if ( startFreq < RFExplorer.MIN_FREQ_BASIC || stopFreq > RFExplorer.MAX_FREQ_BASIC ) {
+        if ( startFreq < RFExplorer.MIN_FREQ || stopFreq > RFExplorer.MAX_FREQ || startFreq >= stopFreq) {
+            log.error ( "Invalid frequency configuration: " + startFreq + " / " + stopFreq )
             return false
         } else {
             return true

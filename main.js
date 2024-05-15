@@ -142,6 +142,8 @@ function createWindow () {
     
     // Add bands
     menuJSON.push ({ label: 'Band', submenu: [] });
+    menuJSON[MENU_BAND].submenu.push ({ label : 'Manual input             F', click () { wc.send ( 'SHOW_MANUAL_BAND_SETTINGS') }});
+    menuJSON[MENU_BAND].submenu.push ({ type:'separator' });
     Object.entries ( FREQ_VENDOR_BANDS ).forEach ( vendorBandData => {
         let key   = vendorBandData[0];
         let value = vendorBandData[1];

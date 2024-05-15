@@ -1,6 +1,7 @@
 .sweetalert2-title {
     font-size: 18px;
     font-family: Arial, Helvetica, sans-serif;
+    margin-top: 1rem
 }
 
 .sweetalert2-validation-message {

@@ -88,14 +88,16 @@ class TinySA {
     static isValidFreqConfig ( startFreq, stopFreq ) {
         switch (TinySA.MODEL) {
             case 'BASIC':
-                if ( startFreq < TinySA.MIN_FREQ_BASIC || stopFreq > TinySA.MAX_FREQ_BASIC ) {
+                if ( startFreq < TinySA.MIN_FREQ_BASIC || stopFreq > TinySA.MAX_FREQ_BASIC || startFreq >= stopFreq ) {
+                    log.error ( "Invalid frequency configuration: " + startFreq + " / " + stopFreq )
                     return false
                 } else {
                     return true
                 }
 
             case 'ULTRA':
-                if ( startFreq < TinySA.MIN_FREQ_ULTRA || stopFreq > TinySA.MAX_FREQ_ULTRA ) {
+                if ( startFreq < TinySA.MIN_FREQ_ULTRA || stopFreq > TinySA.MAX_FREQ_ULTRA || startFreq >= stopFreq ) {
+                    log.error ( "Invalid frequency configuration: " + startFreq + " / " + stopFreq )
                     return false
                 } else {
                     return true
