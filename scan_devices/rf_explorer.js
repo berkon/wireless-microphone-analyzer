@@ -34,6 +34,7 @@ class RFExplorer {
     getConfiguration () {
         // IMPORTANT: After requesting the configuration data, the device immediately starts sending scan data.
         // No additional command is required!
+        this.hold();
         let buf = Buffer.from ( RFExplorer.deviceCommands.GET_CONFIG )
         buf.writeUInt8 ( 0x4, 1 )
         log.info ( `Probing for '${this.constructor.NAME}' hardware (with cmd: '${buf.toString()}' ) ...` )
@@ -46,6 +47,8 @@ class RFExplorer {
     }
 
     async setConfiguration ( startFreq, stopFreq, sweepPoints ) {
+        this.hold();
+
         const startFreqStr = Math.floor(startFreq/1000).toString().padStart(7, '0')
         const stopFreqStr  = Math.floor(stopFreq/1000).toString().padStart(7, '0')
 
@@ -70,6 +73,18 @@ class RFExplorer {
         } else {
             await this.port.writePromise ( sendBuf, 'ascii' )
         }
+    }
+
+    hold () {
+        let buf = Buffer.from ( RFExplorer.deviceCommands.HOLD )
+        buf.writeUInt8 ( 0x4, 1 )
+        log.info ( `Holding data output` )
+
+        this.port.write ( buf, 'ascii', function(err) {
+            if ( err ) {
+                log.error ( err )
+            }
+        });
     }
 
     setHandler (data$) {
