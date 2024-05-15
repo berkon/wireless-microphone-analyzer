@@ -1,5 +1,5 @@
 // API information taken from : https://github.com/RFExplorer/RFExplorer-for-.NET/wiki/RF-Explorer-UART-API-interface-specification
-
+// API communication examples with RealTerm: https://github.com/RFExplorer/RFExplorer-for-.NET/wiki/API-communication-examples-with-RealTerm
 const { DelimiterParser } = require ( '@serialport/parser-delimiter');
 
 class RFExplorer {
@@ -8,17 +8,18 @@ class RFExplorer {
     static BAUD_RATE = 500000;
     static MIN_SPAN = 112000
     static deviceCommands = {
-        GET_CONFIG: '#0C0', // Get current configuration
-        SET_CONFIG: '#0C2-F:'
+        GET_CONFIG: '#0C0',    // Get current configuration
+        SET_CONFIG: '#0C2-F:', // Set configuration
+        HOLD: '#0CH'           // Tell the device to stop sending scan data
     };
     static deviceEvents = {
         NAME: 'RF Explorer',
-        DEVICE_DATA: '#C2-M:',  // '#C2-M:' = model, config and firmware
-        CONFIG_DATA: '#C2-F:',  // '#C2-F:' = config data from scan device
-        SCAN_DATA: '$S' // '$S' = sweep data, 'p' = ASCII code 112 ( 112 sweep points will be received) 'à' = ASCII code 224 ( 224 sweep points will be received)        
-        //'#CAL:',
-        //'#QA:',
-        //'#Sn'
+        DEVICE_DATA: '#C2-M:',     // '#C2-M:' = Main model code, expansion model code and firmware version
+        CONFIG_DATA: '#C2-F:',     // '#C2-F:' = config data from scan device
+        SCAN_DATA: '$S',           // '$S' = sweep data, 'p' = ASCII code 112 ( 112 sweep points will be received) 'à' = ASCII code 224 ( 224 sweep points will be received)        
+        CALIBRATION_DATA: '#CAL:', // Calibration data ?? (nothing in the docs)
+        QUALITY_DATA: '#QA:',      // Quality data ?? (nothing in the docs)
+        SERIAL_NUMBER: '#Sn'       // Serial number
     }
 
     SERIAL_RESPONSE_TIMEOUT = 1500
@@ -31,6 +32,8 @@ class RFExplorer {
     }
 
     getConfiguration () {
+        // IMPORTANT: After requesting the configuration data, the device immediately starts sending scan data.
+        // No additional command is required!
         let buf = Buffer.from ( RFExplorer.deviceCommands.GET_CONFIG )
         buf.writeUInt8 ( 0x4, 1 )
         log.info ( `Probing for '${this.constructor.NAME}' hardware (with cmd: '${buf.toString()}' ) ...` )
@@ -121,18 +124,53 @@ class RFExplorer {
                             RFExplorer.MAX_FREQ = parseInt ( res_arr[8] ) * 1000
                             break
 
-                        case '#CAL:': // Calibration data ?? (nothing in the docs)
-                        case '#QA:': // Quality data ?? (nothing in the docs)
-                            log.info ( "Received data:  ID: " + deviceEvent + " DATA LENGTH: " + dataLength + " DATA: " + data )
-                            break
+                        case this.constructor.deviceEvents.CALIBRATION_DATA:
+                            log.info ( "Received calibration data:  ID: " + deviceEvent + " DATA LENGTH: " + dataLength + " DATA: " + data )
+                            break;
 
-                        case '#Sn': // Serial number
+                        case this.constructor.deviceEvents.QUALITY_DATA:
+                            log.info ( "Received quality data:  ID: " + deviceEvent + " DATA LENGTH: " + dataLength + " DATA: " + data )
+                            break;
+
+                        case this.constructor.deviceEvents.SERIAL_NUMBER:
                             log.info ( "Received serial number:  ID: " + deviceEvent + " DATA LENGTH: " + dataLength + " DATA: " + data )
-                            break
+                            break;
 
-                        case this.constructor.deviceEvents.DEVICE_DATA: // Model, setup and firmware
-                            log.info ( "Received model, setup and firmware version:  ID: " + deviceEvent + " DATA LENGTH: " + dataLength + " DATA: " + data )
-                            break
+                        case this.constructor.deviceEvents.DEVICE_DATA: { // Model data and firmware version
+                            log.info ( "Received model data and firmware version:  ID: " + deviceEvent + " DATA LENGTH: " + dataLength + " DATA: " + data )
+                            const deviceDataArr = data.split(',')
+                            const mainModelCode = parseInt(deviceDataArr[0]);
+                            let mainModelString = '';
+                            const expansionModelCode = parseInt(deviceDataArr[1]);
+                            let expansionModelString = '';
+                            const fwVersion = deviceDataArr[2];
+
+                            switch (mainModelCode) {
+                                case 0:  mainModelString = '433M'       ; break;
+                                case 1:  mainModelString = '868M'       ; break;
+                                case 2:  mainModelString = '915M'       ; break;
+                                case 3:  mainModelString = 'WSUB1G'     ; break;
+                                case 4:  mainModelString = '2.4G'       ; break;
+                                case 5:  mainModelString = 'WSUB3G'     ; break;
+                                case 6:  mainModelString = '6G'         ; break;
+                                case 10: mainModelString = 'WSUB1G_PLUS'; break;
+                                case 60: mainModelString = 'RFEGEN'     ; break;
+                                default:
+                                    log.error( `Unknown 'RF Explorer' model code: ${mainModelCode}` )
+                            }
+
+                            switch (expansionModelCode) {
+                                case 4:   expansionModelString = '2.4G'                ; break;
+                                case 5:   expansionModelString = 'WSUB3G'              ; break;
+                                case 255: expansionModelString = 'No expansion model' ; break;
+                                default:
+                                    log.error( `Unknown expansion model code: ${mainModelCode}` )
+                            }
+
+                            log.info (`    Main model type:      '${mainModelString}'`)
+                            log.info (`    Expansion model type: '${expansionModelString}'`)
+                            log.info (`    Firmware version:     '${fwVersion}'`)
+                        } break;
 
                         case this.constructor.deviceEvents.SCAN_DATA:
                             if ( this.received_config_data ) {
