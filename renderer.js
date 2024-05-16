@@ -785,6 +785,7 @@ const portOpenCb = () => {
 
                             myChart.options.scales.xAxes[0].scaleLabel.labelString = label
                             configStore.set ( 'band_label' , label )
+                            BAND_LABEL = label
                             updateChart ()
                             break
 
@@ -957,6 +958,7 @@ const portOpenCb = () => {
 
                             myChart.options.scales.xAxes[0].scaleLabel.labelString = label
                             configStore.set ( 'band_label' , label )
+                            BAND_LABEL = band_label
                             updateChart ()
                             break
 
@@ -1484,6 +1486,19 @@ ipcRenderer.on ( 'SHOW_MANUAL_BAND_SETTINGS', async (event, message) => {
     showManualBandSettings()
 })
 
+ipcRenderer.on ( 'SAVE_TO_HOTKEY', async (event, message) => {
+    saveToHotkey ( message.hotkey )
+})
+
+function saveToHotkey (hotkey) {
+    configStore.set ( `hotkeys.hotkey_${hotkey}`, {
+        band_label: BAND_LABEL,
+        band_details: BAND_DETAILS ,
+        start_freq: global.START_FREQ,
+        stop_freq: global.STOP_FREQ
+    });
+}
+
 function showManualBandSettings () {
     log.info ( "Showing manual frequency band settings" )
     Swal.fire({
@@ -1767,102 +1782,128 @@ document.addEventListener ( "keydown", async e => {
 
             // Main window
             default:
-                switch ( e.key ) {
-                    case 'ArrowLeft': // Arrow left
-                        if ( e.ctrlKey && !e.shiftKey ) { // Toggle vendor specific channel presets/banks down
-                            if ( chPreset_Preset > 1 ) {
-                                chPreset_Preset--;
-                                log.info (`Toggle vendor specific channel presets/banks down. Now is: ${chPreset_Preset}`)
+                // Get last character of the key code to check if it is a number key
+                // In that case the key code looks like "Digit1" or "Numpad1"
+                let lastChar = e.code.charAt (e.code.length - 1)
 
-                                if ( FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series] && chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset)
-                                    setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
-                                myChart.update();
+                // First check if a hotkey was pressed
+                if ( !isNaN(parseInt(lastChar)) && (e.code.indexOf('Numpad') > -1 || e.code.indexOf('Digit') > -1) ) {
+                    let numberKey = parseInt(lastChar)
+
+                    if ( numberKey >= 1 && numberKey <= 9 ) {
+                        if ( !e.shiftKey ) { // load hotkey data
+                            let bandData = configStore.get(`hotkeys.hotkey_${numberKey}`)
+                            if ( bandData ) {
+                                BAND_LABEL = bandData.band_label
+                                BAND_DETAILS = bandData.band_details
+                                global.START_FREQ = bandData.start_freq;
+                                global.STOP_FREQ  = bandData.stop_freq;
                             } else {
-                                log.error(`Unable to toggle vendor specific channel presets/banks down! Already on preset ${chPreset_Preset}!`)
+                                return
                             }
-                            return;
-                        } else if ( e.shiftKey && !e.ctrlKey ) {
-                            move(-50); // Move frequency band to LEFT by 50% of span
-                        } else if ( !e.shiftKey && !e.ctrlKey ) {
-                            move(-10); // Move frequency band to LEFT by 10% of span
+                        } else { // save data to hotkey
+                            saveToHotkey ( numberKey );
                         }
+                    }
+                } else {
+                    switch ( e.key ) {
+                        case 'ArrowLeft': // Arrow left
+                            if ( e.ctrlKey && !e.shiftKey ) { // Toggle vendor specific channel presets/banks down
+                                if ( chPreset_Preset > 1 ) {
+                                    chPreset_Preset--;
+                                    log.info (`Toggle vendor specific channel presets/banks down. Now is: ${chPreset_Preset}`)
 
-                        BAND_DETAILS = "";
-                        break;
-
-                    case 'ArrowRight': // Arrow right
-                        if ( e.ctrlKey && !e.shiftKey ) { // Toggle vendor specific channel presets/banks up
-                            if ( chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset && FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series] ) {
-                                if ( chPreset_Preset <  FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length ) {
-                                    chPreset_Preset++;
-                                    log.info (`Toggle vendor specific channel presets/banks up. Now is: ${chPreset_Preset}`)
-                                    setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+                                    if ( FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series] && chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset)
+                                        setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
                                     myChart.update();
                                 } else {
-                                    log.error(`Unable to toggle vendor specific channel presets/banks up! Only ${FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length} presets available!`)
+                                    log.error(`Unable to toggle vendor specific channel presets/banks down! Already on preset ${chPreset_Preset}!`)
                                 }
-                            } else {
-                                log.error("Unable to toggle vendor specific channel presets/banks up!")
-                                log.error(`chPreset_Vendor: ${chPreset_Vendor}`)
-                                log.error(`chPreset_Band: ${chPreset_Band}`)
-                                log.error(`chPreset_Series: ${chPreset_Series}`)
-                                log.error(`chPreset_Preset: ${chPreset_Preset}`)
-                                log.error(`FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series]: ${FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series]}`)
+                                return;
+                            } else if ( e.shiftKey && !e.ctrlKey ) {
+                                move(-50); // Move frequency band to LEFT by 50% of span
+                            } else if ( !e.shiftKey && !e.ctrlKey ) {
+                                move(-10); // Move frequency band to LEFT by 10% of span
                             }
-                            return;
-                        } else if ( e.shiftKey && !e.ctrlKey ) {
-                            move(50); // Move frequency band to RIGHT by 50% of span
-                        } else if ( !e.shiftKey && !e.ctrlKey ) {
-                            move(10); // Move frequency band to RIGHT by 10% of span
-                        }
 
-                        BAND_DETAILS = "";
-                        break;
+                            BAND_DETAILS = "";
+                            break;
 
-                    case 'ArrowUp': // Arrow up - Zoom in
-                        if ( !e.shiftKey ) {
-                            zoom(10); // Zoom in by removing 10% of span on both sides ( = 20% )
-                        } else {
-                            zoom(25); // Zoom in by removing 25% of span on both sides ( = 50% )
-                        }
+                        case 'ArrowRight': // Arrow right
+                            if ( e.ctrlKey && !e.shiftKey ) { // Toggle vendor specific channel presets/banks up
+                                if ( chPreset_Vendor && chPreset_Band && chPreset_Series && chPreset_Preset && FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series] ) {
+                                    if ( chPreset_Preset <  FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length ) {
+                                        chPreset_Preset++;
+                                        log.info (`Toggle vendor specific channel presets/banks up. Now is: ${chPreset_Preset}`)
+                                        setVendorChannels ( FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series][parseInt(chPreset_Preset)-1], chPreset_Preset );
+                                        myChart.update();
+                                    } else {
+                                        log.error(`Unable to toggle vendor specific channel presets/banks up! Only ${FREQ_VENDOR_PRESETS[chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series].length} presets available!`)
+                                    }
+                                } else {
+                                    log.error("Unable to toggle vendor specific channel presets/banks up!")
+                                    log.error(`chPreset_Vendor: ${chPreset_Vendor}`)
+                                    log.error(`chPreset_Band: ${chPreset_Band}`)
+                                    log.error(`chPreset_Series: ${chPreset_Series}`)
+                                    log.error(`chPreset_Preset: ${chPreset_Preset}`)
+                                    log.error(`FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series]: ${FREQ_VENDOR_PRESETS [chPreset_Vendor+'_'+chPreset_Band+'_'+chPreset_Series]}`)
+                                }
+                                return;
+                            } else if ( e.shiftKey && !e.ctrlKey ) {
+                                move(50); // Move frequency band to RIGHT by 50% of span
+                            } else if ( !e.shiftKey && !e.ctrlKey ) {
+                                move(10); // Move frequency band to RIGHT by 10% of span
+                            }
 
-                        if ( global.STOP_FREQ - global.START_FREQ < global.SWEEP_POINTS ) {
-                            return;
-                        }
+                            BAND_DETAILS = "";
+                            break;
 
-                        BAND_DETAILS = "";
-                        break;
+                        case 'ArrowUp': // Arrow up - Zoom in
+                            if ( !e.shiftKey ) {
+                                zoom(10); // Zoom in by removing 10% of span on both sides ( = 20% )
+                            } else {
+                                zoom(25); // Zoom in by removing 25% of span on both sides ( = 50% )
+                            }
 
-                    case 'ArrowDown': // Arrow down - Zoom out
-                        if ( !e.shiftKey ) { 
-                            zoom(-10); // Zoom out to 120% by adding 10% of span on both sides ( = 20% )
-                        } else {
-                            zoom(-50); // Zoom out by adding 50% of span on both sides ( = 100% )
-                        }
+                            if ( global.STOP_FREQ - global.START_FREQ < global.SWEEP_POINTS ) {
+                                return;
+                            }
 
-                        BAND_DETAILS = "";
-                        break;
+                            BAND_DETAILS = "";
+                            break;
 
-                    case 'r': // Reset peak
-                        log.info ("Resetting peak values ...");
+                        case 'ArrowDown': // Arrow down - Zoom out
+                            if ( !e.shiftKey ) { 
+                                zoom(-10); // Zoom out to 120% by adding 10% of span on both sides ( = 20% )
+                            } else {
+                                zoom(-50); // Zoom out by adding 50% of span on both sides ( = 100% )
+                            }
 
-                        for ( let i = 0 ; i < global.SWEEP_POINTS ; i++ )
-                            myChart.data.datasets[LINE_LIVE].data[i] = undefined;
+                            BAND_DETAILS = "";
+                            break;
 
-                        myChart.update();
-                        break;
+                        case 'r': // Reset peak
+                            log.info ("Resetting peak values ...");
 
-                    case 'b': // Go back to last vendor band
-                        global.START_FREQ = LAST_START_FREQ;
-                        global.STOP_FREQ    = LAST_STOP_FREQ;
-                        BAND_DETAILS = configStore.get('band_details');
-                        break;
+                            for ( let i = 0 ; i < global.SWEEP_POINTS ; i++ )
+                                myChart.data.datasets[LINE_LIVE].data[i] = undefined;
 
-                    case 'f': // Set manual frequency range (band)
-                        showManualBandSettings()
-                        break;
+                            myChart.update();
+                            break;
 
-                    default:
+                        case 'b': // Go back to last vendor band
+                            global.START_FREQ = LAST_START_FREQ;
+                            global.STOP_FREQ    = LAST_STOP_FREQ;
+                            BAND_DETAILS = configStore.get('band_details');
+                            break;
+
+                        case 'f': // Set manual frequency range (band)
+                            showManualBandSettings()
+                            break;
+
+                        default:
+                            return
+                    }
                 }
         }
     } finally {

@@ -143,6 +143,17 @@ function createWindow () {
     // Add bands
     menuJSON.push ({ label: 'Band', submenu: [] });
     menuJSON[MENU_BAND].submenu.push ({ label : 'Manual input             F', click () { wc.send ( 'SHOW_MANUAL_BAND_SETTINGS') }});
+    menuJSON[MENU_BAND].submenu.push ({ label: 'Save to hotkey', submenu: [
+        { label: "1", click () { wc.send ( 'SAVE_TO_HOTKEY', { hotkey : '1'}) }},
+        { label: "2", click () { wc.send ( 'SAVE_TO_HOTKEY', { hotkey : '2'}) }},
+        { label: "3", click () { wc.send ( 'SAVE_TO_HOTKEY', { hotkey : '3'}) }},
+        { label: "4", click () { wc.send ( 'SAVE_TO_HOTKEY', { hotkey : '4'}) }},
+        { label: "5", click () { wc.send ( 'SAVE_TO_HOTKEY', { hotkey : '5'}) }},
+        { label: "6", click () { wc.send ( 'SAVE_TO_HOTKEY', { hotkey : '6'}) }},
+        { label: "7", click () { wc.send ( 'SAVE_TO_HOTKEY', { hotkey : '7'}) }},
+        { label: "8", click () { wc.send ( 'SAVE_TO_HOTKEY', { hotkey : '8'}) }},
+        { label: "9", click () { wc.send ( 'SAVE_TO_HOTKEY', { hotkey : '9'}) }}
+    ]})
     menuJSON[MENU_BAND].submenu.push ({ type:'separator' });
     Object.entries ( FREQ_VENDOR_BANDS ).forEach ( vendorBandData => {
         let key   = vendorBandData[0];
