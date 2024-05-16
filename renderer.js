@@ -1793,12 +1793,19 @@ document.addEventListener ( "keydown", async e => {
                     if ( numberKey >= 1 && numberKey <= 9 ) {
                         if ( !e.shiftKey ) { // load hotkey data
                             let bandData = configStore.get(`hotkeys.hotkey_${numberKey}`)
+
                             if ( bandData ) {
+                                log.info( `Loaded data from hotkey '${e.code}':`)
+                                log.info( `    Band Label:   ${bandData.band_label}`)
+                                log.info( `    Band Details: ${bandData.band_details}`)
+                                log.info( `    Start Freq.:  ${bandData.start_freq}`)
+                                log.info( `    Stop Freq.:   ${bandData.stop_freq}`)
                                 BAND_LABEL = bandData.band_label
                                 BAND_DETAILS = bandData.band_details
                                 global.START_FREQ = bandData.start_freq;
                                 global.STOP_FREQ  = bandData.stop_freq;
                             } else {
+                                log.info( `No data stored for hotkey '${e.code}'!`)
                                 return
                             }
                         } else { // save data to hotkey
