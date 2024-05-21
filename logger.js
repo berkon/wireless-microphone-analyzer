@@ -5,17 +5,14 @@ var fs = require('fs');
 const archiver = require('archiver');
 
 if ( process.type === 'browser') // 'browser' means we are in the main process
-    var ABS_APP_ROOT = require('electron').app.getAppPath();
+    var USER_DATA_PATH = require('electron').app.getPath('userData');
 else // if not in main process, we must be in the renderer process process.type will then be 'renderer'
-    var ABS_APP_ROOT = require ( '@electron/remote' ).app.getAppPath();
+    var USER_DATA_PATH = require ( '@electron/remote' ).app.getPath('userData');
 
-ABS_APP_ROOT = ABS_APP_ROOT.replace ( /\/resources\/app.asar|\\resources\\app.asar/, '' ); // If running as electron-builder packaged app
-ABS_APP_ROOT = ABS_APP_ROOT.replace ( /\/resources\/app|\\resources\\app/          , '' ); // If running as manually packaged/zip-ed app
+if ( !fs.existsSync ( USER_DATA_PATH + '/log' ) )
+	fs.mkdirSync ( USER_DATA_PATH + '/log' );
 
-if ( !fs.existsSync ( ABS_APP_ROOT + '/log' ) )
-	fs.mkdirSync ( ABS_APP_ROOT + '/log' );
-
-const LOG_FILE = ABS_APP_ROOT + '/log/%DATE%logfile.txt';//error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5
+const LOG_FILE = USER_DATA_PATH + '/log/%DATE%logfile.txt';//error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5
 
 global.ERROR   = 0;
 global.WARNING = 1;
@@ -75,7 +72,7 @@ global.zipLogs = (targetPath) => {
 
 	return new Promise((resolve, reject) => {
 		archive
-			.directory(ABS_APP_ROOT + '/log', false)
+			.directory(USER_DATA_PATH + '/log', false)
 			.on('error', err => {
 				console.error ( getFormattedTimestamp(false), " [ERROR] ", err );
 				wlog.error ( err );
@@ -86,4 +83,10 @@ global.zipLogs = (targetPath) => {
 		stream.on('close', () => resolve());
 		archive.finalize();
 	});
+}
+
+if ( process.type === 'browser' ) {
+	log.info("Main process is writing log data to: " + USER_DATA_PATH + '/log')
+} else {
+	log.info("Renderer process is writing log data to: " + USER_DATA_PATH + '/log')	
 }
