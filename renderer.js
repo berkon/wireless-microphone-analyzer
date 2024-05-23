@@ -958,7 +958,7 @@ const portOpenCb = () => {
 
                             myChart.options.scales.xAxes[0].scaleLabel.labelString = label
                             configStore.set ( 'band_label' , label )
-                            BAND_LABEL = band_label
+                            BAND_LABEL = label
                             updateChart ()
                             break
 
