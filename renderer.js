@@ -749,19 +749,15 @@ const portOpenCb = () => {
                             if ( !RFExplorer.isValidFreqConfig ( data[0].values.START_FREQ, data[0].values.STOP_FREQ ) ) {
                                 log.error ( `Invalid frequency range: ${data[0].values.START_FREQ} - ${data[0].values.STOP_FREQ} Hz!` )
 
-                                Swal.fire({
-                                    title: "Invalid frequency range!",
-                                    html: `The currently selected frequency range is not valid for device <b>${RFExplorer.NAME}</b>!` +
-                                            `<br><br>Allowed range is: ${MIN_FREQ} - ${MAX_FREQ} Hz` +
-                                            `<br><br>Current range is: ${data[0].values.START_FREQ} - ${data[0].values.STOP_FREQ} Hz`,
-                                    icon: "warning",
-                                    showCancelButton: false,
-                                    confirmButtonColor: "#0099ff",
-                                    customClass: {
-                                        title: 'sweetalert2-title',
-                                        container: 'sweetalert2-container'
-                                    }
-                                })
+                                showPopup(
+                                    'warning',
+                                    'POPUP_CAT_INVALID_FREQUENCY',
+                                    "Invalid frequency range!",
+                                    `The currently selected frequency range is not valid for device <b>${RFExplorer.NAME}</b>!` +
+                                    `<br><br>Allowed range is: ${MIN_FREQ} - ${MAX_FREQ} Hz` +
+                                    `<br><br>Current range is: ${data[0].values.START_FREQ} - ${data[0].values.STOP_FREQ} Hz`,
+                                    ['Ok']
+                                )
                                 return
                             }
 
@@ -918,19 +914,15 @@ const portOpenCb = () => {
                             if ( !TinySA.isValidFreqConfig ( data[0].values.START_FREQ, data[0].values.STOP_FREQ ) ) {
                                 log.error ( `Invalid frequency range: ${data[0].values.START_FREQ} - ${data[0].values.STOP_FREQ} Hz!` )
 
-                                Swal.fire({
-                                    title: "Invalid frequency range!",
-                                    html: `The currently selected frequency range is not valid for device <b>${TinySA.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}</b>!` +
-                                        `<br><br>Allowed range is: ${MIN_FREQ} - ${MAX_FREQ} Hz` +
-                                        `<br><br>Current range is: ${data[0].values.START_FREQ} - ${data[0].values.STOP_FREQ} Hz`,
-                                    icon: "warning",
-                                    showCancelButton: false,
-                                    confirmButtonColor: "#0099ff",
-                                    customClass: {
-                                        title: 'sweetalert2-title',
-                                        container: 'sweetalert2-container'
-                                    }
-                                })    
+                                showPopup(
+                                    'warning',
+                                    'POPUP_CAT_INVALID_FREQUENCY',
+                                    "Invalid frequency range!",
+                                    `The currently selected frequency range is not valid for device <b>${TinySA.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}</b>!` +
+                                    `<br><br>Allowed range is: ${MIN_FREQ} - ${MAX_FREQ} Hz` +
+                                    `<br><br>Current range is: ${data[0].values.START_FREQ} - ${data[0].values.STOP_FREQ} Hz`,
+                                    ['Ok']
+                                )
                                 return
                             }
 
@@ -1257,32 +1249,24 @@ ipcRenderer.on ( 'SET_CHAN_PRESET', (event, message) => {
 ipcRenderer.on ( 'SET_COUNTRY', async (event, message) => {
     if ( !message.country_code ) {
         log.info ( "Empty or invalid country code!" )
-        await Swal.fire({
-            title: "Empty or invalid country code!",
-            html: `country_codes.json might be corrupted!`,
-            icon: "error",
-            showCancelButton: false,
-            confirmButtonColor: "#0099ff",
-            customClass: {
-                title: 'sweetalert2-title',
-                container: 'sweetalert2-container'
-            }
-        }) 
+        await showPopup(
+            'error',
+            'POPUP_CAT_INVALID_COUNTRY',
+            "Empty or invalid country code!",
+            `country_codes.json might be corrupted!`,
+            ['OK']
+        )
         return;
     }
 
     if ( !fs.existsSync ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + message.country_code + '.json' ) ) {
-        await Swal.fire({
-            title: "Country not available!",
-            html: 'No frequency related information available for ' + message.country_label +' (' + message.country_code + ')' + '! Falling back to Germany (DE)',
-            icon: "warning",
-            showCancelButton: false,
-            confirmButtonColor: "#0099ff",
-            customClass: {
-                title: 'sweetalert2-title',
-                container: 'sweetalert2-container'
-            }
-        }) 
+        await showPopup(
+            'warning',
+            'POPUP_CAT_INVALID_COUNTRY',
+            "Country not available!",
+            'No frequency related information available for ' + message.country_label +' (' + message.country_code + ')' + '! Falling back to Germany (DE)',
+            ['Ok']
+        )
 
         COUNTRY_CODE = 'DE';
         COUNTRY_NAME = 'Germany';
@@ -1348,17 +1332,13 @@ ipcRenderer.on ( 'RESET_PEAK', (event, message) => {
 });
 
 ipcRenderer.on ( 'RESET_SETTINGS', (event, message) => {
-    Swal.fire({
-        title: "Reset application settings?",
-        html: 'All settings you made will be lost!',
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: "#0099ff",
-        customClass: {
-            title: 'sweetalert2-title',
-            container: 'sweetalert2-container'
-        }
-    }).then ( result => {
+    showPopup(
+        "question",
+        'POPUP_CAT_SETTINGS',
+        "Reset application settings?",
+        'All settings you made will be lost!',
+        ['Ok', 'Cancel']
+    ).then ( result => {
         if (result.isConfirmed) {
             log.info ( "User has resetted application settings")
             configStore.clear()
@@ -1372,17 +1352,13 @@ ipcRenderer.on ( 'MX_LINUX_WORKAROUND', (event, message) => {
         log.info("Enabled workaround for MX Linux")
         configStore.set( 'mx_linux_workaround_enabled', true)
         global.MX_LINUX_WORKAROUND = true
-        Swal.fire({
-            title: "Information",
-            html: 'This enables a workaround which prevents the app from hanging on certain MX Linux systems. Enabling it, will make it work on MX Linux, but also slows down zooming and moving through the spectrum.',
-            icon: "info",
-            showCancelButton: false,
-            confirmButtonColor: "#0099ff",
-            customClass: {
-                title: 'sweetalert2-title',
-                container: 'sweetalert2-container'
-            }
-        }) 
+        showPopup(
+            'info',
+            'POPUP_CAT_GENERAL',
+            "Information",
+            'This enables a workaround which prevents the app from hanging on certain MX Linux systems. Enabling it, will make it work on MX Linux, but also slows down zooming and moving through the spectrum.',
+            ['Ok']
+        )
     } else {
         log.info("Disabled workaround for MX Linux")
         configStore.set( 'mx_linux_workaround_enabled', false)
@@ -1439,17 +1415,13 @@ ipcRenderer.on ( 'SET_SCAN_DEVICE', async (event, message) => {
 
 ipcRenderer.on ( 'DEVICE_SETTINGS', async (event, message) => {
     if ( scanDevice instanceof RFExplorer ) {
-        Swal.fire({
-            title: "No settings available",
-            text: "This device does not have configurable settings!",
-            icon: "warning",
-            showCancelButton: false,
-            confirmButtonColor: "#0099ff",
-            customClass: {
-                title: 'sweetalert2-title',
-                container: 'sweetalert2-container'
-            },
-        })
+        showPopup (
+            'warning',
+            'POPUP_CAT_SETTINGS',
+            "No settings available",
+            "This device does not have configurable settings!",
+            ['Ok']
+        )
     } else if ( scanDevice instanceof TinySA ) {
         Swal.fire({
             title: "Enter number of sweep points",
@@ -1518,7 +1490,6 @@ function showManualBandSettings () {
         showCancelButton: true,
         confirmButtonText: "Ok",
         confirmButtonColor: "#0099ff",
-
         customClass: {
             title: 'sweetalert2-title',
             validationMessage: 'sweetalert2-validation-message'
