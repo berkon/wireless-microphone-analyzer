@@ -160,11 +160,12 @@ class RFExplorer {
                             }
 
                             switch (expansionModelCode) {
-                                case 4:   expansionModelString = '2.4G'                ; break;
-                                case 5:   expansionModelString = 'WSUB3G'              ; break;
-                                case 255: expansionModelString = 'No expansion model' ; break;
+                                case 4:   expansionModelString = '2.4G'              ; break;
+                                case 5:   expansionModelString = 'WSUB3G'            ; break;
+                                case 12:  expansionModelString = '2.4G Gen 2'        ; break;
+                                case 255: expansionModelString = 'No expansion model'; break;
                                 default:
-                                    log.error( `Unknown expansion model code: ${mainModelCode}` )
+                                    log.error( `Unknown expansion model code: ${expansionModelCode}` )
                             }
 
                             log.info (`    Main model type:      '${mainModelString}'`)
