@@ -66,6 +66,28 @@ global.log.error = str => {
 	wlog.error ( str );
 }
 
+global.log.hex = data => {
+	let hexStr =''
+
+	if ( typeof data === 'string' || (Array.isArray(data) && typeof data[0] === 'string')) {
+		let charCodeArr = []
+
+		for ( const char of data ) {
+			charCodeArr.push(char.charCodeAt(0))
+		}
+
+		data = charCodeArr
+	}
+
+	for ( const byte of data ) {
+		hexStr += byte.toString(16).toUpperCase().padStart(2,'0')
+		hexStr += ' '
+	}
+
+	console.log ( hexStr )
+	wlog.info ( hexStr )
+}
+
 global.zipLogs = (targetPath) => {
 	const archive = archiver('zip', { zlib: { level: 9 }});
 	const stream = fs.createWriteStream(targetPath);
