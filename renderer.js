@@ -56,7 +56,8 @@ let formValid = false
 
 let curKeyInputTarget = '';
 let keyInputTargets = {
-    MANUAL_BAND_SETTINGS: 'MANUAL_BAND_SETTINGS'
+    MANUAL_BAND_SETTINGS: 'MANUAL_BAND_SETTINGS',
+    SWEEP_POINT_SETTINGS: 'SWEEP_POINT_SETTINGS'
 }
 
 document.getElementById('donate-button').addEventListener ('click', () => openDonateWindow() )
@@ -1414,7 +1415,7 @@ ipcRenderer.on ( 'SET_SCAN_DEVICE', async (event, message) => {
 })
 
 ipcRenderer.on ( 'DEVICE_SETTINGS', async (event, message) => {
-    if ( scanDevice instanceof RFExplorer ) {
+    if ( scanDevice instanceof RFExplorer && scanDevice.constructor.MODEL === 'BASIC' ) {
         showPopup (
             'warning',
             'POPUP_CAT_SETTINGS',
@@ -1422,17 +1423,27 @@ ipcRenderer.on ( 'DEVICE_SETTINGS', async (event, message) => {
             "This device does not have configurable settings!",
             ['Ok']
         )
-    } else if ( scanDevice instanceof TinySA ) {
+    } else if (
+        (scanDevice instanceof RFExplorer && scanDevice.constructor.MODEL === 'PLUS') ||
+        scanDevice instanceof TinySA
+    ) {
         Swal.fire({
             title: "Enter number of sweep points",
-            input: "text",
-            width: '200px',
+            html:'<p style="font-family: arial">Please enter a value between ' + scanDevice.getMinSweepPoints() + ' and ' + scanDevice.getMaxSweepPoints() + '</p>' +
+            '<div><h2 class="swal2-title sweetalert2-title" style="display: inline; margin-left: 0;">Sweep points</h2><input id="swal-input" class="swal2-input"></div>',
+            width: '600px',
             showCancelButton: true,
             confirmButtonText: "Ok",
             confirmButtonColor: "#0099ff",
+            stopKeydownPropagation: false,
             customClass: {
                 title: 'sweetalert2-title',
                 validationMessage: 'sweetalert2-validation-message'
+            },
+            preConfirm: function () {
+                return new Promise(function (resolve) {
+                    resolve(document.getElementById('swal-input').value)
+                })
             },
             inputValidator: value => {
                 return new Promise( resolve => {
@@ -1444,13 +1455,34 @@ ipcRenderer.on ( 'DEVICE_SETTINGS', async (event, message) => {
                 });
             }
         }).then ( result => {
+            curKeyInputTarget = '';
+
             if (result.isConfirmed) {
-                global.SWEEP_POINTS = result.value
-                log.info ( "Number of sweep points was set to: " + global.SWEEP_POINTS )
-                configStore.set ( 'sweep_points', global.SWEEP_POINTS )
-                scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS );        
+                if ( scanDevice instanceof RFExplorer && scanDevice.constructor.MODEL === 'PLUS' ) {
+                    global.SWEEP_POINTS = parseInt(result.value)
+                    configStore.set ( 'sweep_points', global.SWEEP_POINTS )
+                    scanDevice.setSweepPoints ( parseInt(global.SWEEP_POINTS) ).then (() => {
+                        // Need to set frequency configuration here again, otherwise frequency range moves for unknown reason
+                        scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS );
+                    });
+                } else if ( scanDevice instanceof TinySA ) {
+                    global.SWEEP_POINTS = result.value
+                    log.info ( "Setting number of sweep points to: " + global.SWEEP_POINTS )
+                    configStore.set ( 'sweep_points', global.SWEEP_POINTS )
+                    scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS );   
+                } else {
+                    log.error ( `Unable to set sweep points! Unknown device: ${scanDevice.constructor.NAME} ${scanDevice.constructor.HW_TYPE} ${scanDevice.constructor.MODEL}` )
+                }
             }
         })
+
+        curKeyInputTarget = keyInputTargets.SWEEP_POINT_SETTINGS;
+        setTimeout(()=>{
+            document.getElementsByClassName('swal2-confirm')[0].disabled = true
+            document.getElementById('swal-input').focus()
+        }, 200);
+    } else {
+        log.error ( `Unknown device type: ${scanDevice.constructor.NAME}, ${scanDevice.constructor.HW_TYPE}, ${scanDevice.constructor.MODEL}`)
     }
 })
 
@@ -1742,6 +1774,7 @@ document.addEventListener ( "keydown", async e => {
         switch ( curKeyInputTarget ) {
             // Manual frequency band settings modal
             case keyInputTargets.MANUAL_BAND_SETTINGS:
+            case keyInputTargets.SWEEP_POINT_SETTINGS:
                 switch ( e.key ) {
                     case 'Enter':
                         if ( formValid ) {
@@ -1920,6 +1953,19 @@ document.addEventListener ( "keyup", async e => {
                 document.getElementsByClassName('swal2-confirm')[0].disabled = false
             } else {
                 document.getElementsByClassName('swal2-confirm')[0].disabled = true
+            }
+        } break;
+
+        case keyInputTargets.SWEEP_POINT_SETTINGS: {
+            formValid = false
+
+            if ( !scanDevice.isValidSweepPointRange(document.getElementById('swal-input').value) ) {
+                document.getElementById('swal-input').style.backgroundColor = "#ffb6b6"
+                document.getElementsByClassName('swal2-confirm')[0].disabled = true
+            } else {
+                formValid = true
+                document.getElementById('swal-input').style.backgroundColor = "unset"
+                document.getElementsByClassName('swal2-confirm')[0].disabled = false
             }
         } break;
 

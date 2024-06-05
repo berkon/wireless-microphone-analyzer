@@ -1,28 +1,31 @@
-// API information taken from : https://github.com/RFExplorer/RFExplorer-for-.NET/wiki/RF-Explorer-UART-API-interface-specification
+// API information taken from : https://tinysa.org/wiki/pmwiki.php?n=Main.USBInterface
 
 const { DelimiterParser } = require ( '@serialport/parser-delimiter');
 const { Subject, firstValueFrom } = require('rxjs');
 
 class TinySA {
-    // Device type which shares the same API with similar devices. This is e.g. needed for sw to know how a
+    static NAME      = 'tinySA'; // Basic device name
+    static MODEL     = '' // This divides devices with the same base NAME and HW_TYPE into specific models
+    // The device type shares the same API with similar devices. This is e.g. needed for sw to know how a
     // device can be contacted via the serial port.
     static HW_TYPE   = 'TINY_SA';
     static HW_VERSION= 'HW Version';
-    // Basic device name
-    static NAME      = 'tinySA';
-    // This devides devices with the same base NAME and HW_TYPE into specific models
-    static MODEL     = ''
+    static BAUD_RATE = 115200; // For TinySA the connection baudrate doesn't seem to matter
 
     static MIN_FREQ_BASIC = 0
     static MAX_FREQ_BASIC = 960000000
     static MIN_SPAN_BASIC = 1 // couldn't find any specification if and what the minimum span is
     static MAX_SPAN_BASIC = 959900000 // couldn't find any specification if and what the maximum span is
+    static MIN_SWEEP_POINTS_BASIC = 51
+    static MAX_SWEEP_POINTS_BASIC = 290
+
     static MIN_FREQ_ULTRA = 0
     static MAX_FREQ_ULTRA = 6000000000
     static MIN_SPAN_ULTRA = 1 // couldn't find any specification if and what the minimum span is
     static MAX_SPAN_ULTRA = 5999900000 // couldn't find any specification if and what the maximum span is
+    static MIN_SWEEP_POINTS_ULTRA = 25
+    static MAX_SWEEP_POINTS_ULTRA = 450
 
-    static BAUD_RATE = 115200; // For TinySA the connection baudrate doesn't seem to matter
     static deviceCommands = {
         GET_VERSION: 'version',
         GET_FREQ_CONFIG: 'sweep', // Get current configuration
@@ -82,6 +85,40 @@ class TinySA {
 
             default:
                 log.error ("getMaxSpan(): Unknown TinySa model!")
+        }
+    }
+
+    getMinSweepPoints () {
+        switch ( TinySA.MODEL ) {
+            case 'BASIC': return TinySA.MIN_SWEEP_POINTS_BASIC;
+            case 'ULTRA': return TinySA.MIN_SWEEP_POINTS_ULTRA;
+        }
+    }
+
+    getMaxSweepPoints () {
+        switch ( TinySA.MODEL ) {
+            case 'BASIC': return TinySA.MAX_SWEEP_POINTS_BASIC;
+            case 'ULTRA': return TinySA.MAX_SWEEP_POINTS_ULTRA;
+        }
+    }
+
+    isValidSweepPointRange ( numOfSweepPoints ) {
+        switch ( TinySA.MODEL ) {
+            case 'BASIC':
+                if ( numOfSweepPoints >= TinySA.MIN_SWEEP_POINTS_BASIC &&
+                     numOfSweepPoints <= TinySA.MAX_SWEEP_POINTS_BASIC ) {
+                    return true
+                } else {
+                    return false
+                }
+
+            case 'ULTRA':
+                if ( numOfSweepPoints >= TinySA.MIN_SWEEP_POINTS_ULTRA &&
+                     numOfSweepPoints <= TinySA.MAX_SWEEP_POINTS_ULTRA ) {
+                    return true
+                } else {
+                    return false
+                }       
         }
     }
 
@@ -327,7 +364,6 @@ class TinySA {
                 log.error (`R: '${respLineArr}'  (unknown response`)
         }
     }    
-
 
     setHandler () {
         log.info ( `Setting handler for ${TinySA.NAME} data receiption ... ` )

@@ -1,5 +1,6 @@
 V2.1.0
 ##New Features
+* Added support for RF Explorer Plus models
 * Added logger. App logs can be downloaded via the "Help" menu.
 * Frequency range can now be entered manually (via "Band" menu or f-hotkey)
 * Added hotkeys 1-9 for switching bands. Use "Band" menu or SHIFT-<hotkey> to save current band
