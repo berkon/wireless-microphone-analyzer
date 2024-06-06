@@ -1,28 +1,30 @@
 V2.1.0
-##New Features
+## New Features
 * Added support for RF Explorer Plus models
 * Added logger. App logs can be downloaded via the "Help" menu.
 * Frequency range can now be entered manually (via "Band" menu or f-hotkey)
 * Added hotkeys 1-9 for switching bands. Use "Band" menu or SHIFT-<hotkey> to save current band
+## Improvements
+* Improved stability when scrolling and zoomin
 
 V2.0.4
-##New Features
+## New Features
 * Added forbidden frequencies for Croatia
 
 V2.0.3
-##New Features
+## New Features
 * Added Audix vendor presets for R41/R42 and R61/R62
 
 V2.0.2
-##FIXES
+## FIXES
 * Fixed issue regarding Shure Wireless Workbench export
 
 V2.0.1
-##FIXES
+## FIXES
 * Fixed issue of not being able to select frequency bands
 
 V2.0.0
-##New Features
+## New Features
 * Added Support for TinySA and TinySA Ultra hardware
 * Configurable number of sweep points for TinySA hardware
 * Automatic port detection
@@ -31,7 +33,7 @@ V2.0.0
 * Added dark mode
 * Vendor presets can now also be toggled by <CTRL> + mouse wheel tilt
 * Added donate button :-)
-##FIXES
+## FIXES
 * Now only showing countries which have frequency data available
 * Improved device detection
 * Improved information in notification popups
