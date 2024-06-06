@@ -243,19 +243,20 @@ class RFExplorer {
                             const fwVersion = deviceDataArr[2];
 
                             switch (mainModelCode) {
-                                case 0:  mainModelString = '433M'       ; break;
-                                case 1:  mainModelString = '868M'       ; break;
-                                case 2:  mainModelString = '915M'       ; break;
-                                case 3:  mainModelString = 'WSUB1G'     ; break;
-                                case 4:  mainModelString = '2.4G'       ; break;
-                                case 5:  mainModelString = 'WSUB3G'     ; break;
-                                case 6:  mainModelString = '6G'         ; break;
-                                case 10: mainModelString = 'WSUB1G_PLUS';
-                                    RFExplorer.MODEL = 'PLUS'
+                                case 0:  mainModelString = '433M';
+                                case 1:  mainModelString = '868M';
+                                case 2:  mainModelString = '915M';
+                                case 3:  mainModelString = 'WSUB1G';
+                                case 4:  mainModelString = '2.4G';
+                                case 5:  mainModelString = 'WSUB3G';
+                                case 6:  mainModelString = '6G';
+                                case 60: mainModelString = 'RFEGEN';
+                                    RFExplorer.MODEL = 'BASIC';
                                     break;
-                                case 60: mainModelString = 'RFEGEN'     ; break;
+                                case 10: mainModelString = 'WSUB1G_PLUS';
+                                    RFExplorer.MODEL = 'PLUS';
+                                    break;
                                 default:
-                                    RFExplorer.MODEL = 'BASIC'
                                     log.error( `Unknown 'RF Explorer' model code: ${mainModelCode}` )
                             }
 
