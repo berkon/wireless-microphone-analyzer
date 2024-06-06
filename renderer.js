@@ -729,6 +729,7 @@ const portOpenCb = () => {
                                     popupCategory = ''
                                     Swal.close()
                                 }
+                                ipcRenderer.send('SET_MAIN_WINDOW_TITLE', RFExplorer.NAME)
                                 return
                             }
                             break
@@ -827,7 +828,8 @@ const portOpenCb = () => {
                 responseCheckTimer = setTimeout ( () => {
                     log.info ( `Response check timer ${responseCheckTimer} expired!`)
                     responseCheckTimer = null
-                    log.error ( `No or invalid response from ${RFExplorer.NAME}!`)
+                    log.error ( `No or invalid response from '${RFExplorer.NAME}' on '${globalPorts[portDetectionIndex].path}'!`)
+                    log.error ( `Make sure that no other serial USB device is connected to '${globalPorts[portDetectionIndex].path}!'`)
 
                     // If serial port was connected successfully but to a different device type
                     disconnectPort().then ( async err => {
@@ -895,6 +897,7 @@ const portOpenCb = () => {
                                     popupCategory = ''
                                     Swal.close()
                                 }
+                                ipcRenderer.send('SET_MAIN_WINDOW_TITLE', `${TinySA.NAME} on ${globalPorts[portDetectionIndex].path}`)
                                 return
                             }
                             break
@@ -1003,7 +1006,8 @@ const portOpenCb = () => {
                 responseCheckTimer = setTimeout ( () => {
                     log.info ( `Response check timer ${responseCheckTimer} expired!`)
                     responseCheckTimer = null
-                    log.error ( `No or invalid response from ${TinySA.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}!`)
+                    log.error ( `No or invalid response from '${TinySA.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}' on '${globalPorts[portDetectionIndex].path}'!`)
+                    log.error ( `Make sure that no other serial USB device is connected to '${globalPorts[portDetectionIndex].path}'!`)
                     data$.next([{
                         type: 'ERROR_NO_RESPONSE',
                         status: 'ERROR'
