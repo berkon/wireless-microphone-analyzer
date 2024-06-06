@@ -855,7 +855,7 @@ const portOpenCb = () => {
                                     `<b>${RFExplorer.NAME}</b> could not be found or identified properly on any of the available ports!` +
                                         `<br><br>Please choose the correct device type from the menu or connect the chosen device. If the correct` +
                                         ` device is already connected, please restart it and then click 'Reconnect'.`,
-                                    ['Reconnect']                                
+                                    ['Reconnect', 'Cancel']                                
                                 ).then ( result => {
                                     if ( result.isConfirmed ) {
                                         popupCategory = ''
@@ -1036,7 +1036,7 @@ const portOpenCb = () => {
                                 `<b>${TinySA.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}</b> could not be found or identified properly on any of the available ports!` +
                                     `<br><br>Please choose the correct device type from the menu or connect the chosen device. If the correct` +
                                     ` device is already connected, please restart it and then click 'Reconnect'.`,
-                                ['Reconnect']
+                                ['Reconnect', 'Cancel']
                             ).then ( result => {
                                 if ( result.isConfirmed ) {
                                     popupCategory = ''
