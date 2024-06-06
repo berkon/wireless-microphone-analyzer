@@ -729,7 +729,7 @@ const portOpenCb = () => {
                                     popupCategory = ''
                                     Swal.close()
                                 }
-                                ipcRenderer.send('SET_MAIN_WINDOW_TITLE', RFExplorer.NAME)
+                                ipcRenderer.send('SET_MAIN_WINDOW_TITLE', `${RFExplorer.NAME} on ${globalPorts[portDetectionIndex].path}`)
                                 return
                             }
                             break
