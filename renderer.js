@@ -12,6 +12,7 @@ const fs              = require ('fs');
 var { Subject, firstValueFrom } = require('rxjs');
 const configStore     = new ConfigStore ( Pkg.name )
 require ( './logger.js' );
+const moment = require('moment-timezone');
 
 const RFExplorer = require('./scan_devices/rf_explorer.js');
 const TinySA = require('./scan_devices/tiny_sa.js');
@@ -1319,11 +1320,39 @@ ipcRenderer.on ( 'SET_PORT', async (event, message) => {
 ipcRenderer.on ( 'EXPORT_WW6_IAS_CSV', (event, message) => {
     let i = 0;
 
+    // Make sure file is re-created. Otherwise appendFileSync appends to the old file!
+    fs.writeFileSync  ( message.filename, '', 'utf-8');
+
     for ( var freq = global.START_FREQ; freq <= global.STOP_FREQ ; freq += FREQ_STEP ) {
         const freqStr = Math.round(freq/1000).toString()
         const mHz = freqStr.slice(0, -3)
         const kHz = freqStr.substr(-3, 3).padEnd(3, '0')
         fs.appendFileSync ( message.filename, mHz + '.' + kHz + ", " + myChart.data.datasets[LINE_LIVE].data[i] + "\n", 'utf-8');
+        i++;
+    }
+});
+
+ipcRenderer.on ( 'EXPORT_WSM_CSV', (event, message) => {
+    let i = 0;
+    let utcOffset = moment().utcOffset()
+    let ts = moment().valueOf()
+    let dateTime = moment(ts).utcOffset(utcOffset).format('DD-MM-YYYY hh-mm-ss')
+    let startFreqKhz = Math.floor(global.START_FREQ / 1000)
+    let stopFreqKhz  = Math.floor(global.STOP_FREQ / 1000)
+    let spanMhz = Math.ceil((stopFreqKhz - startFreqKhz) / 1000);
+
+    // Make sure file is re-created. Otherwise appendFileSync appends to the old file!
+    fs.writeFileSync  ( message.filename, `Receiver;${scanDevice.constructor.NAME} (${scanDevice.constructor.MODEL})\n`, 'utf-8');
+    fs.appendFileSync ( message.filename, `Date/Time;${dateTime}\n`, 'utf-8');
+    fs.appendFileSync ( message.filename, `RFUnit;dBm\n`, 'utf-8');
+    fs.appendFileSync ( message.filename, `Frequency Range [kHz];${startFreqKhz};${stopFreqKhz};${spanMhz}\n`, 'utf-8');
+    fs.appendFileSync ( message.filename, `Frequency;RF level (%);RF level\n`, 'utf-8');
+
+    for ( var freq = global.START_FREQ; freq <= global.STOP_FREQ ; freq += FREQ_STEP ) {
+        const freqStr = Math.round(freq/1000).toString()
+        const mHz = freqStr.slice(0, -3)
+        const kHz = freqStr.substr(-3, 3).padEnd(3, '0')
+        fs.appendFileSync ( message.filename, mHz + kHz + ";;" + myChart.data.datasets[LINE_LIVE].data[i] + "\n", 'utf-8');
         i++;
     }
 });

@@ -271,13 +271,24 @@ function createWindow () {
     // Add tools menu
     var toolsMenuJSON = { label: 'Tools', submenu: [
         { label: 'Export', submenu: [
-            { label: "Shure WW6 and IAS (CSV Format)", click () {
-                dialog.showSaveDialog ({
-                    title: "Export for Shure WW6 and IAS (CSV Format)",
-                    filters: [ {name: "CSV", extensions: ["csv"]} ]
-                }).then ( (res) => {
-                    wc.send ( 'EXPORT_WW6_IAS_CSV', { filename : res.filePath })
-                })  }
+            {
+                label: "Shure WW6 and IAS (CSV Format)", click () {
+                    dialog.showSaveDialog ({
+                        title: "Export for Shure WW6 and IAS (CSV Format)",
+                        filters: [ {name: "CSV", extensions: ["csv"]} ]
+                    }).then ( (res) => {
+                        wc.send ( 'EXPORT_WW6_IAS_CSV', { filename : res.filePath })
+                    })
+                }
+            }, {
+                label: "Sennheiser Wireless System Manager (CSV Format)", click () {
+                    dialog.showSaveDialog ({
+                        title: "Export for Sennheiser Wireless System Manager (CSV Format)",
+                        filters: [ {name: "CSV", extensions: ["csv"]} ]
+                    }).then ( (res) => {
+                        wc.send ( 'EXPORT_WSM_CSV', { filename : res.filePath })
+                    })
+                }
             }
         ]},
         { label : 'MX Linux Workaround',
