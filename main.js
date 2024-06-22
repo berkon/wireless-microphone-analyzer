@@ -426,7 +426,7 @@ function createWindow () {
     })
 
     ipcMain.on ( "SET_MAIN_WINDOW_TITLE", (event, data) => {
-        mainWindow.setTitle ( mainWindow.getTitle() + "   ( " + data + " )")
+        mainWindow.setTitle ( productName + " V" + version + "   ( " + data + " )")
     })
 
     /************/
