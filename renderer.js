@@ -700,7 +700,19 @@ let tryPort = (index) => {
                     return Promise.resolve();
                 });
             } else {
-                log.error ( `Tried to write the following data to port '${port.settings.path}', but the stream was already closed: '${data}'`)
+                log.error ( `Tried to write the following data to port '${port.settings.path}', but the port is closed: '${data}'`)
+                showPopup(
+                    'error',
+                    'POPUP_CAT_CONNECTION_ISSUE',
+                    `Port '${port.settings.path}' is closed!`,
+                    `Tried to write data to port '${port.settings.path}', but the port is closed! Please reset the scan device first and then restart th application.`,
+                    ['Restart']
+                ).then ( result => {
+                    popupCategory = ''
+                    if ( result.isConfirmed ) {
+                        restartApp()
+                    }
+                })
             }
         }
     })
