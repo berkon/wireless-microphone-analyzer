@@ -2052,3 +2052,9 @@ function restartApp () {
     app.relaunch ()
     app.exit (0)
 }
+
+module.exports = {
+    getFreqFromPercent,
+    normalizeFreqString,
+    getBaudrate
+}
