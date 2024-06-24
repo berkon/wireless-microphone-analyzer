@@ -2055,6 +2055,8 @@ function restartApp () {
 
 module.exports = {
     getFreqFromPercent,
+    zoom,
+    move,
     normalizeFreqString,
     getBaudrate
 }
