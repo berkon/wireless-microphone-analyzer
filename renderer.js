@@ -1717,25 +1717,35 @@ function move (deltaPercent) {
     log.info ( `    Current frequency range: ${global.START_FREQ} - ${global.STOP_FREQ} Hz` )
     const deltaFreq = getFreqFromPercent(Math.abs(deltaPercent))
 
+    // Move left
     if ( deltaPercent < 0 ) {
-        if ( global.START_FREQ - deltaFreq < global.MIN_FREQ ) {
-            log.info ( `New start frequency ${global.START_FREQ - deltaFreq} would exceed minimum value of ${global.MIN_FREQ}. Moving to ${global.MIN_FREQ} instead!`)
-            global.STOP_FREQ  = global.STOP_FREQ - (global.START_FREQ - global.MIN_FREQ)
+        global.START_FREQ -= deltaFreq
+        global.STOP_FREQ  -= deltaFreq
+
+        if ( global.START_FREQ < global.MIN_FREQ ) {
+            log.info ( `New start frequency ${global.START_FREQ} would exceed minimum value of ${global.MIN_FREQ}. Moving to ${global.MIN_FREQ} instead!`)
+            global.STOP_FREQ  = global.STOP_FREQ + (global.MIN_FREQ - global.START_FREQ)
             global.START_FREQ = global.MIN_FREQ
-        } else {
-            global.START_FREQ -= deltaFreq
-            global.STOP_FREQ  -= deltaFreq
         }
-    } else {
-        if ( global.STOP_FREQ + deltaFreq > global.MAX_FREQ ) {
-            log.info ( `New stop frequency ${global.STOP_FREQ + deltaFreq} would exceed maximum value of ${global.MAX_FREQ}. Moving to ${global.MAX_FREQ} instead!`)
-            global.START_FREQ = global.START_FREQ + (global.MAX_FREQ - global.STOP_FREQ)
+    } else { // Move right
+        global.START_FREQ += deltaFreq
+        global.STOP_FREQ  += deltaFreq
+
+        if ( global.STOP_FREQ > global.MAX_FREQ ) {
+            log.info ( `New stop frequency ${global.STOP_FREQ} would exceed maximum value of ${global.MAX_FREQ}. Moving to ${global.MAX_FREQ} instead!`)
+            global.START_FREQ = global.START_FREQ - (global.STOP_FREQ - global.MAX_FREQ)
             global.STOP_FREQ  = global.MAX_FREQ
-        } else {
-            global.START_FREQ += deltaFreq
-            global.STOP_FREQ  += deltaFreq
         }
     }
+
+    // Make sure to stay in range after all calculations
+    if ( global.START_FREQ < global.MIN_FREQ ) {
+        global.START_FREQ = global.MIN_FREQ
+    }
+    if ( global.STOP_FREQ > global.MAX_FREQ ) {
+        global.STOP_FREQ = global.MAX_FREQ
+    }
+
     log.info ( `    New frequency range:     ${global.START_FREQ} - ${global.STOP_FREQ} Hz` )
 }
 
