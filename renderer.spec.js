@@ -99,3 +99,45 @@ describe ('zoom() in', () => {
         expect(global.STOP_FREQ ).toEqual(166)
     })
 })
+
+describe ('move()', () => {
+    beforeEach( () => {
+        global.MIN_FREQ     = 50 // 50 Hz
+        global.MAX_FREQ     = 900 // 900 Hz
+        global.MIN_SPAN     = 20  // 20 Hz
+        global.MAX_SPAN     = 100 // 100 Hz
+        global.SWEEP_POINTS = 112
+    })
+
+    it('left 10% within valid frequency range', () => {
+        global.START_FREQ   = 100 // 100 Hz
+        global.STOP_FREQ    = 120 // 120 Hz
+        renderer.move(-10)  // Move left by 10%
+        expect(global.START_FREQ).toEqual(98)
+        expect(global.STOP_FREQ ).toEqual(118)
+    })
+
+    it('left 50% and exceed MIN_FREQ', () => {
+        global.START_FREQ   = 60 // 100 Hz
+        global.STOP_FREQ    = 120 // 120 Hz
+        renderer.move(-50)  // Move left by 50%
+        expect(global.START_FREQ).toEqual(50)
+        expect(global.STOP_FREQ ).toEqual(110)
+    })
+
+    it('right 10% within valid frequency range', () => {
+        global.START_FREQ   = 100 // 100 Hz
+        global.STOP_FREQ    = 120 // 120 Hz
+        renderer.move(10)  // Move right by 10%
+        expect(global.START_FREQ).toEqual(102)
+        expect(global.STOP_FREQ ).toEqual(122)
+    })
+
+    it('right 50% and exceed MAX_FREQ', () => {
+        global.START_FREQ   = 770 // 770 Hz
+        global.STOP_FREQ    = 870 // 870 Hz
+        renderer.move(50)  // Move right by 50%
+        expect(global.START_FREQ).toEqual(800)
+        expect(global.STOP_FREQ ).toEqual(900)
+    })
+})
