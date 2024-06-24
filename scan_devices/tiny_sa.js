@@ -75,6 +75,19 @@ class TinySA {
         }
     }
 
+    static getMinSpan() {
+        switch ( TinySA.MODEL ) {
+            case 'BASIC':
+                return TinySA.MIN_SPAN_BASIC
+
+            case 'ULTRA':
+                return TinySA.MIN_SPAN_ULTRA
+
+            default:
+                log.error ("getMinSpan(): Unknown TinySa model!")
+        }
+    }
+
     static getMaxSpan() {
         switch ( TinySA.MODEL ) {
             case 'BASIC':
@@ -307,6 +320,7 @@ class TinySA {
                     resultData.values.FREQ_STEP    = parseInt ( (stopFreq - startFreq) / global.SWEEP_POINTS ) // Frequency step returned in Hz
                     resultData.values.MIN_FREQ     = TinySA.getMinFreq()
                     resultData.values.MAX_FREQ     = TinySA.getMaxFreq()
+                    resultData.values.MIN_SPAN     = TinySA.getMinSpan()
                     resultData.values.MAX_SPAN     = TinySA.getMaxSpan()
                 }
                 

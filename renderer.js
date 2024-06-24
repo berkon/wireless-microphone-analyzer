@@ -1,26 +1,25 @@
 'use strict'
 
-const { ipcRenderer } = require ('electron');
-const { app, BrowserWindow } = require ( '@electron/remote' )
-const ConfigStore     = require ( 'configstore' );
-const { SerialPort }  = require ( 'serialport'  );
-const Chart           = require ( 'chart.js'    );
-const Swal            = require ( 'sweetalert2' );
-const FREQ_VENDOR_PRESETS = require ( 'require-all' )(__dirname +'/frequency_data/presets' );
-const Pkg             = require ('./package.json');
-const fs              = require ('fs');
+const { ipcRenderer }           = require ('electron');
+const { app, BrowserWindow }    = require ( '@electron/remote' )
+const ConfigStore               = require ( 'configstore' );
+const { SerialPort }            = require ( 'serialport'  );
+const Chart                     = require ( 'chart.js'    );
+const Swal                      = require ( 'sweetalert2' );
+const FREQ_VENDOR_PRESETS       = require ( 'require-all' )(__dirname +'/frequency_data/presets' );
+const Pkg                       = require ('./package.json');
+const fs                        = require ('fs');
 var { Subject, firstValueFrom } = require('rxjs');
-const configStore     = new ConfigStore ( Pkg.name )
+const configStore               = new ConfigStore ( Pkg.name )
 require ( './logger.js' );
-const moment = require('moment-timezone');
+const moment                    = require('moment-timezone');
 
-const RFExplorer = require('./scan_devices/rf_explorer.js');
-const TinySA = require('./scan_devices/tiny_sa.js');
+// Supported devices
+const RFExplorer                = require('./scan_devices/rf_explorer.js');
+const TinySA                    = require('./scan_devices/tiny_sa.js');
 
 const SAVED_DATA_VERSION = 1
 
-global.MAX_DBM = -20
-global.MIN_DBM = -110
 const CONGESTION_LEVEL_DBM = -85
 const SERIAL_RESPONSE_TIMEOUT = 1500
 
@@ -32,10 +31,12 @@ const LINE_CONGEST_TRESH = 4
 const LINE_GRIDS         = 5
 const LINE_FORBIDDEN_MARKERS = 6
 
-var MIN_FREQ     = undefined
-var MAX_FREQ     = undefined
-var MIN_SPAN     = undefined
-var MAX_SPAN     = undefined
+global.MAX_DBM      = -20
+global.MIN_DBM      = -110
+global.MIN_FREQ     = undefined
+global.MAX_FREQ     = undefined
+global.MIN_SPAN     = undefined
+global.MAX_SPAN     = undefined
 global.SWEEP_POINTS = 100 // default value
 var COM_PORT = undefined
 var VENDOR_ID    = 'NON'
@@ -54,27 +55,12 @@ let dataSubscription = null
 let popupCategory = ''
 let responseCheckTimer  = null
 let formValid = false
+let ctx = null;
 
 let curKeyInputTarget = '';
 let keyInputTargets = {
     MANUAL_BAND_SETTINGS: 'MANUAL_BAND_SETTINGS',
     SWEEP_POINT_SETTINGS: 'SWEEP_POINT_SETTINGS'
-}
-
-document.getElementById('donate-button').addEventListener ('click', () => openDonateWindow() )
-
-function openDonateWindow () {
-    let win = new BrowserWindow ({
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false
-        },
-        width: 650,
-        height: 650
-    })
-    win.setMenuBarVisibility ( false )
-    win.loadURL("file://" + __dirname + "/donate.html")
-//win.webContents.openDevTools()
 }
 
 // Saved data version handling
@@ -110,7 +96,7 @@ var VIS_FORBIDDEN   = configStore.get('graphVisibility.forbidden'  );
 var VIS_CONGEST     = configStore.get('graphVisibility.congested'  );
 var VIS_TV_CHAN     = configStore.get('graphVisibility.grids'      );
 global.MX_LINUX_WORKAROUND = configStore.get('mx_linux_workaround_enabled' );
-var SCAN_DEVICE     = configStore.get('scan_device' );
+global.SCAN_DEVICE     = configStore.get('scan_device' );
 var COM_PORT        = configStore.get('com_port');
 var SWEEP_POINTS    = configStore.get('sweep_points');
 let DARK_MODE       = configStore.get('dark_mode');
@@ -121,10 +107,6 @@ const chartColors = {
     GREEN  : 'rgb(75 , 222, 192)',
     PURPLE : 'rgb(153, 102, 255)',
     GREY   : 'rgb(201, 203, 207)'
-}
-
-if (DARK_MODE) {
-    document.getElementsByTagName('body')[0].setAttribute('class', 'dark-mode')
 }
 
 const RECOMMENDED_CHANNELS_COLOR = chartColors.GREEN
@@ -151,15 +133,104 @@ if ( !DARK_MODE) {
 log.info ( "Dark mode is " + (DARK_MODE ? "enabled" : "disabled"))
 ipcRenderer.send ('DARK_MODE', { checked : DARK_MODE });
 
-var ctx = document.getElementById("graph2d").getContext('2d');
-var myChart = null
-
 if ( VIS_MANUF_CHAN === undefined ) VIS_MANUF_CHAN = true;
 if ( VIS_FORBIDDEN  === undefined ) VIS_FORBIDDEN  = true;
 if ( VIS_CONGEST    === undefined ) VIS_CONGEST    = true;
 if ( VIS_TV_CHAN    === undefined ) VIS_TV_CHAN    = true;
 
-let showPopup = async ( type, category, title, html, buttonsArr = [] ) => {
+if ( !COUNTRY_CODE || !fs.existsSync ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + COUNTRY_CODE + '.json' ) ) {
+    COUNTRY_CODE = 'DE';
+    log.info ( "No country set or file with forbidden ranges for that country does not exist! Falling back to 'DE'");
+}
+
+if ( !COM_PORT ) {
+    COM_PORT = 'AUTO'
+    configStore.set ( 'com_port', COM_PORT )
+} else {
+    ipcRenderer.send ('SET_PORT', { portPath : COM_PORT });
+}
+
+if ( !SWEEP_POINTS ) {
+    configStore.set ( 'sweep_points', global.SWEEP_POINTS )
+} else {
+    global.SWEEP_POINTS = SWEEP_POINTS
+}
+
+var FREQ_FORBIDDEN = require ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + COUNTRY_CODE + '.json');
+
+if ( fs.existsSync ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json' ) )
+    var FREQ_GRIDS = require ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json');
+else
+    var FREQ_GRIDS = null;
+
+var chDispValShadowArr = [];
+
+var myChart = null
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('donate-button').addEventListener ('click', () => openDonateWindow() )
+
+    if (DARK_MODE) {
+        document.getElementsByTagName('body')[0].setAttribute('class', 'dark-mode')
+    }
+
+    ctx = document.getElementById("graph2d").getContext('2d');
+
+    if ( global.SCAN_DEVICE ) {
+        ipcRenderer.send ('SET_SCAN_DEVICE', { scanDevice : global.SCAN_DEVICE });
+        log.info ( `Scan device is '${global.SCAN_DEVICE}'`)
+        initChart()
+        connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
+    } else {
+        log.info ( `No scan device selected. Waiting for user to select via popup ...`)
+
+        Swal.fire({
+            title: "Device selection",
+            html: `Please choose your scan device. You can change it later via the 'Device' menu.`,
+            input: 'select',
+            inputOptions: {
+                'RF_EXPLORER': RFExplorer.NAME,
+                'TINY_SA': TinySA.NAME
+            },
+            inputPlaceholder: 'Choose a scan device',
+            icon: "question",
+            showCancelButton: false,
+            confirmButtonColor: "#0099ff",
+            customClass: {
+                title: 'sweetalert2-title',
+                container: 'sweetalert2-container'
+            },
+            willOpen: function () {
+                Swal.getConfirmButton().setAttribute('disabled', 'true');
+            },
+            didOpen: () => {
+                document.getElementById('swal2-select').addEventListener("change", () => {
+                    Swal.getConfirmButton().removeAttribute('disabled');                
+                })
+            }
+        }).then ( result => {
+            initChart()
+
+            switch (result.value) {
+                case RFExplorer.HW_TYPE:
+                    ipcRenderer.send ('SET_SCAN_DEVICE', { scanDevice : RFExplorer.HW_TYPE });
+                    configStore.set ('scan_device', 'RF_EXPLORER')
+                    global.SCAN_DEVICE = RFExplorer.HW_TYPE;
+                    connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
+                    break
+
+                case TinySA.HW_TYPE:
+                    ipcRenderer.send ('SET_SCAN_DEVICE', { scanDevice : TinySA.HW_TYPE });
+                    configStore.set ('scan_device', 'TINY_SA')
+                    global.SCAN_DEVICE = TinySA.HW_TYPE;
+                    connectDevice(COM_PORT?COM_PORT:'AUTO', true )
+                    break
+            }
+        })
+    }
+})
+
+async function showPopup ( type, category, title, html, buttonsArr = [] ) {
     popupCategory = category
     let swalConfig = {
         title,
@@ -184,7 +255,7 @@ let showPopup = async ( type, category, title, html, buttonsArr = [] ) => {
     return Swal.fire ( swalConfig )
 }
 
-let initChart = () => {
+async function initChart () {
     myChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -338,32 +409,19 @@ let initChart = () => {
     });
 }
 
-if ( !COUNTRY_CODE || !fs.existsSync ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + COUNTRY_CODE + '.json' ) ) {
-    COUNTRY_CODE = 'DE';
-    log.info ( "No country set or file with forbidden ranges for that country does not exist! Falling back to 'DE'");
+function openDonateWindow () {
+    let win = new BrowserWindow ({
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        },
+        width: 650,
+        height: 650
+    })
+    win.setMenuBarVisibility ( false )
+    win.loadURL("file://" + __dirname + "/donate.html")
+//win.webContents.openDevTools()
 }
-
-if ( !COM_PORT ) {
-    COM_PORT = 'AUTO'
-    configStore.set ( 'com_port', COM_PORT )
-} else {
-    ipcRenderer.send ('SET_PORT', { portPath : COM_PORT });
-}
-
-if ( !SWEEP_POINTS ) {
-    configStore.set ( 'sweep_points', global.SWEEP_POINTS )
-} else {
-    global.SWEEP_POINTS = SWEEP_POINTS
-}
-
-var FREQ_FORBIDDEN = require ( __dirname + '/frequency_data/forbidden/FORBIDDEN_' + COUNTRY_CODE + '.json');
-
-if ( fs.existsSync ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json' ) )
-    var FREQ_GRIDS = require ( __dirname + '/frequency_data/grids/GRIDS_' + COUNTRY_CODE + '.json');
-else
-    var FREQ_GRIDS = null;
-
-var chDispValShadowArr = [];
 
 function connectDevice (portIdentifier, shouldScan ) {
     if ( shouldScan ) {
@@ -378,59 +436,6 @@ function connectDevice (portIdentifier, shouldScan ) {
         connectPort(portIdentifier)
             .then ( () => scanDevice.getConfiguration() )
     }
-}
-
-if ( SCAN_DEVICE ) {
-    ipcRenderer.send ('SET_SCAN_DEVICE', { scanDevice : SCAN_DEVICE });
-    log.info ( `Scan device is '${SCAN_DEVICE}'`)
-    initChart()
-    connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
-} else {
-    log.info ( `No scan device selected. Waiting for user to select via popup ...`)
-
-    Swal.fire({
-        title: "Device selection",
-        html: `Please choose your scan device. You can change it later via the 'Device' menu.`,
-        input: 'select',
-        inputOptions: {
-            'RF_EXPLORER': RFExplorer.NAME,
-            'TINY_SA': TinySA.NAME
-        },
-        inputPlaceholder: 'Choose a scan device',
-        icon: "question",
-        showCancelButton: false,
-        confirmButtonColor: "#0099ff",
-        customClass: {
-            title: 'sweetalert2-title',
-            container: 'sweetalert2-container'
-        },
-        willOpen: function () {
-            Swal.getConfirmButton().setAttribute('disabled', 'true');
-        },
-        didOpen: () => {
-            document.getElementById('swal2-select').addEventListener("change", () => {
-                Swal.getConfirmButton().removeAttribute('disabled');                
-            })
-        }
-    }).then ( result => {
-        initChart()
-
-        switch (result.value) {
-            case RFExplorer.HW_TYPE:
-                ipcRenderer.send ('SET_SCAN_DEVICE', { scanDevice : RFExplorer.HW_TYPE });
-                configStore.set ('scan_device', 'RF_EXPLORER')
-                SCAN_DEVICE = RFExplorer.HW_TYPE;
-                connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
-                break
-
-            case TinySA.HW_TYPE:
-                ipcRenderer.send ('SET_SCAN_DEVICE', { scanDevice : TinySA.HW_TYPE });
-                configStore.set ('scan_device', 'TINY_SA')
-                SCAN_DEVICE = TinySA.HW_TYPE;
-                connectDevice(COM_PORT?COM_PORT:'AUTO', true )
-                break
-        }
-    })
 }
 
 function legendClick ( e, legendItem ) {
@@ -719,7 +724,7 @@ let tryPort = (index) => {
 }
 
 const portOpenCb = () => {
-    switch ( SCAN_DEVICE ) {
+    switch ( global.SCAN_DEVICE ) {
         case 'RF_EXPLORER':
             scanDevice = new RFExplorer(port);
 
@@ -752,10 +757,10 @@ const portOpenCb = () => {
                             global.STOP_FREQ = data[0].values.STOP_FREQ
                             FREQ_STEP = data[0].values.FREQ_STEP
                             global.SWEEP_POINTS = data[0].values.SWEEP_POINTS
-                            MIN_FREQ = data[0].values.MIN_FREQ
-                            MAX_FREQ = data[0].values.MAX_FREQ
-                            MIN_SPAN = RFExplorer.MIN_SPAN
-                            MAX_SPAN = data[0].values.MAX_SPAN
+                            global.MIN_FREQ = data[0].values.MIN_FREQ
+                            global.MAX_FREQ = data[0].values.MAX_FREQ
+                            global.MIN_SPAN = data[0].values.MIN_SPAN
+                            global.MAX_SPAN = data[0].values.MAX_SPAN
 
                             configStore.set ( 'start_freq', global.START_FREQ )
                             configStore.set ( 'stop_freq' , global.STOP_FREQ  )
@@ -769,7 +774,7 @@ const portOpenCb = () => {
                                     'POPUP_CAT_INVALID_FREQUENCY',
                                     "Invalid frequency range!",
                                     `The currently selected frequency range is not valid for device <b>${RFExplorer.NAME}</b>!` +
-                                    `<br><br>Allowed range is: ${MIN_FREQ} - ${MAX_FREQ} Hz` +
+                                    `<br><br>Allowed range is: ${global.MIN_FREQ} - ${global.MAX_FREQ} Hz` +
                                     `<br><br>Current range is: ${data[0].values.START_FREQ} - ${data[0].values.STOP_FREQ} Hz`,
                                     ['Ok']
                                 )
@@ -919,10 +924,10 @@ const portOpenCb = () => {
                             global.START_FREQ = data[0].values.START_FREQ
                             global.STOP_FREQ = data[0].values.STOP_FREQ
                             FREQ_STEP = data[0].values.FREQ_STEP
-                            MIN_FREQ = data[0].values.MIN_FREQ
-                            MAX_FREQ = data[0].values.MAX_FREQ
-                            MIN_SPAN = TinySA.MIN_SPAN
-                            MAX_SPAN = data[0].values.MAX_SPAN
+                            global.MIN_FREQ = data[0].values.MIN_FREQ
+                            global.MAX_FREQ = data[0].values.MAX_FREQ
+                            global.MIN_SPAN = data[0].values.MIN_SPAN
+                            global.MAX_SPAN = data[0].values.MAX_SPAN
 
                             configStore.set ( 'start_freq', global.START_FREQ )
                             configStore.set ( 'stop_freq' , global.STOP_FREQ  )
@@ -936,7 +941,7 @@ const portOpenCb = () => {
                                     'POPUP_CAT_INVALID_FREQUENCY',
                                     "Invalid frequency range!",
                                     `The currently selected frequency range is not valid for device <b>${TinySA.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}</b>!` +
-                                    `<br><br>Allowed range is: ${MIN_FREQ} - ${MAX_FREQ} Hz` +
+                                    `<br><br>Allowed range is: ${global.MIN_FREQ} - ${global.MAX_FREQ} Hz` +
                                     `<br><br>Current range is: ${data[0].values.START_FREQ} - ${data[0].values.STOP_FREQ} Hz`,
                                     ['Ok']
                                 )
@@ -1072,7 +1077,7 @@ const portOpenCb = () => {
             break;
 
         default:
-            log.error ( `Unknown scan device ${SCAN_DEVICE}` )
+            log.error ( `Unknown scan device ${global.SCAN_DEVICE}` )
             scanDevice = null
     }
 }
@@ -1127,7 +1132,7 @@ function connectPort ( portIdentifier ) {
         baudRate = getBaudrate()
 
         if ( baudRate === null ) {
-            log.error ( `Unable to get default baudrate for device ${SCAN_DEVICE}!` )
+            log.error ( `Unable to get default baudrate for device ${global.SCAN_DEVICE}!` )
             return reject('ERR_PORT_NO_BAUDRATE')
         }
 
@@ -1445,13 +1450,13 @@ ipcRenderer.on ( 'SET_SCAN_DEVICE', async (event, message) => {
     switch ( message.scanDevice ) {
         case 'RF_EXPLORER':
             configStore.set ('scan_device', 'RF_EXPLORER')
-            SCAN_DEVICE = message.scanDevice;
+            global.SCAN_DEVICE = message.scanDevice;
             connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
             break;
 
         case 'TINY_SA':
             configStore.set ('scan_device', 'TINY_SA')
-            SCAN_DEVICE = message.scanDevice;
+            global.SCAN_DEVICE = message.scanDevice;
             connectDevice ( COM_PORT?COM_PORT:'AUTO', true )
             break;
 
@@ -1583,7 +1588,7 @@ function showManualBandSettings () {
                 return
             }
 
-            switch ( SCAN_DEVICE ) {
+            switch ( global.SCAN_DEVICE ) {
                 case 'RF_EXPLORER':
                     isValidFreqConfig = RFExplorer.isValidFreqConfig ( startFreq, stopFreq )
                     break;
@@ -1617,7 +1622,7 @@ function normalizeFreqString (freqStr) {
     freqStr = freqStr.replace(/,/, '.') // parseFloat() does not accept comma, so replace it with dot
 
     if ( isNaN(freqStr) ) {
-        if ((/^\d+\s*'Hz$/i).test(freqStr)) { // Check if is number only. That means Hz
+        if ((/^\d+\s*(?:h|Hz)$/i).test(freqStr)) { // Check if is Hz
             return parseInt(freqStr.match(/\d+/g))
         } else if ((/^\d+[.,]?\d*\s*(?:k|kHz)$/i).test(freqStr)) { // Check if is kHz
             freqStr = freqStr.replace(/,/, '.') // parseFloat() does not accept comma, so replace it with dot
@@ -1628,7 +1633,7 @@ function normalizeFreqString (freqStr) {
         } else if ((/^\d+[.,]?\d*\s*(?:G|GHz)$/i).test(freqStr)) { // Check if is GHz
             freqStr = freqStr.replace(/,/, '.') // parseFloat() does not accept comma, so replace it with dot
             return parseFloat(freqStr.match(/\d+[.]?\d*/g)) * 1000000000
-        } else { // Not a number and has no valid units attached
+        } else { // Invalid string
             return false
         }
     } else {
@@ -1637,74 +1642,73 @@ function normalizeFreqString (freqStr) {
 }
 
 function getFreqFromPercent (percent) {
-    return Math.round ( ((global.STOP_FREQ - global.START_FREQ) / 100) * percent );
+    return Math.round ( ((global.STOP_FREQ - global.START_FREQ) / 100) * Math.abs(percent) );
 }
 
 function zoom ( deltaPercent ) { // delta deltaPercent
-    const deltaFreq = getFreqFromPercent ( Math.abs(deltaPercent) )
+    const deltaFreqHalf = Math.round( getFreqFromPercent ( deltaPercent ) / 2 )
 
     if ( deltaPercent < 0 ) { // zoom out
-        let isMinimum = false
-        let isMaximum = false
-
-        log.info ( `Zooming OUT to ${Math.abs(deltaPercent) * 2 + 100}% of current view ...` )
+        log.info ( `Zooming OUT to ${Math.abs(deltaPercent) + 100}% of current view ...` )
         log.info ( `    Current frequency range: ${global.START_FREQ} - ${global.STOP_FREQ} Hz` )
 
-        if ( global.START_FREQ - deltaFreq < MIN_FREQ ) {
-            log.info ( `New start frequency exceeds minimum of ${MIN_FREQ}. Thus setting it to ${MIN_FREQ}!` )
-            global.START_FREQ = MIN_FREQ
-            isMinimum = true
-        } else {
-            global.START_FREQ = global.START_FREQ - deltaFreq
+        global.START_FREQ = global.START_FREQ - deltaFreqHalf
+        global.STOP_FREQ  = global.STOP_FREQ  + deltaFreqHalf
+        let tmpSpan       = global.STOP_FREQ  - global.START_FREQ
+
+        // If new span is greater than maximum frequency span of the scan device
+        if ( tmpSpan > global.MAX_SPAN ) {
+            log.info ( `New span of ${tmpSpan} would exceed maximum span of ${global.MAX_SPAN}! Aligning zoom to max span value ${global.MAX_SPAN}.` )
+            let fill = Math.round ( (tmpSpan - global.MAX_SPAN) / 2 )
+            global.START_FREQ += fill
+            global.STOP_FREQ  = global.START_FREQ + global.MAX_SPAN
         }
 
-        if ( global.STOP_FREQ + deltaFreq > MAX_FREQ ) {
-            log.info ( `New stop frequency exceeds maximum of ${MAX_FREQ}. Thus setting it to ${MAX_FREQ}!` )
-            global.STOP_FREQ = MAX_FREQ
-            isMaximum = true
-        } else {
-            global.STOP_FREQ = global.STOP_FREQ + deltaFreq
+        // If new start frequency is smaller than the minimum frequency supported by the scan device
+        if ( global.START_FREQ < global.MIN_FREQ ) {
+            log.info ( `New start frequency exceeds minimum of ${global.MIN_FREQ}. Thus setting it to ${global.MIN_FREQ}!` )
+            global.STOP_FREQ  = global.STOP_FREQ + (global.MIN_FREQ - global.START_FREQ)
+            global.START_FREQ = global.MIN_FREQ
         }
 
-        let tmpSpan = global.STOP_FREQ - global.START_FREQ
-
-        if ( tmpSpan > MAX_SPAN ) {
-            log.info ( `Selected span of ${tmpSpan} would exceed maximum span of ${MAX_SPAN}! Aligning zoom to max span value ${MAX_SPAN}.` )
-            let fill = Math.round ( ((global.STOP_FREQ - global.START_FREQ) - MAX_SPAN) / 2 )
-
-            if ( isMinimum ) {
-                global.STOP_FREQ = global.START_FREQ + MAX_SPAN
-            } else if ( isMaximum ) {
-                global.START_FREQ = global.STOP_FREQ - MAX_SPAN
-            } else {
-                global.START_FREQ -= fill
-                global.STOP_FREQ  += fill    
-            }
+        // If new stop frequency is greater than the maximum frequency supported by the scan device
+        if ( global.STOP_FREQ > global.MAX_FREQ ) {
+            log.info ( `New stop frequency exceeds maximum of ${global.MAX_FREQ}. Thus setting it to ${global.MAX_FREQ}!` )
+            global.START_FREQ = global.START_FREQ - (global.STOP_FREQ - global.MAX_FREQ)
+            global.STOP_FREQ = global.MAX_FREQ
         }
     } else { // zoom in
-        log.info ( `Zooming IN to ${100 - Math.abs(deltaPercent) * 2}% of current view ...` )
+        log.info ( `Zooming IN to ${100 - Math.abs(deltaPercent)}% of current view ...` )
         log.info ( `    Current frequency range: ${global.START_FREQ} - ${global.STOP_FREQ} Hz` )
 
-        // If smaller than minimal frequency span
-        if ( (global.STOP_FREQ - deltaFreq) - (global.START_FREQ + deltaFreq) < MIN_SPAN ) {
-            log.info ( `Selected span of ${global.STOP_FREQ - global.START_FREQ} is smaller than ${MIN_SPAN}! Aligning zoom to min span value ${MIN_SPAN}.` )
-            let fill = Math.floor ( ((global.STOP_FREQ - global.START_FREQ) - MIN_SPAN) / 2 )
-            global.STOP_FREQ -= fill
-            global.START_FREQ += fill
+        global.START_FREQ += deltaFreqHalf;
+        global.STOP_FREQ  -= deltaFreqHalf;
+
+        // If new frequency range is smaller than minimum frequency span supported by the scanning device
+        if ( global.STOP_FREQ - global.START_FREQ < global.MIN_SPAN ) {
+            log.info ( `New span of ${global.STOP_FREQ - global.START_FREQ} is smaller than ${global.MIN_SPAN}! Aligning zoom to min span value ${global.MIN_SPAN}.` )
+            let fill = Math.floor ( (global.MIN_SPAN - (global.STOP_FREQ - global.START_FREQ)) / 2 )
+            global.START_FREQ -= fill
+            global.STOP_FREQ = global.START_FREQ + global.MIN_SPAN
         }
 
-        // If smaller than minimum number of sweep points
+        // If new frequency range is smaller than minimum number of sweep points supported by the scanning device
         if ( global.STOP_FREQ - global.START_FREQ < global.SWEEP_POINTS ) {
             log.info ( `Selected span of ${global.STOP_FREQ - global.START_FREQ} is smaller than number of sweep points ${global.SWEEP_POINTS}! Aligning zoom to number of sweep points ${global.SWEEP_POINTS}.` )
-            let fill = Math.floor ( ((global.STOP_FREQ - global.START_FREQ) - MIN_SPAN) / 2 )
-            global.START_FREQ += fill;
-            global.STOP_FREQ  -= fill;
-        } else {
-            global.START_FREQ += deltaFreq;
-            global.STOP_FREQ  -= deltaFreq;
+            let fill = Math.floor ( (global.SWEEP_POINTS - (global.STOP_FREQ - global.START_FREQ)) / 2 )
+            global.START_FREQ -= fill;
+            global.STOP_FREQ  = global.START_FREQ + global.SWEEP_POINTS;
         }
     }
 
+    // Make sure to stay in range after all calculations
+    if ( global.START_FREQ < global.MIN_FREQ ) {
+        global.START_FREQ = global.MIN_FREQ
+    }
+    if ( global.STOP_FREQ > global.MAX_FREQ ) {
+        global.STOP_FREQ = global.MAX_FREQ
+    }
+    
     log.info ( `    New frequency range:     ${global.START_FREQ} - ${global.STOP_FREQ} Hz` )
 }
 
@@ -1714,19 +1718,19 @@ function move (deltaPercent) {
     const deltaFreq = getFreqFromPercent(Math.abs(deltaPercent))
 
     if ( deltaPercent < 0 ) {
-        if ( global.START_FREQ - deltaFreq < MIN_FREQ ) {
-            log.info ( `New start frequency ${global.START_FREQ - deltaFreq} would exceed minimum value of ${MIN_FREQ}. Moving to ${MIN_FREQ} instead!`)
-            global.STOP_FREQ  = global.STOP_FREQ - (global.START_FREQ - MIN_FREQ)
-            global.START_FREQ = MIN_FREQ
+        if ( global.START_FREQ - deltaFreq < global.MIN_FREQ ) {
+            log.info ( `New start frequency ${global.START_FREQ - deltaFreq} would exceed minimum value of ${global.MIN_FREQ}. Moving to ${global.MIN_FREQ} instead!`)
+            global.STOP_FREQ  = global.STOP_FREQ - (global.START_FREQ - global.MIN_FREQ)
+            global.START_FREQ = global.MIN_FREQ
         } else {
             global.START_FREQ -= deltaFreq
             global.STOP_FREQ  -= deltaFreq
         }
     } else {
-        if ( global.STOP_FREQ + deltaFreq > MAX_FREQ ) {
-            log.info ( `New stop frequency ${global.STOP_FREQ + deltaFreq} would exceed maximum value of ${MAX_FREQ}. Moving to ${MAX_FREQ} instead!`)
-            global.START_FREQ = global.START_FREQ + (MAX_FREQ - global.STOP_FREQ)
-            global.STOP_FREQ  = MAX_FREQ
+        if ( global.STOP_FREQ + deltaFreq > global.MAX_FREQ ) {
+            log.info ( `New stop frequency ${global.STOP_FREQ + deltaFreq} would exceed maximum value of ${global.MAX_FREQ}. Moving to ${global.MAX_FREQ} instead!`)
+            global.START_FREQ = global.START_FREQ + (global.MAX_FREQ - global.STOP_FREQ)
+            global.STOP_FREQ  = global.MAX_FREQ
         } else {
             global.START_FREQ += deltaFreq
             global.STOP_FREQ  += deltaFreq
@@ -2025,11 +2029,11 @@ document.addEventListener ( "keyup", async e => {
 })
 
 function getBaudrate () {
-    switch ( SCAN_DEVICE ) {
+    switch ( global.SCAN_DEVICE ) {
         case 'RF_EXPLORER': return RFExplorer.BAUD_RATE;
         case 'TINY_SA'    : return TinySA.BAUD_RATE;
         default:
-            log.error (`Cannot get baudrate for unknown device: ${SCAN_DEVICE}`);
+            log.error (`Cannot get baudrate for unknown device: ${global.SCAN_DEVICE}`);
             return null;
     }
 }

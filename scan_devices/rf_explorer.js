@@ -11,12 +11,10 @@ class RFExplorer {
     static BAUD_RATE  = 500000;
 
     static MIN_SPAN_BASIC = 112000; // 112 kHz
-    static MAX_SPAN_BASIC = 600000000; // 600 MHz
     static MIN_SWEEP_POINTS_BASIC = 112
     static MAX_SWEEP_POINTS_BASIC = 112
     
     static MIN_SPAN_PLUS  = 112000; // 112 kHz
-    static MAX_SPAN_PLUS  = 192500000; // 192.5 MHz
     static MIN_SWEEP_POINTS_PLUS = 112
     static MAX_SWEEP_POINTS_PLUS = 65535
 
@@ -57,6 +55,13 @@ class RFExplorer {
         switch ( RFExplorer.MODEL ) {
             case 'BASIC': return RFExplorer.MAX_SWEEP_POINTS_BASIC;
             case 'PLUS' : return RFExplorer.MAX_SWEEP_POINTS_PLUS;
+        }
+    }
+
+    getMinSpan() {
+        switch ( RFExplorer.MODEL ) {
+            case 'BASIC': return RFExplorer.MIN_SPAN_BASIC;
+            case 'PLUS' : return RFExplorer.MIN_SPAN_PLUS;
         }
     }
 
@@ -214,7 +219,8 @@ class RFExplorer {
                                     STOP_FREQ:  ( freqStep * (sweepPoints-1) ) + starFreq,
                                     MIN_FREQ: parseInt ( res_arr[7] ) * 1000, // Minimum frequency returned in kHz thus multiply by 1000
                                     MAX_FREQ: parseInt ( res_arr[8] ) * 1000, // Maximum frequency returned in kHz thus multiply by 1000
-                                    MAX_SPAN: parseInt ( res_arr[9] ) * 1000 // Maximum span returned in kHz thus multiply by 1000
+                                    MAX_SPAN: parseInt ( res_arr[9] ) * 1000, // Maximum span returned in kHz thus multiply by 1000
+                                    MIN_SPAN: this.getMinSpan()
                                 }
                             }])
                             RFExplorer.MIN_FREQ = parseInt ( res_arr[7] ) * 1000
