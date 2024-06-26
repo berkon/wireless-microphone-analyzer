@@ -44,6 +44,7 @@ class TinySA {
     data$                = new Subject();
     goodScanCounter      = 0;
     scanningActive       = false;
+    isRepeatedScanrawCommand = false;
 
     constructor (port, data$) {
         this.port = port
@@ -157,6 +158,12 @@ class TinySA {
     }
 
     async sendPromise ( logMsg, cmd, params ) {
+        if ( cmd === this.lastCmdSent && cmd === 'scanraw') {
+            this.isRepeatedScanrawCommand = true
+        } else {
+            this.isRepeatedScanrawCommand = false
+        }
+
         this.lastCmdSent = cmd
         this.lastCmdLineSent = cmd
 
@@ -166,13 +173,16 @@ class TinySA {
             }
         }
 
-        log.info ( "----------------- New Command -----------------" )
+        if ( !this.isRepeatedScanrawCommand ) {
+            log.info ( "----------------- New Command -----------------" )
 
-        if ( logMsg ) {   
-            log.info ( logMsg )
+            if ( logMsg ) {   
+                log.info ( logMsg )
+            }
+
+            log.info ( `T: '${this.lastCmdLineSent}'`)
         }
 
-        log.info ( `T: '${this.lastCmdLineSent}'`)
         this.port.writePromise ( Buffer.from ( this.lastCmdLineSent + '\r' ), 'ascii' );
         return await firstValueFrom(this.data$)
     }
@@ -221,9 +231,9 @@ class TinySA {
         tmp_buf = tmp_buf.replaceAll(String.fromCharCode(0x09),'⇥')
         tmp_buf = tmp_buf.replace(/{.*}/, `{${tmp_buf.lastIndexOf('}') - tmp_buf.indexOf('{') -1 } bytes scan data}`)
 
-//        if ( this.lastCmdSent !== 'scanraw') {
+        if ( !this.isRepeatedScanrawCommand ) {
             log.info(`R: '${tmp_buf}'`)
-//        }
+        }
 
         // If the returned data is a scan result do a special handling here to avoid
         // an accidental splitting at scan values which by coincidence represent '/r/n'
