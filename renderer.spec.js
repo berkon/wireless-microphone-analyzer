@@ -32,7 +32,7 @@ describe('General', () => {
 
     it('getBaudrate()', () => {
         //jest.spyOn(app, 'getBaudrate');
-        renderer.SCAN_DEVICE = RFExplorer.HW_TYPE
+        global.SCAN_DEVICE = RFExplorer.HW_TYPE
         expect(renderer.getBaudrate()).toEqual(RFExplorer.BAUD_RATE)
         global.SCAN_DEVICE = TinySA.HW_TYPE
         expect(renderer.getBaudrate()).toEqual(TinySA.BAUD_RATE)
