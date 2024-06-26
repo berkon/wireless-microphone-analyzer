@@ -740,7 +740,7 @@ const portOpenCb = () => {
                     switch ( data[0].type ) {
                         case 'NAME':
                             if ( data[0].values.NAME === RFExplorer.NAME ) {
-                                log.info ( `Stoping response check timer ${responseCheckTimer} ...` )
+                                log.info ( `Stoping response check timer #${responseCheckTimer} ...` )
                                 clearTimeout ( responseCheckTimer )
                                 responseCheckTimer = null
                                 log.info ( `Successfully detected '${data[0].values.NAME}' hardware!` )
@@ -839,7 +839,7 @@ const portOpenCb = () => {
 
                 // In case another timer is running stop it!
                 if ( responseCheckTimer ) {
-                    log.info ( `Stoping response check timer ${responseCheckTimer} ...` )
+                    log.info ( `Stoping response check timer #${responseCheckTimer} ...` )
                     clearTimeout ( responseCheckTimer )
                     responseCheckTimer = null
                 }
@@ -908,7 +908,7 @@ const portOpenCb = () => {
                     switch ( data[0].type ) {
                         case 'NAME':
                             if ( data[0].values.NAME === TinySA.NAME ) {
-                                log.info ( `Stoping response check timer ${responseCheckTimer} ...` )
+                                log.info ( `Stoping response check timer #${responseCheckTimer} ...` )
                                 clearTimeout ( responseCheckTimer )
                                 responseCheckTimer = null
                                 log.info ( `Successfully detected '${data[0].values.NAME}${TinySA.MODEL==="ULTRA"?" Ultra":""}' hardware!` )
@@ -1007,7 +1007,7 @@ const portOpenCb = () => {
                         } break
 
                         case 'ERROR_RECEIVED_TRASH':
-                            log.info ( `Stoping response check timer ${responseCheckTimer} ...` )
+                            log.info ( `Stoping response check timer #${responseCheckTimer} ...` )
                             clearTimeout ( responseCheckTimer )
                             responseCheckTimer = null
                             disconnectPort().then ( () => connectDevice(COM_PORT?COM_PORT:'AUTO', true) )

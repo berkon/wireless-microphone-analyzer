@@ -13,19 +13,19 @@ class TinySA {
     static HW_VERSION= 'HW Version';
     static BAUD_RATE = 115200; // For TinySA the connection baudrate doesn't seem to matter
 
-    static MIN_FREQ_BASIC = 0
+    static MIN_FREQ_BASIC = 100000
     static MAX_FREQ_BASIC = 960000000
     static MIN_SPAN_BASIC = 1 // couldn't find any specification if and what the minimum span is
     static MAX_SPAN_BASIC = 959900000 // couldn't find any specification if and what the maximum span is
     static MIN_SWEEP_POINTS_BASIC = 51
-    static MAX_SWEEP_POINTS_BASIC = 290
+    static MAX_SWEEP_POINTS_BASIC = 65535
 
-    static MIN_FREQ_ULTRA = 0
+    static MIN_FREQ_ULTRA = 100000
     static MAX_FREQ_ULTRA = 6000000000
     static MIN_SPAN_ULTRA = 1 // couldn't find any specification if and what the minimum span is
     static MAX_SPAN_ULTRA = 5999900000 // couldn't find any specification if and what the maximum span is
     static MIN_SWEEP_POINTS_ULTRA = 25
-    static MAX_SWEEP_POINTS_ULTRA = 450
+    static MAX_SWEEP_POINTS_ULTRA = 65535
 
     static deviceCommands = {
         GET_VERSION: 'version',
