@@ -2,6 +2,7 @@
 
 const { DelimiterParser } = require ( '@serialport/parser-delimiter');
 const { Subject, firstValueFrom } = require('rxjs');
+const { timeout } = require ('rxjs/operators');
 
 class TinySA {
     static NAME      = 'tinySA'; // Basic device name
@@ -197,7 +198,11 @@ class TinySA {
         this.scanningActive = false;
         log.info ( "Disabling periodic scan ..." )
         log.info ( "Wait for lastly requested scan data to be received before continuing ...")
-        await firstValueFrom(this.data$) // Wait for last scan data to arrive
+        try {
+            await firstValueFrom(this.data$.pipe(timeout(1000))) // Wait for last scan data to arrive
+        } catch (error) {
+            log.info ( "Timeout!")
+        }
         log.info ( "Periodic scan was active and is now disabled")
         await this.sendPromise ( `Setting start frequency to: ${startFreq} ...`, TinySA.deviceCommands.SET_FREQ_CONFIG_START, [startFreq] )
         await this.sendPromise ( `Setting stop frequency to: ${stopFreq} ...`, TinySA.deviceCommands.SET_FREQ_CONFIG_STOP, [stopFreq] )

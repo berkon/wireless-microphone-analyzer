@@ -10,6 +10,7 @@ const FREQ_VENDOR_PRESETS       = require ( 'require-all' )(__dirname +'/frequen
 const Pkg                       = require ('./package.json');
 const fs                        = require ('fs');
 var { Subject, firstValueFrom } = require('rxjs');
+const { timeout }               = require ('rxjs/operators');
 const configStore               = new ConfigStore ( Pkg.name )
 require ( './logger.js' );
 const moment                    = require('moment-timezone');
@@ -1329,7 +1330,11 @@ ipcRenderer.on ( 'SET_PORT', async (event, message) => {
     scanDevice.scanningActive = false
     log.info ( "Periodic scan is now disabled" )
     log.info ( "Wait for lastly requested scan data to be received before continuing ..." )
-    await firstValueFrom(data$) // Wait for last scan data to arrive
+    try {
+        await firstValueFrom(data$.pipe(timeout(1000))) // Wait for last scan data to arrive
+    } catch (error) {
+        log.info ( "Timeout!")
+    }
     log.info ( "Reconnecting port ..." )
     disconnectPort().then ( () => connectDevice ( COM_PORT, false ) )
 })
@@ -1975,7 +1980,7 @@ document.addEventListener ( "keydown", async e => {
 
                         case 'f': // Set manual frequency range (band)
                             showManualBandSettings()
-                            break;
+                            return;
 
                         default:
                             return
