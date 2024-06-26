@@ -1485,6 +1485,8 @@ ipcRenderer.on ( 'DEVICE_SETTINGS', async (event, message) => {
         Swal.fire({
             title: "Enter number of sweep points",
             html:'<p style="font-family: arial">Please enter a value between ' + scanDevice.getMinSweepPoints() + ' and ' + scanDevice.getMaxSweepPoints() + '</p>' +
+            '<p style="font-family: arial">IMPORTANT!</p>' +
+            '<p style="font-family: arial">When entering values greater than 1000 most devices will respond extremely slow and it might look like the tool has crashed! Also when scanning with such slow response times, there is always the risk to not catch a spike which might occour only for one or even less than a second!' + '</p>' +
             '<div><h2 class="swal2-title sweetalert2-title" style="display: inline; margin-left: 0;">Sweep points</h2><input id="swal-input" class="swal2-input"></div>',
             width: '600px',
             showCancelButton: true,
