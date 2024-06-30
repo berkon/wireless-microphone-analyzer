@@ -3,6 +3,7 @@
 const { DelimiterParser } = require ( '@serialport/parser-delimiter');
 const { Subject, firstValueFrom } = require('rxjs');
 const { timeout } = require ('rxjs/operators');
+const Utils = require ('../utils.js');
 
 class TinySA {
     static NAME      = 'tinySA'; // Basic device name
@@ -227,27 +228,34 @@ class TinySA {
         log.info ( "Periodic scan was active and is now disabled")
         // If using Basic TinySA model, switch frequency mode according to the requested frequency range
         if ( TinySA.MODEL === 'BASIC' ) {
+            // New frequency range to be set is in LOW range
             if ( TinySA.isValidFreqConfig(startFreq, stopFreq) === 'LOW' ) {
-                TinySA.FREQ_BAND_MODE = 'LOW'
-                if ( stopFreq === TinySA.MAX_FREQ_BASIC_LOW ) {
-                    document.getElementById('warning-message').innerHTML = `WARNING! You've reached the maximum frequency of TinySA's LOW mode of ${TinySA.MAX_FREQ_BASIC_LOW/1000000} MHz!<br>If you want to switch to HIGH mode, enter (or select) a frequency range within ${TinySA.MIN_FREQ_BASIC_HIGH/1000000} MHz and ${TinySA.MAX_FREQ_BASIC_HIGH/1000000} MHz!`
-                    document.getElementById('warning-message').style.display = 'unset'
+                if ( TinySA.FREQ_BAND_MODE === 'HIGH' ) {
+                    Utils.showMiniWarning('Switching to LOW mode', 2000);
                 } else {
-                    document.getElementById('warning-message').innerHTML = ''
-                    document.getElementById('warning-message').style.display = 'none'
+                    if ( stopFreq === TinySA.MAX_FREQ_BASIC_LOW ) {
+                        Utils.showMiniWarning(`WARNING! You've reached the maximum frequency of TinySA's LOW mode of ${TinySA.MAX_FREQ_BASIC_LOW/1000000} MHz!<br>If you want to switch to HIGH mode, enter (or select) a frequency range within ${TinySA.MIN_FREQ_BASIC_HIGH/1000000} MHz and ${TinySA.MAX_FREQ_BASIC_HIGH/1000000} MHz!`);
+                    } else {
+                        Utils.hideMiniWarning()
+                    }
                 }
+
+                TinySA.FREQ_BAND_MODE = 'LOW'
                 await this.sendPromise ( `Setting frequency mode to LOW ...`, TinySA.deviceCommands.MODE, ['low', 'input'] )
                 global.MIN_FREQ = TinySA.MIN_FREQ_BASIC_LOW
                 global.MAX_FREQ = TinySA.MAX_FREQ_BASIC_LOW
-            } else if ( TinySA.isValidFreqConfig(startFreq, stopFreq) === 'HIGH' ) {
-                TinySA.FREQ_BAND_MODE = 'HIGH'
-                if ( startFreq === TinySA.MIN_FREQ_BASIC_HIGH ) {
-                    document.getElementById('warning-message').innerHTML = `WARNING! You've reached the minimum frequency of TinySA's HIGH mode of ${TinySA.MIN_FREQ_BASIC_HIGH/1000000} MHz!<br>If you want to switch to LOW mode, enter (or select) a frequency range within ${TinySA.MIN_FREQ_BASIC_LOW/1000} kHz and ${TinySA.MAX_FREQ_BASIC_LOW/1000000} MHz!`
-                    document.getElementById('warning-message').style.display = 'unset'
+            } else if ( TinySA.isValidFreqConfig(startFreq, stopFreq) === 'HIGH' ) { // New frequency range to be set is in HIGH range
+                if ( TinySA.FREQ_BAND_MODE === 'LOW' ) {
+                    Utils.showMiniWarning('Switching to HIGH mode', 2000);
                 } else {
-                    document.getElementById('warning-message').innerHTML = ''
-                    document.getElementById('warning-message').style.display = 'none'
+                    if ( startFreq === TinySA.MIN_FREQ_BASIC_HIGH ) {
+                        Utils.showMiniWarning(`WARNING! You've reached the minimum frequency of TinySA's HIGH mode of ${TinySA.MIN_FREQ_BASIC_HIGH/1000000} MHz!<br>If you want to switch to LOW mode, enter (or select) a frequency range within ${TinySA.MIN_FREQ_BASIC_LOW/1000} kHz and ${TinySA.MAX_FREQ_BASIC_LOW/1000000} MHz!`);
+                    } else {
+                        Utils.hideMiniWarning()
+                    }
                 }
+
+                TinySA.FREQ_BAND_MODE = 'HIGH'
                 await this.sendPromise ( `Setting frequency mode to HIGH ...`, TinySA.deviceCommands.MODE, ['high', 'input'] )
                 global.MIN_FREQ = TinySA.MIN_FREQ_BASIC_HIGH
                 global.MAX_FREQ = TinySA.MAX_FREQ_BASIC_HIGH
