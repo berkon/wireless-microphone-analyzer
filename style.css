@@ -42,3 +42,20 @@
 .dark-mode {
     background-color: black;
 }
+
+#warning-message {
+    display: none;
+    position: absolute;
+    top: 86%;
+    left: 50%;
+    font-size: 12px;
+    color: white;
+    background: rgb(255 26 26);
+    border-radius: 3px;
+    padding: 3px 5px;
+    font-family: Arial;
+    line-height: 18px;
+    margin: auto;
+    transform: translate(-50%, -50%);
+    opacity: 0.7;
+ }

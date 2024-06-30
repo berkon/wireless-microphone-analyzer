@@ -3,7 +3,7 @@
   "productName": "Wireless Microphone Analyzer",
   "version": "2.2.0",
   "license": "CC0-1.0",
-  "description": "Uses the RF-Explorer (a spectrum analyzer hardware) to check for free/congested wireless microphone frequencies",
+  "description": "Uses RF-Explorer or TinySA spectrum analyzer hardware to check for free/congested wireless microphone frequencies",
   "author": "Bernd Konnerth <bernd@konnerth.de>",
   "main": "main.js",
   "repository": "https://github.com/berkon/wireless-microphone-analyzer",
@@ -38,12 +38,13 @@
   "jest": {
     "projects": [
       {
-          "testRegex": "((\\.|/)(main.spec))\\.(js|ts|tsx)?$",
+          "testMatch": ["<rootDir>/main.spec.js"],
           "runner": "@kayahr/jest-electron-runner/main",
           "testEnvironment": "node"
       },
       {
-          "testRegex": "((\\.|/)(renderer.spec))\\.(js|ts|tsx)?$",
+          "testMatch": ["<rootDir>/**/*.spec.js"],
+          "testPathIgnorePatterns": ["<rootDir>/main.spec.js"],
           "runner": "@kayahr/jest-electron-runner",
           "testEnvironment": "@kayahr/jest-electron-runner/environment"
       }

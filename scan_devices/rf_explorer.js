@@ -4,7 +4,7 @@ const { DelimiterParser } = require ( '@serialport/parser-delimiter');
 
 class RFExplorer {
     static NAME       = 'RF Explorer'; // Basic device name
-    static MODEL     = '' // This divides devices with the same base NAME and HW_TYPE into specific models
+    static MODEL      = '' // This divides devices with the same base NAME and HW_TYPE into specific models
     // The device type shares the same API with similar devices. This is e.g. needed for sw to know how a
     // device can be contacted via the serial port.
     static HW_TYPE    = 'RF_EXPLORER';
@@ -223,8 +223,8 @@ class RFExplorer {
                                     MIN_SPAN: this.getMinSpan()
                                 }
                             }])
-                            RFExplorer.MIN_FREQ = parseInt ( res_arr[7] ) * 1000
-                            RFExplorer.MAX_FREQ = parseInt ( res_arr[8] ) * 1000
+                            global.MIN_FREQ = parseInt ( res_arr[7] ) * 1000
+                            global.MAX_FREQ = parseInt ( res_arr[8] ) * 1000
                             break
 
                         case this.constructor.deviceEvents.CALIBRATION_DATA:
@@ -304,7 +304,7 @@ class RFExplorer {
     }
 
     static isValidFreqConfig ( startFreq, stopFreq ) {
-        if ( startFreq < RFExplorer.MIN_FREQ || stopFreq > RFExplorer.MAX_FREQ || startFreq >= stopFreq) {
+        if ( startFreq < global.MIN_FREQ || stopFreq > global.MAX_FREQ || startFreq >= stopFreq) {
             log.error ( "Invalid frequency configuration: " + startFreq + " / " + stopFreq )
             return false
         } else {

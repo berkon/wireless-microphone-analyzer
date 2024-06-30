@@ -12,15 +12,23 @@ class TinySA {
     static HW_TYPE   = 'TINY_SA';
     static HW_VERSION= 'HW Version';
     static BAUD_RATE = 115200; // For TinySA the connection baudrate doesn't seem to matter
+    static FREQ_BAND_MODE = 'HIGH';
 
-    static MIN_FREQ_BASIC = 100000
-    static MAX_FREQ_BASIC = 960000000
+    // TinySA Basic (small unit) has two frequency ranges in which it can operate.
+    // Low  100 kHz - 350 MHz
+    // High 240 MHz - 960 MHz
+    // These ranges overlap by 110 MHz and must be switched with the 'mode' to accomodate the desired range
+    static MIN_FREQ_BASIC_LOW  =    100000
+    static MAX_FREQ_BASIC_LOW  = 350000000
+    static MIN_FREQ_BASIC_HIGH = 240000000
+    static MAX_FREQ_BASIC_HIGH = 960000000
+
     static MIN_SPAN_BASIC = 1 // couldn't find any specification if and what the minimum span is
     static MAX_SPAN_BASIC = 959900000 // couldn't find any specification if and what the maximum span is
     static MIN_SWEEP_POINTS_BASIC = 51
     static MAX_SWEEP_POINTS_BASIC = 65535
 
-    static MIN_FREQ_ULTRA = 100000
+    static MIN_FREQ_ULTRA =     100000
     static MAX_FREQ_ULTRA = 6000000000
     static MIN_SPAN_ULTRA = 1 // couldn't find any specification if and what the minimum span is
     static MAX_SPAN_ULTRA = 5999900000 // couldn't find any specification if and what the maximum span is
@@ -32,7 +40,8 @@ class TinySA {
         GET_FREQ_CONFIG: 'sweep', // Get current configuration
         SET_FREQ_CONFIG_START: 'sweep start',
         SET_FREQ_CONFIG_STOP: 'sweep stop',
-        SCAN: 'scanraw'
+        SCAN: 'scanraw',
+        MODE: 'mode'
     };
 
     SERIAL_RESPONSE_TIMEOUT = 1500
@@ -54,7 +63,7 @@ class TinySA {
     static getMinFreq() {
         switch ( TinySA.MODEL ) {
             case 'BASIC':
-                return TinySA.MIN_FREQ_BASIC
+                return TinySA.FREQ_BAND_MODE === 'LOW' ? TinySA.MIN_FREQ_BASIC_LOW : TinySA.MIN_FREQ_BASIC_HIGH;
 
             case 'ULTRA':
                 return TinySA.MIN_FREQ_ULTRA
@@ -67,7 +76,7 @@ class TinySA {
     static getMaxFreq() {
         switch ( TinySA.MODEL ) {
             case 'BASIC':
-                return TinySA.MAX_FREQ_BASIC
+                return TinySA.FREQ_BAND_MODE === 'LOW' ? TinySA.MAX_FREQ_BASIC_LOW : TinySA.MAX_FREQ_BASIC_HIGH
 
             case 'ULTRA':
                 return TinySA.MAX_FREQ_ULTRA
@@ -140,13 +149,15 @@ class TinySA {
     static isValidFreqConfig ( startFreq, stopFreq ) {
         switch (TinySA.MODEL) {
             case 'BASIC':
-                if ( startFreq < TinySA.MIN_FREQ_BASIC || stopFreq > TinySA.MAX_FREQ_BASIC || startFreq >= stopFreq ) {
-                    log.error ( "Invalid frequency configuration: " + startFreq + " / " + stopFreq )
-                    return false
+                if ( startFreq >= TinySA.MIN_FREQ_BASIC_LOW && stopFreq <= TinySA.MAX_FREQ_BASIC_LOW && startFreq <= stopFreq ) {
+                    return 'LOW'
+                } else if ( startFreq >= TinySA.MIN_FREQ_BASIC_HIGH && stopFreq <= TinySA.MAX_FREQ_BASIC_HIGH && startFreq <= stopFreq ) {
+                    return 'HIGH'
                 } else {
-                    return true
+                    log.error ( "Invalid frequency configuration: " + startFreq + " / " + stopFreq )
+                    log.error ( `Must be within: 100 kHz - 350 MHz (LOW) or 240 MHz - 960 MHz (HIGH)`)
+                    return false
                 }
-
             case 'ULTRA':
                 if ( startFreq < TinySA.MIN_FREQ_ULTRA || stopFreq > TinySA.MAX_FREQ_ULTRA || startFreq >= stopFreq ) {
                     log.error ( "Invalid frequency configuration: " + startFreq + " / " + stopFreq )
@@ -158,7 +169,7 @@ class TinySA {
     }
 
     async sendPromise ( logMsg, cmd, params ) {
-        if ( cmd === this.lastCmdSent && cmd === 'scanraw') {
+        if ( cmd === this.lastCmdSent && cmd === TinySA.deviceCommands.SCAN) {
             this.isRepeatedScanrawCommand = true
         } else {
             this.isRepeatedScanrawCommand = false
@@ -214,6 +225,40 @@ class TinySA {
             log.info ( "Timeout!")
         }
         log.info ( "Periodic scan was active and is now disabled")
+        // If using Basic TinySA model, switch frequency mode according to the requested frequency range
+        if ( TinySA.MODEL === 'BASIC' ) {
+            if ( TinySA.isValidFreqConfig(startFreq, stopFreq) === 'LOW' ) {
+                TinySA.FREQ_BAND_MODE = 'LOW'
+                if ( stopFreq === TinySA.MAX_FREQ_BASIC_LOW ) {
+                    document.getElementById('warning-message').innerHTML = `WARNING! You've reached the maximum frequency of TinySA's LOW mode of ${TinySA.MAX_FREQ_BASIC_LOW/1000000} MHz!<br>If you want to switch to HIGH mode, enter (or select) a frequency range within ${TinySA.MIN_FREQ_BASIC_HIGH/1000000} MHz and ${TinySA.MAX_FREQ_BASIC_HIGH/1000000} MHz!`
+                    document.getElementById('warning-message').style.display = 'unset'
+                } else {
+                    document.getElementById('warning-message').innerHTML = ''
+                    document.getElementById('warning-message').style.display = 'none'
+                }
+                await this.sendPromise ( `Setting frequency mode to LOW ...`, TinySA.deviceCommands.MODE, ['low', 'input'] )
+                global.MIN_FREQ = TinySA.MIN_FREQ_BASIC_LOW
+                global.MAX_FREQ = TinySA.MAX_FREQ_BASIC_LOW
+            } else if ( TinySA.isValidFreqConfig(startFreq, stopFreq) === 'HIGH' ) {
+                TinySA.FREQ_BAND_MODE = 'HIGH'
+                if ( startFreq === TinySA.MIN_FREQ_BASIC_HIGH ) {
+                    document.getElementById('warning-message').innerHTML = `WARNING! You've reached the minimum frequency of TinySA's HIGH mode of ${TinySA.MIN_FREQ_BASIC_HIGH/1000000} MHz!<br>If you want to switch to LOW mode, enter (or select) a frequency range within ${TinySA.MIN_FREQ_BASIC_LOW/1000} kHz and ${TinySA.MAX_FREQ_BASIC_LOW/1000000} MHz!`
+                    document.getElementById('warning-message').style.display = 'unset'
+                } else {
+                    document.getElementById('warning-message').innerHTML = ''
+                    document.getElementById('warning-message').style.display = 'none'
+                }
+                await this.sendPromise ( `Setting frequency mode to HIGH ...`, TinySA.deviceCommands.MODE, ['high', 'input'] )
+                global.MIN_FREQ = TinySA.MIN_FREQ_BASIC_HIGH
+                global.MAX_FREQ = TinySA.MAX_FREQ_BASIC_HIGH
+            } else {
+                log.error(`Unable to set frequency mode! Start/stop frequency ${startFreq}/${stopFreq} is not within any of the following frequency ranges:`)
+                log.error(`Low  100 kHz - 350 MHz`)
+                log.error(`High 240 MHz - 960 MHz`)
+                return
+            }
+        }
+
         await this.sendPromise ( `Setting start frequency to: ${startFreq} ...`, TinySA.deviceCommands.SET_FREQ_CONFIG_START, [startFreq] )
         await this.sendPromise ( `Setting stop frequency to: ${stopFreq} ...`, TinySA.deviceCommands.SET_FREQ_CONFIG_STOP, [stopFreq] )
         await this.sendPromise ( `Reading back current frequency settings ...`, TinySA.deviceCommands.GET_FREQ_CONFIG, null )
@@ -250,7 +295,7 @@ class TinySA {
         }
 
         for (let [index, line] of respLineArr.entries()) {
-            if ( this.lastCmdSent !== 'scanraw') {
+            if ( this.lastCmdSent !== TinySA.deviceCommands.SCAN ) {
                 if (respLineArr[0] === this.lastCmdLineSent && index === 0) {
                     log.info ( `[${index}]: ${line}  (cmd echo)` )
                 } else if (line.indexOf('{') === 0 && line.lastIndexOf('}') === line.length -1) {
@@ -327,16 +372,13 @@ class TinySA {
                     status: TinySA.isValidFreqConfig(startFreq, stopFreq) ? 'VALID' : 'INVALID',
                     values: {
                         START_FREQ: startFreq,
-                        STOP_FREQ: stopFreq
+                        STOP_FREQ: stopFreq,
+                        FREQ_STEP: parseInt ( (stopFreq - startFreq) / global.SWEEP_POINTS ), // Frequency step returned in Hz
+                        MIN_FREQ: TinySA.getMinFreq(),
+                        MAX_FREQ: TinySA.getMaxFreq(),
+                        MIN_SPAN: TinySA.getMinSpan(),
+                        MAX_SPAN: TinySA.getMaxSpan()
                     }
-                }
-
-                if ( TinySA.isValidFreqConfig(startFreq, stopFreq) ) {
-                    resultData.values.FREQ_STEP    = parseInt ( (stopFreq - startFreq) / global.SWEEP_POINTS ) // Frequency step returned in Hz
-                    resultData.values.MIN_FREQ     = TinySA.getMinFreq()
-                    resultData.values.MAX_FREQ     = TinySA.getMaxFreq()
-                    resultData.values.MIN_SPAN     = TinySA.getMinSpan()
-                    resultData.values.MAX_SPAN     = TinySA.getMaxSpan()
                 }
                 
                 log.info (`Parsed frequency settings:`)
@@ -387,10 +429,15 @@ class TinySA {
                 // This command does not respond with any data (except the command echo of course)
                 this.data$.next([{type: 'NO_DATA'}])
                 break
-    
+
+            case TinySA.deviceCommands.MODE:
+                // This command does not respond with any data (except the command echo of course)
+                this.data$.next([{type: 'NO_DATA'}])
+                break
+
             default:
                 log.error (`Last command was: '${this.lastCmdSent}'`)
-                log.error (`R: '${respLineArr}'  (unknown response`)
+                log.error (`R: '${respLineArr}'  (unknown response)`)
         }
     }    
 
