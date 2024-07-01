@@ -234,7 +234,7 @@ class TinySA {
                     Utils.showMiniWarning('Switching to LOW mode', 2000);
                 } else {
                     if ( stopFreq === TinySA.MAX_FREQ_BASIC_LOW ) {
-                        Utils.showMiniWarning(`WARNING! You've reached the maximum frequency of TinySA's LOW mode of ${TinySA.MAX_FREQ_BASIC_LOW/1000000} MHz!<br>If you want to switch to HIGH mode, enter (or select) a frequency range within ${TinySA.MIN_FREQ_BASIC_HIGH/1000000} MHz and ${TinySA.MAX_FREQ_BASIC_HIGH/1000000} MHz!`);
+                        Utils.showMiniWarning(`WARNING! You've reached the maximum frequency of TinySA's LOW mode of ${TinySA.MAX_FREQ_BASIC_LOW/1000000} MHz!<br>If you want to switch to HIGH mode, enter (or select) a frequency range within ${TinySA.MIN_FREQ_BASIC_HIGH/1000000} MHz and ${TinySA.MAX_FREQ_BASIC_HIGH/1000000} MHz!`, 15000);
                     } else {
                         Utils.hideMiniWarning()
                     }
@@ -249,7 +249,7 @@ class TinySA {
                     Utils.showMiniWarning('Switching to HIGH mode', 2000);
                 } else {
                     if ( startFreq === TinySA.MIN_FREQ_BASIC_HIGH ) {
-                        Utils.showMiniWarning(`WARNING! You've reached the minimum frequency of TinySA's HIGH mode of ${TinySA.MIN_FREQ_BASIC_HIGH/1000000} MHz!<br>If you want to switch to LOW mode, enter (or select) a frequency range within ${TinySA.MIN_FREQ_BASIC_LOW/1000} kHz and ${TinySA.MAX_FREQ_BASIC_LOW/1000000} MHz!`);
+                        Utils.showMiniWarning(`WARNING! You've reached the minimum frequency of TinySA's HIGH mode of ${TinySA.MIN_FREQ_BASIC_HIGH/1000000} MHz!<br>If you want to switch to LOW mode, enter (or select) a frequency range within ${TinySA.MIN_FREQ_BASIC_LOW/1000} kHz and ${TinySA.MAX_FREQ_BASIC_LOW/1000000} MHz!`, 15000);
                     } else {
                         Utils.hideMiniWarning()
                     }
