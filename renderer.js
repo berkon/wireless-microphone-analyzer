@@ -1146,6 +1146,17 @@ function connectPort ( portIdentifier ) {
                 return reject ( err )
             })
         } else if ( typeof portIdentifier === 'string') {
+            // Check if the port selected in an older session still exists
+            log.info ( `Trying to find dedicated port '${COM_PORT}'`)
+            let foundPortIndex = globalPorts.findIndex( port => port.path === COM_PORT )
+
+            // If not set mode to 'AUTO'
+            if ( foundPortIndex === -1 ) {
+                log.info ( `Dedicated port is not available anymore. Using 'AUTO' mode for detection!`)
+                portIdentifier = 'AUTO'
+                ipcRenderer.send ('SET_PORT', { portPath : 'AUTO' });
+            }
+
             if ( portIdentifier === 'AUTO' ) { // Automatic port selection
                 log.info ( `Auto-detecting port ...`)
 
@@ -1165,17 +1176,12 @@ function connectPort ( portIdentifier ) {
                 })
             } else { // Select port by port name string
                 log.info ( `Connecting to dedicated port '${COM_PORT}'`)
-
-                for ( const [index, port] of globalPorts.entries() ) {
-                    if ( port.path === COM_PORT) {
-                        tryPort(index).then ( () => {
-                            portOpenCb()
-                            return resolve()
-                        }).catch ( err => {
-                            return reject (err)
-                        })
-                    }
-                }    
+                tryPort(foundPortIndex).then ( () => {
+                    portOpenCb()
+                    return resolve()
+                }).catch ( err => {
+                    return reject (err)
+                })
             }
         }
     })
