@@ -1,10 +1,8 @@
 { "label":"AT - Licensed bands", "submenu": [
     { "label": "Licensed Band 1 (174 - 216MHz)"  , "start_freq": 174000 , "stop_freq": 216000 , "details": "Licensed Band 1 (174 - 216MHz)"   },
-    { "label": "Licensed Band 2 (230 - 250MHz)"  , "start_freq": 230000 , "stop_freq": 250000 , "details": "Licensed Band 2 (230 - 250MHz)"   },
     { "label": "Licensed Band 3 (470 - 703MHz)"  , "start_freq": 470000 , "stop_freq": 703000 , "details": "Licensed Band 3 (470 - 703MHz)"   },
     { "label": "Licensed Band 4 (733 - 758MHz)"  , "start_freq": 733000 , "stop_freq": 758000 , "details": "Licensed Band 4 (733 - 758MHz)"   },
     { "label": "Licensed Band 5 (788 - 790MHz)"  , "start_freq": 788000 , "stop_freq": 790000 , "details": "Licensed Band 5 (788 - 790MHz)"   },
-    { "label": "Licensed Band 6 (823 - 832MHz)"  , "start_freq": 823000 , "stop_freq": 832000 , "details": "Licensed Band 6 (823 - 832MHz)"   },
     { "label": "Licensed Band 7 (1350 - 1400MHz)", "start_freq": 1350000, "stop_freq": 1400000, "details": "Licensed Band 7 (1350 - 1400MHz)" },
     { "label": "Licensed Band 8 (1518 - 1525MHz)", "start_freq": 1518000, "stop_freq": 1525000, "details": "Licensed Band 8 (1518 - 1525MHz)" }
 ]}

@@ -1,5 +1,7 @@
 { "label":"AT - Unlicensed bands", "submenu": [
-    { "label": "ISM Band (863 - 865MHz)"     , "start_freq": 863000 , "stop_freq": 865000 , "details": "ISM Band (863 - 865MHz)"},
-    { "label": "DECT        (1880 - 1900MHz)", "start_freq": 1880000, "stop_freq": 1900000, "details": "DECT (1880 - 1900MHz)"  },
-    { "label": "WLAN      (2400 - 2484MHz)"  , "start_freq": 2399500, "stop_freq": 2484500, "details": "WLAN (2400 - 2484MHz)"  }
+    { "label": "LTE 800 Gap     (823 - 832MHz)", "start_freq": 823000 , "stop_freq": 832000 , "details": "LTE 800 Gap (823 - 832MHz)"    },
+    { "label": "ISM Band         (863 - 865MHz)"     , "start_freq": 863000 , "stop_freq": 865000 , "details": "ISM Band (863 - 865MHz)"},
+    { "label": "LTE  1800 Gap  (1785 - 1804,8MHz)", "start_freq": 1785000, "stop_freq": 1804800, "details": "LTE 1800 Gap (1785 - 1804,8MHz)" },
+    { "label": "DECT                (1880 - 1900MHz)", "start_freq": 1880000, "stop_freq": 1900000, "details": "DECT (1880 - 1900MHz)"  },
+    { "label": "WLAN              (2400 - 2484MHz)"  , "start_freq": 2399500, "stop_freq": 2484500, "details": "WLAN (2400 - 2484MHz)"  }
 ]}
