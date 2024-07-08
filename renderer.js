@@ -1232,7 +1232,17 @@ function setBand ( startFreq, stopFreq, details) {
     configStore.set ( 'band_details'   , details );
 
     BAND_DETAILS = details;
-    scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS );
+    scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS ).then ( result => {
+        if ( !result ) {
+            showPopup(
+                'error',
+                'POPUP_CAT_INVALID_FREQUENCY',
+                "Invalid frequency range!",
+                `In the current configuration this devices is not capable of handling the requested frequency range of ${startFreq} Hz - ${stopFreq} Hz! Values must be within ${global.MIN_FREQ} Hz - ${global.MAX_FREQ} Hz!`,
+                ['OK']
+            )
+        }
+    })
 }
 
 ipcRenderer.on ( 'SET_VENDOR_4_ANALYSIS', (event, message) => {

@@ -100,6 +100,10 @@ class RFExplorer {
     }
 
     async setConfiguration ( startFreq, stopFreq, sweepPoints ) {
+        if ( RFExplorer.isValidFreqConfig(startFreq, stopFreq) === false ) {
+            return false
+        }
+
         const startFreqStr = Math.floor(startFreq/1000).toString().padStart(7, '0')
         const stopFreqStr  = Math.floor(stopFreq/1000).toString().padStart(7, '0')
 
@@ -120,9 +124,12 @@ class RFExplorer {
                 await this.port.writePromise ( sendBuf, 'ascii' )
             } catch (err) {
                 log.error ("Unable to write to serial port: " + err)
+                return false
             }
+            return true
         } else {
             await this.port.writePromise ( sendBuf, 'ascii' )
+            return true
         }
     }
 
@@ -206,17 +213,18 @@ class RFExplorer {
 
                             let res_arr = data.split ( "," )
 
-                            const starFreq    = parseInt ( res_arr[0] ) * 1000 // Start frequency returned in kHz thus multiply by 1000
+                            const startFreq   = parseInt ( res_arr[0] ) * 1000 // Start frequency returned in kHz thus multiply by 1000
                             const freqStep    = parseInt ( res_arr[1] )        // Frequency step returned in Hz
                             const sweepPoints = parseInt ( res_arr[4] )        // Number of sweep points
+                            const stopFreq    = ( freqStep * (sweepPoints-1) ) + startFreq
 
                             data$.next([{
                                 type: 'CONFIG_DATA',
                                 values: {
-                                    START_FREQ: starFreq,
+                                    START_FREQ: startFreq,
                                     FREQ_STEP: freqStep,
                                     SWEEP_POINTS: sweepPoints,
-                                    STOP_FREQ:  ( freqStep * (sweepPoints-1) ) + starFreq,
+                                    STOP_FREQ: stopFreq,
                                     MIN_FREQ: parseInt ( res_arr[7] ) * 1000, // Minimum frequency returned in kHz thus multiply by 1000
                                     MAX_FREQ: parseInt ( res_arr[8] ) * 1000, // Maximum frequency returned in kHz thus multiply by 1000
                                     MAX_SPAN: parseInt ( res_arr[9] ) * 1000, // Maximum span returned in kHz thus multiply by 1000
@@ -225,6 +233,14 @@ class RFExplorer {
                             }])
                             global.MIN_FREQ = parseInt ( res_arr[7] ) * 1000
                             global.MAX_FREQ = parseInt ( res_arr[8] ) * 1000
+
+                            log.info(`    Min Freq    : ${global.MIN_FREQ} Hz`)
+                            log.info(`    Max Freq    : ${global.MAX_FREQ} Hz`)
+                            log.info(`    Start Freq  : ${startFreq} Hz`)
+                            log.info(`    Stop Freq   : ${stopFreq} Hz`)
+                            log.info(`    Freq Step   : ${freqStep} Hz`)
+                            log.info(`    Sweep points: ${sweepPoints} Hz`)
+                            log.info(`    Max Span    : ${parseInt ( res_arr[9] ) * 1000} Hz`)
                             break
 
                         case this.constructor.deviceEvents.CALIBRATION_DATA:
@@ -304,8 +320,9 @@ class RFExplorer {
     }
 
     static isValidFreqConfig ( startFreq, stopFreq ) {
-        if ( startFreq < global.MIN_FREQ || stopFreq > global.MAX_FREQ || startFreq >= stopFreq) {
+        if ( startFreq < global.MIN_FREQ || stopFreq > global.MAX_FREQ || startFreq >= stopFreq ) {
             log.error ( "Invalid frequency configuration: " + startFreq + " / " + stopFreq )
+            log.error ( `Must be within: ${global.MIN_FREQ} Hz - ${global.MAX_FREQ} Hz!`)
             return false
         } else {
             return true
