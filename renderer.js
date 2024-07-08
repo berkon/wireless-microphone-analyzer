@@ -807,6 +807,7 @@ const portOpenCb = () => {
                             break
 
                         case 'SCAN_DATA': {
+                            hideWaitIndicator()
                             let val_changed = false
 
                             for ( let i = 0 ; i < data[0].values.length ; i++ ) {
@@ -1232,6 +1233,8 @@ function setBand ( startFreq, stopFreq, details) {
     configStore.set ( 'band_details'   , details );
 
     BAND_DETAILS = details;
+
+    showWaitIndicator()
     scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS ).then ( result => {
         if ( !result ) {
             showPopup(
@@ -1331,6 +1334,7 @@ ipcRenderer.on ( 'SET_COUNTRY', async (event, message) => {
         FREQ_GRIDS = undefined;
 
     updateChart();
+    showWaitIndicator()
     scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS ); // Need this to refresh country name on x-axis
 });
 
@@ -1536,13 +1540,15 @@ ipcRenderer.on ( 'DEVICE_SETTINGS', async (event, message) => {
                     configStore.set ( 'sweep_points', global.SWEEP_POINTS )
                     scanDevice.setSweepPoints ( parseInt(global.SWEEP_POINTS) ).then (() => {
                         // Need to set frequency configuration here again, otherwise frequency range moves for unknown reason
+                        showWaitIndicator()
                         scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS );
                     });
                 } else if ( scanDevice instanceof TinySA ) {
                     global.SWEEP_POINTS = result.value
                     log.info ( "Setting number of sweep points to: " + global.SWEEP_POINTS )
                     configStore.set ( 'sweep_points', global.SWEEP_POINTS )
-                    scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS );   
+                    showWaitIndicator()
+                    scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS );
                 } else {
                     log.error ( `Unable to set sweep points! Unknown device: ${scanDevice.constructor.NAME} ${scanDevice.constructor.HW_TYPE} ${scanDevice.constructor.MODEL}` )
                 }
@@ -1844,6 +1850,7 @@ document.addEventListener ( "wheel", async e => {
         }
 
         BAND_DETAILS = "";
+        showWaitIndicator()
         await scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS );
     } finally {
         isExecuting = false;
@@ -2006,6 +2013,7 @@ document.addEventListener ( "keydown", async e => {
                 }
         }
 
+        showWaitIndicator()
         await scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS );
     } finally {
         isExecuting = false
@@ -2074,6 +2082,14 @@ function getBaudrate () {
 function restartApp () {
     app.relaunch ()
     app.exit (0)
+}
+
+function showWaitIndicator() {
+    document.getElementById('wait-indicator').style.display = 'flex'
+}
+
+function hideWaitIndicator() {
+    document.getElementById('wait-indicator').style.display = 'none'
 }
 
 module.exports = {

@@ -8,6 +8,18 @@
     <body style="height: 100%; margin: 0">
         <span id="donate-button">Thank you! 😊</span>
         <span id="warning-message"></span>
+
+        <div id="wait-indicator" class="center-spinner">
+            <div aria-hidden="true" class="spinner-wrapper">
+                <div class="spinner">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+
         <canvas id="graph2d" style="width: 100vw; height: 100vh"></canvas>
         <script type="text/javascript">
             require('./renderer.js')
