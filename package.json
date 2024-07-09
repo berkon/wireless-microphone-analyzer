@@ -22,7 +22,7 @@
   "dependencies": {
     "@electron/remote": "^2.1.1",
     "archiver": "^7.0.1",
-    "chart.js": "^2.7.2",
+    "chart.js": "^2.7.3",
     "configstore": "^4.0.0",
     "electron-localshortcut": "^3.1.0",
     "moment-timezone": "^0.5.45",

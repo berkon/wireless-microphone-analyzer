@@ -309,7 +309,7 @@ async function initChart () {
                     label: 'Congest_Thresh',
                     backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.5).rgbString(),
                     borderColor: FORBIDDEN_COLOR,
-                    borderWidth: 2, // 0 is not working!
+                    borderWidth: 2,
                     pointRadius: 0,
                     fill: 'none',
                     lineTension: 0,
@@ -326,13 +326,15 @@ async function initChart () {
                     spanGaps: false,
                     hidden: !VIS_TV_CHAN
                 },{
+                    type: "bar",
                     label: 'Forbidden Start Marker',
-                    backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(0.2).rgbString(),
+                    backgroundColor: Chart.helpers.color(FORBIDDEN_COLOR).alpha(1).rgbString(),
                     borderColor: FORBIDDEN_COLOR,
-                    borderWidth: 0.2,
+                    borderWidth: 0.01,
                     pointRadius: 0,
                     lineTension: 0,
                     spanGaps: false,
+                    barThickness: 2,
                     hidden: !VIS_FORBIDDEN
                 }
             ]
@@ -482,16 +484,18 @@ function setForbidden () {
         let data_point = left_data_point;
         myChart.config.options.scales.xAxes[1].labels[left_data_point] = f.info;
 
-        if ( f.start * 1000 >= global.START_FREQ )
+        if ( f.start * 1000 >= global.START_FREQ ) {
             myChart.data.datasets[LINE_FORBIDDEN_MARKERS].data[left_data_point] = global.MIN_DBM;
+        }
 
         while ( data_point <= right_data_point ) {
             myChart.data.datasets[LINE_FORBIDDEN].data[data_point] = global.MAX_DBM;
             data_point++;
         }
 
-        if ( f.stop * 1000 <= global.STOP_FREQ )
+        if ( f.stop * 1000 <= global.STOP_FREQ ) {
             myChart.data.datasets[LINE_FORBIDDEN_MARKERS].data[right_data_point] = global.MIN_DBM;
+        }
     }
 }
 
