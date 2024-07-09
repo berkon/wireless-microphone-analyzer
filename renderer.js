@@ -983,6 +983,7 @@ const portOpenCb = () => {
                             break
 
                         case 'SCAN_DATA': {
+                            hideWaitIndicator()
                             let val_changed = false
 
                             for ( let i = 0 ; i < data[0].values.length ; i++ ) {
