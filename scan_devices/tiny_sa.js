@@ -244,6 +244,7 @@ class TinySA {
                 await this.sendPromise ( `Setting frequency mode to LOW ...`, TinySA.deviceCommands.MODE, ['low', 'input'] )
                 global.MIN_FREQ = TinySA.MIN_FREQ_BASIC_LOW
                 global.MAX_FREQ = TinySA.MAX_FREQ_BASIC_LOW
+                return true
             } else if ( TinySA.isValidFreqConfig(startFreq, stopFreq) === 'HIGH' ) { // New frequency range to be set is in HIGH range
                 if ( TinySA.FREQ_BAND_MODE === 'LOW' ) {
                     Utils.showMiniWarning('Switching to HIGH mode', 2000);
@@ -259,11 +260,12 @@ class TinySA {
                 await this.sendPromise ( `Setting frequency mode to HIGH ...`, TinySA.deviceCommands.MODE, ['high', 'input'] )
                 global.MIN_FREQ = TinySA.MIN_FREQ_BASIC_HIGH
                 global.MAX_FREQ = TinySA.MAX_FREQ_BASIC_HIGH
+                return true
             } else {
                 log.error(`Unable to set frequency mode! Start/stop frequency ${startFreq}/${stopFreq} is not within any of the following frequency ranges:`)
                 log.error(`Low  100 kHz - 350 MHz`)
                 log.error(`High 240 MHz - 960 MHz`)
-                return
+                return false
             }
         }
 
