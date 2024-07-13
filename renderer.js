@@ -1230,6 +1230,33 @@ ipcRenderer.on ( 'CHANGE_BAND', (event, message) => {
 });
 
 function setBand ( startFreq, stopFreq, details) {
+    let isValidFreqConfig = false;
+
+    switch ( global.SCAN_DEVICE ) {
+        case 'RF_EXPLORER':
+            isValidFreqConfig = RFExplorer.isValidFreqConfig ( startFreq, stopFreq )
+            break;
+
+        case 'TINY_SA':
+            isValidFreqConfig = TinySA.isValidFreqConfig( startFreq, stopFreq )
+            break;
+    }
+
+    if ( !isValidFreqConfig ) {
+         // Need timeout here to make sure that a previous popup (e.g. for manual frequency input)
+         // was closed already before opening this one!
+        setTimeout ( () => {
+            showPopup(
+                'error',
+                'POPUP_CAT_INVALID_FREQUENCY',
+                "Invalid frequency range!",
+                `In the current configuration this devices is not capable of handling the requested frequency range of ${startFreq} Hz - ${stopFreq} Hz! Values must be within ${global.MIN_FREQ} Hz - ${global.MAX_FREQ} Hz!`,
+                ['OK']
+            )
+        }, 100 )
+        return false
+    }
+
     global.START_FREQ = LAST_START_FREQ = startFreq;
     global.STOP_FREQ  = LAST_STOP_FREQ  = stopFreq;
 
@@ -1240,17 +1267,7 @@ function setBand ( startFreq, stopFreq, details) {
     BAND_DETAILS = details;
 
     showWaitIndicator()
-    scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS ).then ( result => {
-        if ( !result ) {
-            showPopup(
-                'error',
-                'POPUP_CAT_INVALID_FREQUENCY',
-                "Invalid frequency range!",
-                `In the current configuration this devices is not capable of handling the requested frequency range of ${startFreq} Hz - ${stopFreq} Hz! Values must be within ${global.MIN_FREQ} Hz - ${global.MAX_FREQ} Hz!`,
-                ['OK']
-            )
-        }
-    })
+    scanDevice.setConfiguration ( global.START_FREQ, global.STOP_FREQ, global.SWEEP_POINTS )
 }
 
 ipcRenderer.on ( 'SET_VENDOR_4_ANALYSIS', (event, message) => {
@@ -1616,22 +1633,9 @@ function showManualBandSettings () {
         if ( result.isConfirmed ) {
             const startFreq = normalizeFreqString(result.value[0])
             const stopFreq = normalizeFreqString(result.value[1])
-            let isValidFreqConfig = false;
 
             if ( startFreq === null || stopFreq === null ) {
-                return
-            }
-
-            switch ( global.SCAN_DEVICE ) {
-                case 'RF_EXPLORER':
-                    isValidFreqConfig = RFExplorer.isValidFreqConfig ( startFreq, stopFreq )
-                    break;
-                case 'TINY_SA':
-                    isValidFreqConfig = TinySA.isValidFreqConfig( startFreq, stopFreq )
-                    break;
-            }
-
-            if ( !isValidFreqConfig ) {
+                log.error( `Start frequency or stop frequency is null! ${startFreq} ${stopFreq}` )
                 return
             }
 

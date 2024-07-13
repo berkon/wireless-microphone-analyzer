@@ -162,6 +162,7 @@ class TinySA {
             case 'ULTRA':
                 if ( startFreq < TinySA.MIN_FREQ_ULTRA || stopFreq > TinySA.MAX_FREQ_ULTRA || startFreq >= stopFreq ) {
                     log.error ( "Invalid frequency configuration: " + startFreq + " / " + stopFreq )
+                    log.error ( `Must be within: ${TinySA.MIN_FREQ_ULTRA} Hz - ${TinySA.MAX_FREQ_ULTRA} Hz`)
                     return false
                 } else {
                     return true
