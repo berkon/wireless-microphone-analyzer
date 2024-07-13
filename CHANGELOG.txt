@@ -1,11 +1,13 @@
-V2.2.1
+V2.3.0
 ## New Features
 * Added frequency data for Austria
 
 ## Improvements
-* Reduced installer size by approx. 5 MB
-* Show error popup if invalid frequency range is requested
 * Show wait indicator while waiting for first scan from device
+* Show error popup if invalid frequency range is requested
+* Reduced installer size by approx. 5 MB
+
+## Fixes
 * Boundary markers for forbidden ranges disappear when setting high sweep point number
 
 V2.2.0

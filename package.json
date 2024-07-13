@@ -1,7 +1,7 @@
 {
   "name": "wireless-microphone-analyzer",
   "productName": "Wireless Microphone Analyzer",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "license": "CC0-1.0",
   "description": "Uses RF-Explorer or TinySA spectrum analyzer hardware to check for free/congested wireless microphone frequencies",
   "author": "Bernd Konnerth <bernd@konnerth.de>",
