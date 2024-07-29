@@ -10,7 +10,7 @@ The Wireless Microphone Analyzer shows the frequency spectrum captured with the 
 </p>
 
 ### Connection
-When starting the app, it automatically tries to detect the serial port to which scanner hardware is attached to. If this doesn't work, you can open the "**Port**" menu and select the corresponding port manually. In case there is still no display, please restart the app or press **\<CTRL>\<R>**. It looks like sometimes the serial ports are not detected properly by the underying Electron framework.
+When starting the app, it automatically tries to detect the serial port to which the scanner hardware is attached to. Nevertheless you have to make sure that the correct hardware type is selected! If this doesn't work, you can open the "**Port**" menu and select the corresponding port manually. In case there is still no display, please restart the app or press **\<CTRL>\<R>**. It looks like sometimes the serial ports are not detected properly by the underying Electron framework.
 
 ### UI Description
 It is possible to show/hide each of the displayed graphs:
