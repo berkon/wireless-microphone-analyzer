@@ -328,6 +328,58 @@ class RFExplorer {
             return true
         }
     }
+
+    // This function enables BASIC Models, which only have 112 sweep points, to scan large frequency ranges
+    // with high resolution, by splitting the requested frequency range into smaller pieces and scanning
+    // them consecutively.
+    static splitScanRange() {
+        let freqRange = global.STOP_FREQ - global.START_FREQ
+        let minStepSize = RFExplorer.MIN_SPAN_BASIC / RFExplorer.MIN_SWEEP_POINTS_BASIC
+        let subRanges = []
+        let leftOver = 0
+
+        if ( global.SWEEP_POINTS > freqRange / minStepSize ) {
+            console.log (`Number of sweep points is higher than range to be scanned!`)
+            console.log (`    Range to scan: ${freqRange} in Hz!`)
+            console.log (`    Minimum step size: ${minStepSize} in Hz!`)
+            console.log (`    Number of sweep points: ${global.SWEEP_POINTS}!`)
+            
+            let calculatedSweepPoints = freqRange / minStepSize
+            
+            if ( calculatedSweepPoints < RFExplorer.MIN_SWEEP_POINTS_BASIC) {
+                console.error (`Unable to set ${calculatedSweepPoints} sweep points. Number of sweep points is lower than the minimum sweep point number for this device of ${RFExplorer.MIN_SWEEP_POINTS_BASIC}!`)
+                return false
+            } else {
+                console.log (`Setting number of sweep points to max. possible value: ${calculatedSweepPoints}`)
+                global.SWEEP_POINTS = calculatedSweepPoints
+            }
+        }
+
+        let numOfSubRanges = global.SWEEP_POINTS / RFExplorer.MAX_SWEEP_POINTS_BASIC
+        let subRangeSize = freqRange / numOfSubRanges
+
+        if ( global.SWEEP_POINTS % RFExplorer.MAX_SWEEP_POINTS_BASIC ) {
+            leftOver = global.SWEEP_POINTS % RFExplorer.MAX_SWEEP_POINTS_BASIC ;
+        }
+
+        for ( let i = 0; i < numOfSubRanges; i++ ) {
+            subRanges.push({
+                START_FREQ: global.START_FREQ + subRangeSize * i,
+                STOP_FREQ: global.START_FREQ + (subRangeSize * (i + 1)) - 1
+            })
+        }
+
+        if (leftOver) {
+            subRanges.push({
+                START_FREQ: subRanges.at(-1).STOP_FREQ + 1,
+                STOP_FREQ: global.STOP_FREQ
+            })
+        } else {
+            subRanges.at(-1).STOP_FREQ++
+        }
+
+        return subRanges
+    }
 }
 
 module.exports = RFExplorer;
