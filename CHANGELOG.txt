@@ -1,3 +1,8 @@
+V2.4.0
+## New Features
+* Added Sennheiser vendor presets for 1G8 ew G4
+* Added unlicensed and forbidden bands for New Zealand
+
 V2.3.0
 ## New Features
 * Added frequency data for Austria
