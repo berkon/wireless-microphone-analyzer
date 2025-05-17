@@ -1,0 +1,5 @@
+{ "label":"NZ - Unlicensed bands", "submenu": [
+    { "label": "Radio Microphone Devices GUSL Band 1 (502 - 606MHz)"    , "start_freq": 502000 , "stop_freq": 606000 , "details": "Radio Microphone Devices GUSL Band 1 (502 - 606MHz)"       },
+    { "label": "Radio Microphone Devices GUSL Band 2 (622 - 698MHz)"    , "start_freq": 622000 , "stop_freq": 698000 , "details": "Radio Microphone Devices GUSL Band 1 (622 - 698MHz)"       },
+    { "label": "Radio Microphone Devices GUSL (502 - 698MHz)"    , "start_freq": 502000 , "stop_freq": 698000 , "details": "Radio Microphone Devices GUSL(502 - 698MHz)"       }
+]}

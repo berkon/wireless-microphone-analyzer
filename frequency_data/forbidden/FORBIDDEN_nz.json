@@ -1,0 +1,5 @@
+[
+    { "start": 0  , "stop": 502000  , "info": "Forbidden" },
+    { "start": 606000 , "stop": 622000  , "info": "Māori reserved" },
+    { "start": 698000 , "stop": 2400000 , "info": "Forbidden" }
+]
