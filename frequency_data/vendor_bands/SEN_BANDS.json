@@ -123,15 +123,20 @@
             { "label": "E-Band   (823 - 865MHz)", "start_freq": 823000, "stop_freq": 865000, "details": "Sennheiser EW 300/500 G3 E-Band (823 - 865MHz)" , "band": "SEN_E_G3"  }
         ]},
         { "label":"G4 EW100", "submenu": [
-            { "label": "A1-Band (470 - 516MHz)" , "start_freq": 470000, "stop_freq": 516000, "details": "Sennheiser EW 100 G4 A1-Band (470 - 516MHz)", "band": "SEN_A1_G4" },
-            { "label": "A-Band   (516 - 558MHz)", "start_freq": 516000, "stop_freq": 558000, "details": "Sennheiser EW 100 G4 A-Band (516 - 558MHz)" , "band": "SEN_A_G3"  },
-            { "label": "G-Band   (566 - 608MHz)", "start_freq": 566000, "stop_freq": 608000, "details": "Sennheiser EW 100 G4 G-Band (566 - 608MHz)" , "band": "SEN_G_G3"  },
-            { "label": "GB-Band  (606 - 648MHz)", "start_freq": 606000, "stop_freq": 648000, "details": "Sennheiser EW 100 G4 GB-Band (606 - 648MHz)", "band": "SEN_GB_G3" },
-            { "label": "B-Band   (626 - 668MHz)", "start_freq": 626000, "stop_freq": 668000, "details": "Sennheiser EW 100 G4 B-Band (626 - 668MHz)" , "band": "SEN_B_G3"  },
-            { "label": "C-Band   (734 - 776MHz)", "start_freq": 734000, "stop_freq": 776000, "details": "Sennheiser EW 100 G4 C-Band (734 - 776MHz)" , "band": "SEN_C_G3"  },
-            { "label": "D-Band   (780 - 822MHz)", "start_freq": 780000, "stop_freq": 822000, "details": "Sennheiser EW 100 G4 D-Band (780 - 822MHz)" , "band": "SEN_D_G3"  },
-            { "label": "E-Band   (823 - 865MHz)", "start_freq": 823000, "stop_freq": 865000, "details": "Sennheiser EW 100 G4 E-Band (823 - 865MHz)" , "band": "SEN_E_G3"  },
-            { "label": "1G8-Band (1785 - 1805MHz)", "start_freq": 1785000, "stop_freq": 1805000, "details": "Sennheiser EW G4 100 1G8-Band (1785 - 1805MHz)" , "band": "SEN_1G8_G3" }
+            { "label": "A1-Band  (470 - 516MHz)", "start_freq": 470000, "stop_freq": 516000, "details": "Sennheiser EW 100 G4 A1-Band (470 - 516MHz)", "band": "SEN_A1_G4" },
+            { "label": "A-Band   (516 - 558MHz)", "start_freq": 516000, "stop_freq": 558000, "details": "Sennheiser EW 100 G4 A-Band (516 - 558MHz)" , "band": "SEN_A_G4"  },
+            { "label": "AS-Band  (520 - 558MHz)", "start_freq": 520000, "stop_freq": 558000, "details": "Sennheiser EW 100 G4 AS-Band (520 - 558MHz)", "band": "SEN_AS_G4" },
+            { "label": "G-Band   (566 - 608MHz)", "start_freq": 566000, "stop_freq": 608000, "details": "Sennheiser EW 100 G4 G-Band (566 - 608MHz)" , "band": "SEN_G_G4"  },
+            { "label": "GB-Band  (606 - 648MHz)", "start_freq": 606000, "stop_freq": 648000, "details": "Sennheiser EW 100 G4 GB-Band (606 - 648MHz)", "band": "SEN_GB_G4" },
+            { "label": "B-Band   (626 - 668MHz)", "start_freq": 626000, "stop_freq": 668000, "details": "Sennheiser EW 100 G4 B-Band (626 - 668MHz)" , "band": "SEN_B_G4"  },
+            { "label": "C-Band   (734 - 776MHz)", "start_freq": 734000, "stop_freq": 776000, "details": "Sennheiser EW 100 G4 C-Band (734 - 776MHz)" , "band": "SEN_C_G4"  },
+            { "label": "CTH-Band (748.2 - 757.8MHz)", "start_freq": 748200, "stop_freq": 757800, "details": "Sennheiser EW 100 G4 CTH-Band (748.2 - 757.8MHz)" , "band": "SEN_CTH_G4"  },
+            { "label": "D-Band   (780 - 822MHz)", "start_freq": 780000, "stop_freq": 822000, "details": "Sennheiser EW 100 G4 D-Band (780 - 822MHz)" , "band": "SEN_D_G4"  },
+            { "label": "TH-Band  (794 - 806MHz)", "start_freq": 794000, "stop_freq": 806000, "details": "Sennheiser EW 100 G4 TH-Band (794 - 806MHz)" , "band": "SEN_TH_G4"  },
+            { "label": "JB-Band  (806 - 810MHz)", "start_freq": 806000, "stop_freq": 810000, "details": "Sennheiser EW 100 G4 JB-Band (806 - 810MHz)" , "band": "SEN_JB_G4"  },
+            { "label": "E-Band   (823 - 865MHz)", "start_freq": 823000, "stop_freq": 865000, "details": "Sennheiser EW 100 G4 E-Band (823 - 865MHz)" , "band": "SEN_E_G4"  },
+            { "label": "K+-Band  (925 - 937.5MHz)", "start_freq": 925000, "stop_freq": 937500, "details": "Sennheiser EW 100 G4 K+-Band (925 - 937.5MHz)" , "band": "SEN_K+_G4"  },
+            { "label": "1G8-Band (1785 - 1800MHz)", "start_freq": 1785000, "stop_freq": 1800000, "details": "Sennheiser EW G4 100 1G8-Band (1785 - 1800MHz)" , "band": "SEN_1G8_G4" }
         ]},
         { "label":"G4 EW300/500", "submenu": [
             { "label": "AW+-Band (470 - 558MHz)", "start_freq": 470000, "stop_freq": 558000, "details": "Sennheiser EW 300/500 G4 AW+-Band (470 - 558MHz)", "band": "SEN_AW+_G4"},
@@ -147,13 +152,16 @@
         ]},
         { "label":"G4 IEM", "submenu": [
             { "label": "A1-Band (470 - 516MHz)", "start_freq": 470000, "stop_freq": 516000, "details": "Sennheiser EW IEM G4 A1-Band (470 - 516MHz)", "band": "SEN_A1_G4" },
-            { "label": "A-Band  (516 - 558MHz)", "start_freq": 516000, "stop_freq": 558000, "details": "Sennheiser EW IEM G4 A-Band (516 - 558MHz)" , "band": "SEN_A_G3"  },
-            { "label": "G-Band  (566 - 608MHz)", "start_freq": 566000, "stop_freq": 608000, "details": "Sennheiser EW IEM G4 G-Band (566 - 608MHz)" , "band": "SEN_G_G3"  },
-            { "label": "GB-Band (606 - 648MHz)", "start_freq": 606000, "stop_freq": 648000, "details": "Sennheiser EW IEM G4 GB-Band (606 - 648MHz)", "band": "SEN_GB_G3" },
-            { "label": "B-Band  (626 - 668MHz)", "start_freq": 626000, "stop_freq": 668000, "details": "Sennheiser EW IEM G4 B-Band (626 - 668MHz)" , "band": "SEN_B_G3"  },
-            { "label": "C-Band  (734 - 776MHz)", "start_freq": 734000, "stop_freq": 776000, "details": "Sennheiser EW IEM G4 C-Band (734 - 776MHz)" , "band": "SEN_C_G3"  },
-            { "label": "D-Band  (780 - 822MHz)", "start_freq": 780000, "stop_freq": 822000, "details": "Sennheiser EW IEM G4 D-Band (780 - 822MHz)" , "band": "SEN_D_G3"  },
-            { "label": "E-Band  (823 - 865MHz)", "start_freq": 823000, "stop_freq": 865000, "details": "Sennheiser EW IEM G4 E-Band (823 - 865MHz)" , "band": "SEN_E_G3"  }
+            { "label": "A-Band  (516 - 558MHz)", "start_freq": 516000, "stop_freq": 558000, "details": "Sennheiser EW IEM G4 A-Band (516 - 558MHz)" , "band": "SEN_A_G4"  },
+            { "label": "AS-Band (520 - 558MHz)", "start_freq": 520000, "stop_freq": 558000, "details": "Sennheiser EW IEM G4 AS-Band (520 - 558MHz)", "band": "SEN_AS_G4" },
+            { "label": "G-Band  (566 - 608MHz)", "start_freq": 566000, "stop_freq": 608000, "details": "Sennheiser EW IEM G4 G-Band (566 - 608MHz)" , "band": "SEN_G_G4"  },
+            { "label": "GB-Band (606 - 648MHz)", "start_freq": 606000, "stop_freq": 648000, "details": "Sennheiser EW IEM G4 GB-Band (606 - 648MHz)", "band": "SEN_GB_G4" },
+            { "label": "B-Band  (626 - 668MHz)", "start_freq": 626000, "stop_freq": 668000, "details": "Sennheiser EW IEM G4 B-Band (626 - 668MHz)" , "band": "SEN_B_G4"  },
+            { "label": "C-Band  (734 - 776MHz)", "start_freq": 734000, "stop_freq": 776000, "details": "Sennheiser EW IEM G4 C-Band (734 - 776MHz)" , "band": "SEN_C_G4"  },
+            { "label": "CTH-Band (748.2 - 757.8MHz)", "start_freq": 748200, "stop_freq": 757800, "details": "Sennheiser EW IEM G4 CTH-Band (748.2 - 757.8MHz)" , "band": "SEN_CTH_G4" },
+            { "label": "D-Band  (780 - 822MHz)", "start_freq": 780000, "stop_freq": 822000, "details": "Sennheiser EW IEM G4 D-Band (780 - 822MHz)" , "band": "SEN_D_G4"  },
+            { "label": "TH-Band (794 - 806MHz)", "start_freq": 794000, "stop_freq": 806000, "details": "Sennheiser EW IEM G4 TH-Band (794 - 806MHz)" , "band": "SEN_TH_G4" },
+            { "label": "E-Band  (823 - 865MHz)", "start_freq": 823000, "stop_freq": 865000, "details": "Sennheiser EW IEM G4 E-Band (823 - 865MHz)" , "band": "SEN_E_G4"  }
         ]},
         { "label":"EW D", "submenu": [
             { "label": "Q1-Q6-Band (470.2 - 526MHz)", "start_freq": 470200, "stop_freq": 526000, "details": "Sennheiser EW D Q1-Q6-Band (470.2 - 526MHz)" , "band": "SEN_D_Q1-Q6" },
