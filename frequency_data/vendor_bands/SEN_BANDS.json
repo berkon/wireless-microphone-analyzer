@@ -156,7 +156,15 @@
             { "label": "E-Band  (823 - 865MHz)", "start_freq": 823000, "stop_freq": 865000, "details": "Sennheiser EW IEM G4 E-Band (823 - 865MHz)" , "band": "SEN_E_G3"  }
         ]},
         { "label":"EW D", "submenu": [
-            { "label": "Q1-Q6-Band (470.2 - 526MHz)", "start_freq": 470200, "stop_freq": 526000, "details": "Sennheiser EW D Q1-Q6-Band (470.2 - 526MHz)" , "band": "SEN_D_Q1-Q6"  }
+            { "label": "Q1-Q6-Band (470.2 - 526MHz)", "start_freq": 470200, "stop_freq": 526000, "details": "Sennheiser EW D Q1-Q6-Band (470.2 - 526MHz)" , "band": "SEN_D_Q1-Q6" },
+            { "label": "R1-R6-Band (520 - 576MHz)", "start_freq": 520000, "stop_freq": 576000, "details": "Sennheiser EW D R1-R6-Band (520 - 576MHz)" , "band": "SEN_D_R1-R6" },
+            { "label": "R4-R9-Band (552 - 607.8MHz)", "start_freq": 552000, "stop_freq": 607800, "details": "Sennheiser EW D R4-R9-Band (552 - 607.8MHz)" , "band": "SEN_D_R4-R9" },
+            { "label": "S1-S7-Band (606.2 - 662MHz)", "start_freq": 606200, "stop_freq": 662000, "details": "Sennheiser EW D S1-S7-Band (606.2 - 662MHz)" , "band": "SEN_D_S1-S7" },
+            { "label": "S4-S7-Band (630 - 662MHz)", "start_freq": 630000, "stop_freq": 662000, "details": "Sennheiser EW D S4-S7-Band (630 - 662MHz)" , "band": "SEN_D_S4-S7" },
+            { "label": "S7-S10-Band (662 - 693.8MHz)", "start_freq": 662000, "stop_freq": 693800, "details": "Sennheiser EW D S7-S10-Band (662 - 693.8MHz)" , "band": "SEN_D_S7-S10" },
+            { "label": "U1-U5-Band (823.2 - 831.8MHz)", "start_freq": 823200, "stop_freq": 831800, "details": "Sennheiser EW D U1-U5-Band (823.2 - 831.8MHz)" , "band": "SEN_D_U1-U5" },
+            { "label": "V3-V4-Band (925.2 - 937.3MHz)", "start_freq": 925200, "stop_freq": 937300, "details": "Sennheiser EW D V3-V4-Band (925.2 - 937.3MHz)" , "band": "SEN_D_V3-V4" },
+            { "label": "Y1-Y3-Band (1785.2 - 1799.8MHz)", "start_freq": 1785200, "stop_freq": 1799800, "details": "Sennheiser EW D Y1-Y3-Band (1785.2 - 1799.8MHz)" , "band": "SEN_D_Y1-Y3" }
         ]}
     ]},
     { "label":"D1", "submenu": [
