@@ -575,10 +575,8 @@ function setVendorChannels ( presets, bank ) {
         
         chDispValShadowArr.push ([left_data_point, right_data_point, false]); // Last param shows if congested or not
 
-        let data_point       = left_data_point;
-        let f = presets[i].toString().split('');
-        f.splice ( 3, 0, "." );
-        f = f.join ( '' );
+        let data_point = left_data_point;
+        let f = formatFrequencyString(presets[i].toString());
         let label_pos = left_data_point + Math.floor((right_data_point - left_data_point )/2);
         myChart.config.options.scales.xAxes[2].labels[label_pos] = 'B'+(bank.length===1?'0':'')+bank+'.C'+(i.toString().length===1?'0':'')+(i+1)+'  ('+f+')';
 
