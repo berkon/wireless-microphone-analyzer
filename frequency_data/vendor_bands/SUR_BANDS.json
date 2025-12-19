@@ -211,8 +211,8 @@
         { "label": "UB-Band    (692 - 716MHz)" , "start_freq": 692000, "stop_freq": 716000, "details": "Shure UC UB-Band (692 - 716MHz)", "band": "SUR_UC_UB"}
     ]},
     { "label":"UHF", "submenu": [
-        { "label": "J4-Band      (554 - 584MHz)", "start_freq": 554000, "stop_freq": 584000, "details": "Shure UHF J4-Band (554 - 584MHz)", "band": "SUR_UHF_J3"},
-        { "label": "M4-Band    (662 - 692MHz)"  , "start_freq": 662000, "stop_freq": 692000, "details": "Shure UHF J3-Band (662 - 692MHz)", "band": "SUR_UHF_J3"},
+        { "label": "J4-Band      (554 - 584MHz)", "start_freq": 554000, "stop_freq": 584000, "details": "Shure UHF J4-Band (554 - 584MHz)", "band": "SUR_UHF_J4"},
+        { "label": "M4-Band    (662 - 692MHz)"  , "start_freq": 662000, "stop_freq": 692000, "details": "Shure UHF M4-Band (662 - 692MHz)", "band": "SUR_UHF_M4"},
         { "label": "UA-Band    (782 - 806MHz)"  , "start_freq": 782000, "stop_freq": 806000, "details": "Shure UHF UA-Band (782 - 806MHz)", "band": "SUR_UHF_UA"},
         { "label": "UB-Band    (692 - 716MHz)"  , "start_freq": 692000, "stop_freq": 716000, "details": "Shure UHF UB-Band (692 - 716MHz)", "band": "SUR_UHF_UB"}
     ]},
