@@ -155,9 +155,12 @@
             { "label": "D-Band  (780 - 822MHz)", "start_freq": 780000, "stop_freq": 822000, "details": "Sennheiser EW IEM G4 D-Band (780 - 822MHz)" , "band": "SEN_D_G3"  },
             { "label": "E-Band  (823 - 865MHz)", "start_freq": 823000, "stop_freq": 865000, "details": "Sennheiser EW IEM G4 E-Band (823 - 865MHz)" , "band": "SEN_E_G3"  }
         ]},
-        { "label":"D1", "submenu": [
-            { "label": "2G4-Band  (2400 - 2483,5MHz)", "start_freq": 2400000, "stop_freq": 2483500, "details": "Sennheiser EW D1 2G4-Band (2400 - 2483,5MHz)" , "band": "SEN_2G4"  }
+        { "label":"EW D", "submenu": [
+            { "label": "Q1-Q6-Band (470.2 - 526MHz)", "start_freq": 470200, "stop_freq": 526000, "details": "Sennheiser EW D Q1-Q6-Band (470.2 - 526MHz)" , "band": "SEN_D_Q1-Q6"  }
         ]}
+    ]},
+    { "label":"D1", "submenu": [
+        { "label": "2G4-Band  (2400 - 2483,5MHz)", "start_freq": 2400000, "stop_freq": 2483500, "details": "Sennheiser EW D1 2G4-Band (2400 - 2483,5MHz)" , "band": "SEN_2G4"  }
     ]},
     { "label":"XS Wireless", "submenu": [
         { "label": "A-Band   (548 - 572MHz)", "start_freq": 548000, "stop_freq": 572000, "details": "Sennheiser XS Wireless A-Band (548 - 572MHz)" , "band": "SEN_A_XS" },
