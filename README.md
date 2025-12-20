@@ -54,7 +54,21 @@ If the command above fails, you might need to update the dependencies with:
 In order to run the tool as non-root, you have to add your username to the "dialout" group:
 
     sudo gpasswd --add <your_username> dialout
-    
+
 **IMPORTANT:** After adding your username to the group you should reboot your system.
+
+When you are getting this error message when trying to run the AppImage:
+
+    dlopen(): error loading libfuse.so.2
+
+execute this command to install libfuse.so.2:
+
+    sudo apt install libfuse2
+
+When you are getting an error message like this when trying to run the AppImage:
+
+    [4613:1220/145834.062235:FATAL:setuid_sandbox_host.cc(158)] The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now. You need to make sure that /tmp/.mount_Wireleu5FpRs/chrome-sandbox is owned by root and has mode 4755.
+
+try running with the option: **--no-sandbox**
 
 For Linux normally no special driver is required, as the corresponding driver is already included in most Linux distribuitions. In case you are on a different OS and the driver is missing in your installation, you can download it from [here](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers?tab=downloads).
