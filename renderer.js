@@ -9,7 +9,7 @@ const Swal                      = require ( 'sweetalert2' );
 const FREQ_VENDOR_PRESETS       = require ( 'require-all' )(__dirname +'/frequency_data/presets' );
 const Pkg                       = require ('./package.json');
 const fs                        = require ('fs');
-var { Subject, firstValueFrom } = require('rxjs');
+var { Subject, firstValueFrom } = require ('rxjs');
 const { timeout }               = require ('rxjs/operators');
 const configStore               = new ConfigStore ( Pkg.name )
 require ( './logger.js' );
