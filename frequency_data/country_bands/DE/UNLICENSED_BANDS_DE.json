@@ -1,11 +1,15 @@
 { "label":"DE - Unlicensed bands", "submenu": [
+    { "label": "Wireless Mic (32,475 - 34,325MHz)", "start_freq": 32475 , "stop_freq": 34325 , "details": "Wireless Mic (32,475 - 34,325 MHz)"},
+    { "label": "Wireless Mic (34,530 - 34,950MHz)", "start_freq": 34530 , "stop_freq": 34950 , "details": "Wireless Mic (34,530 - 34,950 MHz)"},
+    { "label": "Wireless Mic (36,610 - 38,125MHz)", "start_freq": 36610 , "stop_freq": 38125 , "details": "Wireless Mic (36,610 - 38,125 MHz)"},
     { "label": "Wireless Mic (174 - 230MHz)"  , "start_freq": 174000 , "stop_freq": 230000 , "details": "Wireless Mic (174 - 230MHz)"   },
     { "label": "Wireless Mic (470 - 608MHz)"  , "start_freq": 470000 , "stop_freq": 608000 , "details": "Wireless Mic (470 - 608MHz)"   },
-    { "label": "Wireless Mic (614 - 698MHz)"  , "start_freq": 614000 , "stop_freq": 698000 , "details": "Wireless Mic (614 - 698MHz)"   },
+    { "label": "Wireless Mic (614 - 694MHz)"  , "start_freq": 614000 , "stop_freq": 694000 , "details": "Wireless Mic (614 - 694MHz)"   },
+    { "label": "Wireless Mic (736 - 753MHz)"  , "start_freq": 736000 , "stop_freq": 753000 , "details": "Wireless Mic (736 - 753MHz)"   },
     { "label": "Wireless Mic (823 - 832MHz)"  , "start_freq": 823000 , "stop_freq": 832000 , "details": "Wireless Mic (823 - 832MHz)"   },
-    { "label": "Wireless Mic / ISM (863 - 865MHz)"  , "start_freq": 863000 , "stop_freq": 865000 , "details": "Wireless Mic (863 - 865MHz)"   },
+    { "label": "Wireless Mic / ISM (863 - 865MHz)"  , "start_freq": 863000 , "stop_freq": 865000 , "details": "Wireless Mic / ISM (863 - 865MHz)"   },
     { "label": "Wireless Mic (1350 - 1400MHz)", "start_freq": 1350000, "stop_freq": 1400000, "details": "Wireless Mic (1350 - 1400MHz)" },
     { "label": "Wireless Mic (1785 - 1805MHz)", "start_freq": 1785000, "stop_freq": 1805000, "details": "Wireless Mic (1785 - 1805MHz)" },
-    { "label": "DECT         (1880 - 1900MHz)", "start_freq": 1880000, "stop_freq": 1900000, "details": "DECT (1880 - 1900MHz)"         },
-    { "label": "WiFi         (2400 - 2484MHz)", "start_freq": 2399500, "stop_freq": 2484500, "details": "WLAN (2400 - 2484MHz)"         }
+    { "label": "Wireless Mic / DECT (1880 - 1900MHz)", "start_freq": 1880000, "stop_freq": 1900000, "details": "Wireless Mic / DECT (1880 - 1900MHz)" },
+    { "label": "Wireless Mic / WiFi (2400 - 2484MHz)", "start_freq": 2399500, "stop_freq": 2484500, "details": "Wireless Mic / WiFi (2400 - 2484MHz)" }
 ]}
