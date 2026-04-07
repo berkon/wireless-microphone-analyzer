@@ -15,7 +15,7 @@
   ],
   "devDependencies": {
     "@kayahr/jest-electron-runner": "^29.14.0",
-    "electron": "^18.3.15",
+    "electron": "^39.8.5",
     "electron-builder": "26.0.12",
     "jest": "^29.7.0"
   },
